@@ -25,3 +25,24 @@ gulp build
 ```
 
 * To update Semantic UI: `npm update`
+
+---
+
+rsync _site to ./ on master:
+
+```
+rsync -a --filter='P _site/'      \
+         --filter='P _cache/'     \
+         --filter='P .git/'       \
+         --filter='P .gitignore'  \
+         --filter='P .stack-work' \
+         --filter='P .gitignore'  \
+         --delete-excluded        \
+         _site/ .
+```
+
+For Windows, robocopy is nice:
+
+```
+robocopy _site . /mir /z /w:5 /xa:h /xd .git /xd .stack-work /xd _cache /xd _site /xf .gitignore /xf LICENSE /xf README.md
+```
