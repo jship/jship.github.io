@@ -44,5 +44,5 @@ rsync -a --filter='P _site/'      \
 For Windows, robocopy is nice:
 
 ```
-robocopy _site . /mir /z /w:5 /xa:h /xd .git /xd .stack-work /xd _cache /xd _site /xf .gitignore /xf LICENSE /xf README.md
+robocopy _site . /mir /z /w:5 /xa:h /xd .git /xd .stack-work /xd node_modules /xd semantic /xd _cache /xd _site /xf .gitignore /xf LICENSE /xf README.md
 ```
