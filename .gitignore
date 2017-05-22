@@ -16,6 +16,12 @@ cabal.sandbox.config
 *.hp
 .stack-work/
 
+### hpack ###
+*.cabal
+
+### codex ###
+codex.tags
+
 ### Hakyll ###
 _cache/
 _site/
