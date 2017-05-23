@@ -7,6 +7,9 @@ import System.FilePath
 main :: IO ()
 main =
   hakyll $ do
+    match "semantic/dist/components/*.min.js" $ do
+      route $ customRoute $ ("js" </>) . takeFileName . toFilePath
+      compile copyFileCompiler
     match "semantic/dist/components/*.min.css" $ do
       route $ customRoute $ ("css" </>) . takeFileName . toFilePath
       compile copyFileCompiler
