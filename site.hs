@@ -13,6 +13,9 @@ main =
     match "semantic/dist/components/*.min.css" $ do
       route $ customRoute $ ("css" </>) . takeFileName . toFilePath
       compile copyFileCompiler
+    match "js/*" $ do
+      route idRoute
+      compile copyFileCompiler
     match "css/*" $ do
       route idRoute
       compile compressCssCompiler
