@@ -8,22 +8,21 @@
 
   <!-- Site Properties -->
   <title>jship - $title$</title>
-  <link rel="stylesheet" type="text/css" href="css/reset.min.css">
-  <link rel="stylesheet" type="text/css" href="css/site.min.css">
-
+  <link rel="stylesheet" type="text/css" href="css/button.min.css">
+  <link rel="stylesheet" type="text/css" href="css/card.min.css">
   <link rel="stylesheet" type="text/css" href="css/container.min.css">
-  <link rel="stylesheet" type="text/css" href="css/grid.min.css">
-  <link rel="stylesheet" type="text/css" href="css/header.min.css">
-  <link rel="stylesheet" type="text/css" href="css/image.min.css">
-  <link rel="stylesheet" type="text/css" href="css/menu.min.css">
-
   <link rel="stylesheet" type="text/css" href="css/divider.min.css">
   <link rel="stylesheet" type="text/css" href="css/dropdown.min.css">
-  <link rel="stylesheet" type="text/css" href="css/segment.min.css">
-  <link rel="stylesheet" type="text/css" href="css/button.min.css">
-  <link rel="stylesheet" type="text/css" href="css/list.min.css">
+  <link rel="stylesheet" type="text/css" href="css/grid.min.css">
+  <link rel="stylesheet" type="text/css" href="css/header.min.css">
   <link rel="stylesheet" type="text/css" href="css/icon.min.css">
+  <link rel="stylesheet" type="text/css" href="css/image.min.css">
+  <link rel="stylesheet" type="text/css" href="css/list.min.css">
+  <link rel="stylesheet" type="text/css" href="css/menu.min.css">
+  <link rel="stylesheet" type="text/css" href="css/reset.min.css">
+  <link rel="stylesheet" type="text/css" href="css/segment.min.css">
   <link rel="stylesheet" type="text/css" href="css/sidebar.min.css">
+  <link rel="stylesheet" type="text/css" href="css/site.min.css">
   <link rel="stylesheet" type="text/css" href="css/transition.min.css">
 
   <!-- This page's CSS. -->
@@ -38,10 +37,21 @@
   <script src="js/default.js"></script>
 </head>
 <body>
+  <!-- Following Menu -->
+  <div class="ui large top fixed hidden menu">
+    <div class="ui container">
+      <div class="header item">
+        jship
+      </div>
+      <a class="item">Home</a>
+      <a class="item">Blog</a>
+      <a class="item">Contact</a>
+      <a class="item">Resume</a>
+    </div>
+  </div>
 
-<!-- Following Menu -->
-<div class="ui large top fixed hidden menu">
-  <div class="ui container">
+  <!-- Sidebar Menu -->
+  <div class="ui vertical inverted sidebar menu">
     <div class="header item">
       jship
     </div>
@@ -50,38 +60,27 @@
     <a class="item">Contact</a>
     <a class="item">Resume</a>
   </div>
-</div>
 
-<!-- Sidebar Menu -->
-<div class="ui vertical inverted sidebar menu">
-  <div class="header item">
-    jship
-  </div>
-  <a class="item">Home</a>
-  <a class="item">Blog</a>
-  <a class="item">Contact</a>
-  <a class="item">Resume</a>
-</div>
-
-<!-- Page Contents -->
-<div class="pusher page-background-gradient">
-  <div class="ui vertical center aligned segment">
-    <div class="ui container">
-      <div class="ui large secondary inverted pointing menu top-pointing-menu">
-        <a class="toc item">
-          <i class="sidebar icon"></i>
-        </a>
-        <div class="header item">
-          jship
+  <!-- Page Contents -->
+  <div class="pusher page-background-gradient">
+    <div class="ui vertical center aligned segment top-menu-segment">
+      <div class="ui container">
+        <div class="ui large secondary inverted pointing menu top-pointing-menu">
+          <a class="toc item">
+            <i class="sidebar icon"></i>
+          </a>
+          <div class="header item">
+            jship
+          </div>
+          <a class="item">Home</a>
+          <a class="item">Blog</a>
+          <a class="item">Contact</a>
+          <a class="item">Resume</a>
         </div>
-        <a class="item">Home</a>
-        <a class="item">Blog</a>
-        <a class="item">Contact</a>
-        <a class="item">Resume</a>
       </div>
     </div>
+    $body$
   </div>
-</div>
 
 </body>
 </html>
