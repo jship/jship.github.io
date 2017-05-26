@@ -19,5 +19,11 @@ $(document).ready(function() {
     if (document.title.indexOf($(this).text()) >= 0) {
       $(this).addClass('active');
     }
+    if ($(this).text().indexOf('Email') >= 0) {
+      var mkEmailLink = function() {
+        return ["ja", "s", "onp", "ship", "man@gma", "il.com"].join('');
+      };
+      $(this).attr('href', 'mailto:' + mkEmailLink());
+    }
   });
 });
