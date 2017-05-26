@@ -96,3 +96,11 @@
 .top-pointing-menu {
   border-color: transparent !important;
 }
+
+.ui.card:last-child {
+    margin-bottom: 2em;
+}
+
+.ui.segment:last-child {
+    margin-bottom: 2em;
+}
