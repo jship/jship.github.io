@@ -25,12 +25,6 @@ main =
     match "images/*" $ do
       route idRoute
       compile copyFileCompiler
-    --match (fromList ["about.md", "contact.markdown"]) $ do
-    --  route $ setExtension "html"
-    --  compile $
-    --    pandocCompiler >>=
-    --    loadAndApplyTemplate "templates/default.html" defaultContext >>=
-    --    relativizeUrls
     --match "posts/*" $ do
     --  route $ setExtension "html"
     --  compile $
@@ -48,7 +42,7 @@ main =
     --    makeItem "" >>= loadAndApplyTemplate "templates/archive.html" archiveCtx >>=
     --      loadAndApplyTemplate "templates/default.html" archiveCtx >>=
     --      relativizeUrls
-    match "about.html" $ do
+    match (fromList ["about.html", "contact.html"]) $ do
       route idRoute
       compile $ do
         let aboutCtx = defaultContext
