@@ -25,7 +25,7 @@ main =
     match "images/*" $ do
       route idRoute
       compile copyFileCompiler
-    --match (fromList ["about.rst", "contact.markdown"]) $ do
+    --match (fromList ["about.md", "contact.markdown"]) $ do
     --  route $ setExtension "html"
     --  compile $
     --    pandocCompiler >>=
@@ -48,13 +48,19 @@ main =
     --    makeItem "" >>= loadAndApplyTemplate "templates/archive.html" archiveCtx >>=
     --      loadAndApplyTemplate "templates/default.html" archiveCtx >>=
     --      relativizeUrls
+    match "about.html" $ do
+      route idRoute
+      compile $ do
+        let aboutCtx = defaultContext
+        getResourceBody >>= applyAsTemplate aboutCtx >>=
+          loadAndApplyTemplate "templates/default.html" aboutCtx >>=
+          relativizeUrls
     match "index.html" $ do
       route idRoute
       compile $ do
         posts <- recentFirst =<< loadAll "posts/*"
         let indexCtx =
               listField "posts" postCtx (return posts) `mappend`
-              constField "title" "Home" `mappend`
               defaultContext
         getResourceBody >>= applyAsTemplate indexCtx >>=
           loadAndApplyTemplate "templates/default.html" indexCtx >>=
