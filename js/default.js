@@ -31,12 +31,21 @@ $(document).ready(function() {
     }
   });
 
+  // if not a top level page, for now, just assume on a specific blog post
   if (!isTopLevelPage) {
     $('.ui.menu a.item').each(function() {
-      // if not a top level page, for now, just assume on a specific blog post
       if ($(this).text().indexOf('Blog') >= 0) {
         $(this).addClass('active');
       }
     });
   }
+
+  // right rail for RSS/Atom buttons
+  $('.ui.sticky').sticky({
+    context: '#archive_content',
+    onStick: function() {
+      console.log('hello 3');
+      $('.ui.sticky').animate({'margin-top': '1em'}, 200);
+    }
+  });
 });

@@ -1,7 +1,22 @@
-<ul>
+<div class="ui feed">
     $for(posts)$
-        <li>
-            <a href="$url$">$title$</a> - $date$
-        </li>
+      <div class="event">
+        <div class="label">
+          <i class="pencil icon"></i>
+        </div>
+        <div class="content">
+          <div class="summary">
+            <a class="user" href="/about.html">
+              Jason Shipman
+            </a> published a blog post: <a href="$url$">$title$</a>
+            <div class="date">
+              $date$
+            </div>
+          </div>
+          <div class="meta">
+            <i class="tags icon"></i> Foo, Bar, Baz
+          </div>
+        </div>
+      </div>
     $endfor$
-</ul>
+</div>
