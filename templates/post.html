@@ -1,8 +1,38 @@
-<div class="info">
-    Posted on $date$
-    $if(author)$
-        by $author$
-    $endif$
+<div class="ui raised very padded text container segment" id="blog_content">
+  <h2 class="ui header">$title$</h2>
+  <div class="ui right close rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            $author$
+          </a>
+          <div class="date">
+            $date$
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i> Foo, Bar, Baz
+        </div>
+      </div>
+    </div>
+  </div>
+  $body$
 </div>
-
-$body$
