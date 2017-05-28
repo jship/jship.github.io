@@ -8,6 +8,9 @@
 
   <!-- Site Properties -->
   <title>jship - example post</title>
+  <link rel="stylesheet" type="text/css" href="../css/reset.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/site.min.css">
+
   <link rel="stylesheet" type="text/css" href="../css/button.min.css">
   <link rel="stylesheet" type="text/css" href="../css/card.min.css">
   <link rel="stylesheet" type="text/css" href="../css/container.min.css">
@@ -21,15 +24,14 @@
   <link rel="stylesheet" type="text/css" href="../css/list.min.css">
   <link rel="stylesheet" type="text/css" href="../css/menu.min.css">
   <link rel="stylesheet" type="text/css" href="../css/rail.min.css">
-  <link rel="stylesheet" type="text/css" href="../css/reset.min.css">
   <link rel="stylesheet" type="text/css" href="../css/segment.min.css">
   <link rel="stylesheet" type="text/css" href="../css/sidebar.min.css">
-  <link rel="stylesheet" type="text/css" href="../css/site.min.css">
   <link rel="stylesheet" type="text/css" href="../css/sticky.min.css">
   <link rel="stylesheet" type="text/css" href="../css/transition.min.css">
 
   <!-- This page's CSS. -->
   <link rel="stylesheet" type="text/css" href="../css/default.css">
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css">
 
   <script src="../js/jquery.min.js"></script>
   <script src="../js/visibility.min.js"></script>
@@ -86,14 +88,43 @@
         </div>
       </div>
     </div>
-    <div class="info">
-    Posted on August 23, 2015
-    
-        by Jason Shipman
-    
-</div>
-
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed nunc ac mi vestibulum molestie. Ut lacinia aliquam urna, ut rutrum ligula consequat eu. Maecenas orci magna, dapibus ac mauris ac, consectetur tincidunt odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut imperdiet aliquam lacus non scelerisque. In ut ullamcorper leo, vel bibendum nisl. Vestibulum quis mollis enim. Mauris justo purus, dignissim non sagittis ut, feugiat quis velit. Sed lobortis massa euismod iaculis venenatis. Fusce cursus mattis pretium. Vestibulum sit amet libero vel felis posuere tristique. Vestibulum ac leo bibendum est interdum malesuada. Curabitur ut molestie tortor. Etiam ullamcorper porta nibh, condimentum mattis enim malesuada vel. Quisque at blandit magna. Aliquam lacus ligula, suscipit vitae posuere nec, pretium ac nulla.</p>
+    <div class="ui raised very padded text container segment" id="blog_content">
+  <h2 class="ui header">example post</h2>
+  <div class="ui right close rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="../rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="../atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="../images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="../about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 23, 2015
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i> Foo, Bar, Baz
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed nunc ac mi vestibulum molestie. Ut lacinia aliquam urna, ut rutrum ligula consequat eu. Maecenas orci magna, dapibus ac mauris ac, consectetur tincidunt odio. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut imperdiet aliquam lacus non scelerisque. In ut ullamcorper leo, vel bibendum nisl. Vestibulum quis mollis enim. Mauris justo purus, dignissim non sagittis ut, feugiat quis velit. Sed lobortis massa euismod iaculis venenatis. Fusce cursus mattis pretium. Vestibulum sit amet libero vel felis posuere tristique. Vestibulum ac leo bibendum est interdum malesuada. Curabitur ut molestie tortor. Etiam ullamcorper porta nibh, condimentum mattis enim malesuada vel. Quisque at blandit magna. Aliquam lacus ligula, suscipit vitae posuere nec, pretium ac nulla.</p>
 <p>Vivamus et rhoncus sapien, eu cursus nulla. Nullam ut dolor magna. Integer imperdiet, augue vitae fringilla suscipit, tellus justo aliquam neque, ullamcorper lobortis diam purus eu turpis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis commodo tempor augue sed scelerisque. Nam at fermentum velit, a pharetra odio. Donec vitae arcu eget leo pharetra finibus. Vestibulum pretium libero scelerisque, imperdiet purus eget, eleifend elit. Integer mollis, arcu consequat commodo tristique, leo augue efficitur nibh, eu semper leo tellus ut ipsum. Curabitur ut egestas eros. Suspendisse consectetur tempor arcu sit amet scelerisque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed porttitor pellentesque justo, eget lacinia nisi semper ultrices. Vivamus diam diam, ornare eget convallis a, tempor sed nisi.</p>
 <p>Quisque convallis vehicula libero. Curabitur ultrices consectetur purus et euismod. Mauris eros massa, malesuada in dui non, condimentum vulputate massa. Sed sit amet ultrices urna, ac dignissim erat. Etiam placerat sagittis leo, vitae elementum velit accumsan eget. In eu rutrum lorem. Nam vestibulum aliquam odio, eu luctus turpis tincidunt eget. In vel purus ut nulla euismod viverra ut ornare sem. Donec ut mollis purus, vitae rhoncus eros. In aliquam velit nec velit luctus accumsan. Pellentesque sed lacinia ante.</p>
 <p>Vivamus facilisis quam ac turpis imperdiet convallis. Ut purus est, malesuada nec ante et, maximus ornare nulla. Praesent aliquam ligula nibh, non interdum velit vestibulum id. Etiam lobortis diam id quam elementum lacinia. Donec placerat facilisis justo in blandit. Integer sit amet finibus ligula. Donec sit amet volutpat arcu. Suspendisse potenti. Praesent nisl quam, iaculis eget interdum non, vestibulum in nibh. Maecenas quis ligula felis. Aenean sit amet justo quis enim blandit fringilla.</p>
@@ -113,6 +144,7 @@
 <p>Sed dictum tristique bibendum. In a sem ultrices, ultricies purus ut, efficitur lorem. Aliquam non nunc vitae sem efficitur ultricies et at neque. Quisque vel sagittis diam. Aliquam erat volutpat. Nullam consequat fringilla massa at gravida. Cras nibh leo, placerat ac pellentesque ac, ultrices eget nisi. Aenean eu laoreet quam, eu tincidunt sapien. Mauris nulla nibh, pulvinar id libero vitae, faucibus lacinia purus. In blandit ultricies turpis, sed consectetur odio iaculis laoreet. In hac habitasse platea dictumst. Aenean vitae pharetra dui. Nunc tincidunt ex vitae nisl ultrices, et ornare urna volutpat. Aenean auctor elementum diam, vel cursus metus consectetur a. Maecenas vitae metus porta, congue mauris eget, luctus lorem. Ut a elit dolor.</p>
 <p>Nam quis lacus vel nisl gravida tempus ut quis enim. Vivamus libero urna, vehicula eu porta quis, molestie et lectus. Praesent dictum ante et nisi gravida, laoreet iaculis nibh mattis. Ut tincidunt varius dignissim. Nullam sed nunc hendrerit, ullamcorper risus sed, vulputate eros. Vestibulum elementum tincidunt posuere. Duis ut est rhoncus arcu finibus dignissim eget tristique felis. Maecenas quis sem purus. Nulla facilisi.</p>
 <p>Vivamus semper purus ex, nec auctor purus pellentesque eu. Integer blandit erat scelerisque risus dapibus blandit. Fusce eu ligula augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Fusce ac eros purus. Phasellus accumsan sapien ut magna condimentum, ut cursus urna aliquam. Praesent lorem dolor, posuere id malesuada ut, egestas vel neque. Sed condimentum diam sed ornare vehicula.</p>
+</div>
 
   </div>
 
