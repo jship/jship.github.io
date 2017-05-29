@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>jship's Personal Blog</title>
+    <link href="https://jship.com/atom.xml" rel="self" />
+    <link href="https://jship.com" />
+    <id>https://jship.com/atom.xml</id>
+    <author>
+        <name>Jason Shipman</name>
+        <email>jasonpshipman@gmail.com</email>
+    </author>
+    <updated>2017-05-28T00:00:00Z</updated>
+    <entry>
+    <title>Welcome to my blog</title>
+    <link href="https://jship.com/posts/2017-05-28-welcome.html" />
+    <id>https://jship.com/posts/2017-05-28-welcome.html</id>
+    <published>2017-05-28T00:00:00Z</published>
+    <updated>2017-05-28T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Welcome to my blog</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            May 28, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i> Foo, Bar, Baz
+        </div>
+      </div>
+    </div>
+  </div>
+  <p>Welcome, all. I am Jason Shipman, a software engineer in the Tampa/St. Petersburg area. You can find out more about me <a href="/about.html">here</a>. I have been itching to create a blog for a while and now it has begun!</p>
+<p>This blog will be rooted pretty heavily in statically-typed functional programming, specifically with <a href="https://www.haskell.org/">Haskell</a> and possibly some <a href="http://www.purescript.org/">Purescript</a>, <a href="https://www.idris-lang.org/">Idris</a>, &lt;insert some other ML-influenced language here&gt;, etc. That being said, I enjoy programming regardless of static or dynamic typing. I intend to learn a dynamic functional language at some point, so expect some posts about that too. Whether that winds up being <a href="https://clojure.org/">Clojure</a>, <a href="https://www.erlang.org/">Erlang</a>, or <a href="https://elixir-lang.org/">Elixir</a> remains to be seen. More common languages like C++ and Javascript will likely crop up on this blog now and again as well.</p>
+<p>This blog is powered by <a href="https://jaspervdj.be/hakyll/index.html">Hakyll</a>, a fantastic static site generator.</p>
+<p>A two-line Haskell program is worth a thousand words:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> putStrLn <span class="st">&quot;Welcome!&quot;</span></code></pre></div>
+</div>
+]]></summary>
+</entry>
+
+</feed>
