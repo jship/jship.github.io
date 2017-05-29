@@ -29,7 +29,10 @@
           </div>
         </div>
         <div class="meta">
-          <i class="tags icon"></i> Foo, Bar, Baz
+          <i class="tags icon"></i>
+          $if(tags)$
+            $tags$
+          $endif$
         </div>
       </div>
     </div>

@@ -13,9 +13,12 @@
               $date$
             </div>
           </div>
-          <div class="meta">
-            <i class="tags icon"></i> Foo, Bar, Baz
-          </div>
+          $if(tags)$
+            <div class="meta">
+              <i class="tags icon"></i>
+              $tags$
+            </div>
+          $endif$
         </div>
       </div>
     $endfor$

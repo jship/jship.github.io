@@ -104,3 +104,8 @@
 .ui.segment:last-child {
     margin-bottom: 2em;
 }
+
+.ui.feed>.event>.content .meta>* {
+  position: relative;
+  margin-left: 0;
+}

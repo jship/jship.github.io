@@ -8,7 +8,10 @@ main :: IO ()
 main =
   hakyll $ do
     match "semantic/dist/themes/default/assets/fonts/*" $ do
-      route $ customRoute $ (("themes" </> "default" </> "assets" </> "fonts") </>) . takeFileName . toFilePath
+      route $
+        customRoute $
+        (("themes" </> "default" </> "assets" </> "fonts") </>) .
+        takeFileName . toFilePath
       compile copyFileCompiler
     match "semantic/dist/components/*.min.js" $ do
       route $ customRoute $ ("js" </>) . takeFileName . toFilePath
@@ -25,30 +28,47 @@ main =
     match "images/*" $ do
       route idRoute
       compile copyFileCompiler
+    tags <- buildTags "posts/*" (fromCapture "tags/*.html")
+    tagsRules tags $ \tag pattern -> do
+      let title = "Posts tagged with \"" ++ tag ++ "\""
+      route idRoute
+      compile $ do
+        posts <- recentFirst =<< loadAll pattern
+        let ctx =
+              constField "title" title `mappend`
+              listField "posts" (postCtxWithTags tags) (return posts) `mappend`
+              defaultContext
+        makeItem "" >>= loadAndApplyTemplate "templates/tag.html" ctx >>=
+          loadAndApplyTemplate "templates/default.html" ctx >>=
+          relativizeUrls
     match "posts/*" $ do
       route $ setExtension "html"
       compile $
-        pandocCompiler >>= loadAndApplyTemplate "templates/post.html" postCtx >>= saveSnapshot "content" >>=
-        loadAndApplyTemplate "templates/default.html" postCtx >>=
+        pandocCompiler >>=
+        loadAndApplyTemplate "templates/post.html" (postCtxWithTags tags) >>=
+        saveSnapshot "content" >>=
+        loadAndApplyTemplate "templates/default.html" (postCtxWithTags tags) >>=
         relativizeUrls
     create ["atom.xml"] $ do
       route idRoute
       compile $ do
         let feedCtx = postCtx `mappend` bodyField "description"
-        posts <- fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
+        posts <-
+          fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
         renderAtom feedConfig feedCtx posts
     create ["rss.xml"] $ do
       route idRoute
       compile $ do
         let feedCtx = postCtx `mappend` bodyField "description"
-        posts <- fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
+        posts <-
+          fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
         renderRss feedConfig feedCtx posts
     create ["archive.html"] $ do
       route idRoute
       compile $ do
         posts <- recentFirst =<< loadAll "posts/*"
         let archiveCtx =
-              listField "posts" postCtx (return posts) `mappend`
+              listField "posts" (postCtxWithTags tags) (return posts) `mappend`
               constField "title" "Blog" `mappend`
               defaultContext
         makeItem "" >>= loadAndApplyTemplate "templates/archive.html" archiveCtx >>=
@@ -66,8 +86,7 @@ main =
       compile $ do
         posts <- recentFirst =<< loadAll "posts/*"
         let indexCtx =
-              listField "posts" postCtx (return posts) `mappend`
-              defaultContext
+              listField "posts" postCtx (return posts) `mappend` defaultContext
         getResourceBody >>= applyAsTemplate indexCtx >>=
           loadAndApplyTemplate "templates/default.html" indexCtx >>=
           relativizeUrls
@@ -76,11 +95,15 @@ main =
 postCtx :: Context String
 postCtx = dateField "date" "%B %e, %Y" `mappend` defaultContext
 
+postCtxWithTags :: Tags -> Context String
+postCtxWithTags tags = tagsField "tags" tags `mappend` postCtx
+
 feedConfig :: FeedConfiguration
-feedConfig = FeedConfiguration
-  { feedTitle       = "jship's Personal Blog"
+feedConfig =
+  FeedConfiguration
+  { feedTitle = "jship's Personal Blog"
   , feedDescription = "This feed provides the latest blog posts from jship"
-  , feedAuthorName  = "Jason Shipman"
+  , feedAuthorName = "Jason Shipman"
   , feedAuthorEmail = "jasonpshipman@gmail.com"
-  , feedRoot        = "https://jship.com"
+  , feedRoot = "https://jship.github.io"
   }
