@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>jship's Personal Blog</title>
-    <link href="https://jship.com/atom.xml" rel="self" />
-    <link href="https://jship.com" />
-    <id>https://jship.com/atom.xml</id>
+    <link href="https://jship.github.io/atom.xml" rel="self" />
+    <link href="https://jship.github.io" />
+    <id>https://jship.github.io/atom.xml</id>
     <author>
         <name>Jason Shipman</name>
         <email>jasonpshipman@gmail.com</email>
@@ -11,8 +11,8 @@
     <updated>2017-05-28T00:00:00Z</updated>
     <entry>
     <title>Welcome to my blog</title>
-    <link href="https://jship.com/posts/2017-05-28-welcome.html" />
-    <id>https://jship.com/posts/2017-05-28-welcome.html</id>
+    <link href="https://jship.github.io/posts/2017-05-28-welcome.html" />
+    <id>https://jship.github.io/posts/2017-05-28-welcome.html</id>
     <published>2017-05-28T00:00:00Z</published>
     <updated>2017-05-28T00:00:00Z</updated>
     <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
@@ -46,7 +46,10 @@
           </div>
         </div>
         <div class="meta">
-          <i class="tags icon"></i> Foo, Bar, Baz
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Hakyll.html">Hakyll</a>
+          
         </div>
       </div>
     </div>
