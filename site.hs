@@ -28,9 +28,21 @@ main =
     match "posts/*" $ do
       route $ setExtension "html"
       compile $
-        pandocCompiler >>= loadAndApplyTemplate "templates/post.html" postCtx >>=
+        pandocCompiler >>= loadAndApplyTemplate "templates/post.html" postCtx >>= saveSnapshot "content" >>=
         loadAndApplyTemplate "templates/default.html" postCtx >>=
         relativizeUrls
+    create ["atom.xml"] $ do
+      route idRoute
+      compile $ do
+        let feedCtx = postCtx `mappend` bodyField "description"
+        posts <- fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
+        renderAtom feedConfig feedCtx posts
+    create ["rss.xml"] $ do
+      route idRoute
+      compile $ do
+        let feedCtx = postCtx `mappend` bodyField "description"
+        posts <- fmap (take 10) . recentFirst =<< loadAllSnapshots "posts/*" "content"
+        renderRss feedConfig feedCtx posts
     create ["archive.html"] $ do
       route idRoute
       compile $ do
@@ -63,3 +75,12 @@ main =
 
 postCtx :: Context String
 postCtx = dateField "date" "%B %e, %Y" `mappend` defaultContext
+
+feedConfig :: FeedConfiguration
+feedConfig = FeedConfiguration
+  { feedTitle       = "jship's Personal Blog"
+  , feedDescription = "This feed provides the latest blog posts from jship"
+  , feedAuthorName  = "Jason Shipman"
+  , feedAuthorEmail = "jasonpshipman@gmail.com"
+  , feedRoot        = "https://jship.com"
+  }
