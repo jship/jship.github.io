@@ -16,6 +16,10 @@
   <div class="ui right rail">
     <div class="ui sticky">
       <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
         <a class="item" href="/rss.xml">
           <i class="rss icon"></i>
           RSS
