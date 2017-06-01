@@ -109,3 +109,8 @@
   position: relative;
   margin-left: 0;
 }
+
+.ui.card .meta *, .ui.cards>.card .meta * {
+  position: relative;
+  margin-right: 0;
+}

@@ -84,9 +84,10 @@ main =
     match "index.html" $ do
       route idRoute
       compile $ do
-        posts <- recentFirst =<< loadAll "posts/*"
+        posts <- fmap (take 3) . recentFirst =<< loadAll "posts/*"
         let indexCtx =
-              listField "posts" postCtx (return posts) `mappend` defaultContext
+              listField "posts" (postCtxWithTags tags) (return posts) `mappend`
+              defaultContext
         getResourceBody >>= applyAsTemplate indexCtx >>=
           loadAndApplyTemplate "templates/default.html" indexCtx >>=
           relativizeUrls

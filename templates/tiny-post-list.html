@@ -1,0 +1,20 @@
+<div class="ui feed">
+    $for(posts)$
+      <div class="event">
+        <div class="content">
+          <div class="summary">
+            <a href="$url$">$title$</a>
+            <div class="date">
+              $date$
+            </div>
+          </div>
+          $if(tags)$
+            <div class="meta">
+              <i class="tags icon"></i>
+              $tags$
+            </div>
+          $endif$
+        </div>
+      </div>
+    $endfor$
+</div>
