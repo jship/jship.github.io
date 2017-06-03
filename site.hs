@@ -91,6 +91,13 @@ main =
         getResourceBody >>= applyAsTemplate indexCtx >>=
           loadAndApplyTemplate "templates/default.html" indexCtx >>=
           relativizeUrls
+    match "resume.md" $ do
+      route $ setExtension "html"
+      compile $
+        pandocCompiler >>=
+        loadAndApplyTemplate "templates/resume.html" defaultContext >>=
+        loadAndApplyTemplate "templates/default.html" defaultContext >>=
+        relativizeUrls
     match "templates/*" $ compile templateCompiler
 
 postCtx :: Context String
