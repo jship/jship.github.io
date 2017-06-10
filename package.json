@@ -1,0 +1,11 @@
+{
+    "name": "jship-github-io",
+    "preferGlobal": false,
+    "version": "0.0.1",
+    "author": "Jason Shipman",
+    "description": "package.json purely for Semantic UI and nothing else",
+    "license": "MIT",
+    "dependencies": {
+        "semantic-ui": "^2.2.10"
+    }
+}
