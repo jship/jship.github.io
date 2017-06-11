@@ -41,10 +41,10 @@ $(document).ready(function() {
   }
 
   // right rail for RSS/Atom buttons on Blog (archive) page or specific post
-  $('.ui.sticky').sticky({
-    context: '#blog_content',
-    onStick: function() {
-      $('.ui.sticky').animate({'margin-top': '1em'}, 200);
-    }
-  });
+  //$('.ui.sticky').sticky({
+  //  context: '#blog_content',
+  //  onStick: function() {
+  //    $('.ui.sticky').animate({'margin-top': '1em'}, 200);
+  //  }
+  //});
 });
