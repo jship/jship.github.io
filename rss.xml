@@ -7,8 +7,153 @@
         <description><![CDATA[This feed provides the latest blog posts from jship]]></description>
         <atom:link href="https://jship.github.io/rss.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Sun, 28 May 2017 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Sun, 11 Jun 2017 00:00:00 UT</lastBuildDate>
         <item>
+    <title>ZuriHac Recap: 2017</title>
+    <link>https://jship.github.io/posts/2017-06-11-zurihac-recap.html</link>
+    <description><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">ZuriHac Recap: 2017</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            June 11, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/ZuriHac.html">ZuriHac</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="location">Location</h3>
+<p>ZuriHac 2017 took place at <a href="https://www.hsr.ch/Home.home.0.html">Hochschule für Technik Rapperswil</a>, a university in the beautiful Rapperswil-Jona area of Switzerland. Rapperswil-Jona is southeast of Zürich, and the HSR is <a href="https://www.google.ch/maps/place/HSR+Hochschule+f%C3%BCr+Technik+Rapperswil/@47.2233607,8.815174,17z/data=!3m1!4b1!4m5!3m4!1s0x479ab6e12facc7ad:0x711fa65bf58f9c0f!8m2!3d47.2233607!4d8.8173627">here</a> on Google Maps. The university is located right on the lake and the view was absolutely stunning:</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+I can think of worse places to have a hackathon. <a href="https://twitter.com/hashtag/ZuriHac?src=hash">#ZuriHac</a> <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> <a href="https://twitter.com/hashtag/Haskell?src=hash">#Haskell</a> <a href="https://t.co/tEzFENJ7hw">https://t.co/tEzFENJ7hw</a> <a href="https://t.co/iIXOOv3qdj">pic.twitter.com/iIXOOv3qdj</a>
+</p>
+— cocharles (<span class="citation">@acid2</span>) <a href="https://twitter.com/acid2/status/873287264356499457">June 9, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="keynote-niel-mitchell---friday-june-9-1000">Keynote: Niel Mitchell - Friday, June 9 @ 10:00</h3>
+<p>The kickoff keynote for the event was presented by <a href="https://twitter.com/ndm_haskell">Niel Mitchell</a>, where he discussed how to make drive-by contributions to Haskell projects. Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions. Slides available <a href="http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf">here</a>.</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Neil Mitchell opening <a href="https://twitter.com/hashtag/Zurihac?src=hash">#Zurihac</a> with advice on how to get started contributing to Haskell projects. Perfect start! <a href="https://t.co/b2kJBflGBA">pic.twitter.com/b2kJBflGBA</a>
+</p>
+— Monoid Mary (<span class="citation">@argumatronic</span>) <a href="https://twitter.com/argumatronic/status/873091270389911553">June 9, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="project-pitches---friday-june-9-1100">Project Pitches - Friday, June 9 @ 11:00</h3>
+<p>After the first keynote, the Haskellers working on their own projects for ZuriHac gave short pitches advertising what is available to hack on, if their projects are beginner friendly, and so on. Some examples: <a href="https://github.com/haskell-servant/servant">servant</a>, <a href="https://github.com/LumiGuide/haskell-opencv">haskell-opencv</a>, <a href="https://github.com/jcmincke/Blast">Blast</a>, and <a href="https://github.com/haskell-foundation/foundation">foundation</a>. Then we all dispersed to begin hacking.</p>
+<p>Here is Pasqualino Titto Assini pitching his <a href="http://quid2.org/">Quid-2</a> project:</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+A room full of Haskellers <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> <a href="https://t.co/T0qbLwIPHq">pic.twitter.com/T0qbLwIPHq</a>
+</p>
+— Mikhail Glushenkov (<span class="citation">@refold</span>) <a href="https://twitter.com/refold/status/873117989695913986">June 9, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="talk-mario-meili-cyrill-schenkel---friday-june-9-1600">Talk: Mario Meili &amp; Cyrill Schenkel - Friday, June 9 @ 16:00</h3>
+<p>Mario Meili and Cyrill Schenkel, students at the HSR, gave a joint presentation. Mario’s portion dicussed what is blocking Haskell’s adoption and Cyrill’s portion discussed what is lacking in Haskell tooling. Multiple attendees were there to work on different aspects of tooling, so I hope Cyrill, Mario, and the tooling Haskellers got together during the weekend!</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Mario Meili's talk at <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> about what holds up Haskell adoption <a href="https://t.co/z37IQteHGr">pic.twitter.com/z37IQteHGr</a>
+</p>
+— Jens Petersen (<span class="citation">@juhp</span>) <a href="https://twitter.com/juhp/status/873202283193876481">June 9, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="keynote-julie-moronuki---friday-june-9-1700">Keynote: Julie Moronuki - Friday, June 9 @ 17:00</h3>
+<p><a href="https://twitter.com/argumatronic">Julie Moronuki</a> delivered a keynote on teaching Haskell and also teaching in general. Slides available <a href="https://docs.google.com/presentation/d/1_I5mYXivG5NbOHnICld_Xo41uOyAT57Yade5qfz2toQ/edit">here</a>. The points in this talk resonated strongly for me and outline problems I have seen and experienced with education (at least in the US, not sure about elsewhere). Teachers often encourage blind memorization instead of fundamental understanding, particularly in math courses, and this can significantly hamper students’ future learning. A mathematician friend of mine from college described math as a “universal language for connecting ideas”. If students do not understand the fundamentals, they have more difficulty grokking the concepts built on top of these fundamentals. No one should be deprived of this universal language!</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Teaching should be so good that concepts are internalized as naturally as beliefs. <a href="https://twitter.com/hashtag/zurihac?src=hash">#zurihac</a> <a href="https://t.co/q1nWCZlg1U">pic.twitter.com/q1nWCZlg1U</a>
+</p>
+— tmpz (<span class="citation">@tmpz</span>) <a href="https://twitter.com/tmpz/status/873203035836747776">June 9, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="dinner---friday-june-9-1800">Dinner - Friday, June 9 @ 18:00</h3>
+<p>PIZZA TRUCK!!!</p>
+<h3 id="keynote-stephen-diehl---saturday-june-10-1000">Keynote: Stephen Diehl - Saturday, June 10 @ 10:00</h3>
+<p><a href="https://twitter.com/smdiehl">Stephen Diehl</a> gave his keynote on elliptic curve crypto in Haskell. This talk had a crash course on a bit of abstract algebra/elliptic curves, and the rest of the talk was on using Haskell to establish trust between two parties using commitment schemes, zero knowledge proofs, verifiable computation, etc. My experience with cryptography is limited to basic usage of secret-key stuff in <a href="https://github.com/jedisct1/libsodium">libsodium</a>, so this provided me with plenty of future reading material. Code available <a href="https://github.com/sdiehl/zurihac-crypto">here</a>.</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="de" dir="ltr">
+Keynote by Stephen Diehl on Modern Cryptography in Haskell <a href="https://twitter.com/hashtag/haskell?src=hash">#haskell</a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> <a href="https://t.co/uEjx1zBj62">pic.twitter.com/uEjx1zBj62</a>
+</p>
+— ZuriHac (<span class="citation">@ZuriHac</span>) <a href="https://twitter.com/ZuriHac/status/873453982383001600">June 10, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="keynote-simon-thompson---saturday-june-10-1700">Keynote: Simon Thompson - Saturday, June 10 @ 17:00</h3>
+<p><a href="https://twitter.com/smdiehl">Simon Thompson</a>’s keynote was on “the eseence of laziness”. He discussed the evolution of Haskell’s approach to IO, lessons learned from <a href="http://miranda.org.uk/">Miranda</a>, how it began with <code>interact</code>, etc. Simon introduced an interesting DSL that he expanded on throughout the talk. I cannot find the code or the slides for this one, so please ping me if you know where they are.</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Getting to listen to one of my heroes, <a href="https://twitter.com/thompson_si"><span class="citation">@thompson_si</span></a>, talk about laziness and Haskell prehistory. <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> is wonderful. <a href="https://t.co/DczGKfi7q7">pic.twitter.com/DczGKfi7q7</a>
+</p>
+— Monoid Mary (<span class="citation">@argumatronic</span>) <a href="https://twitter.com/argumatronic/status/873559880472428544">June 10, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="dinner---saturday-june-10-1800">Dinner - Saturday, June 10 @ 18:00</h3>
+<p>BYOBBQ!!!</p>
+<h3 id="keynote-edward-kmett---sunday-june-11-1000">Keynote: Edward Kmett - Sunday, June 11 @ 10:00</h3>
+<p><a href="https://twitter.com/kmett">Edward Kmett</a> gave the final keynote and pulled a fast one on all the Haskellers - it had virtually no Haskell! His talk was on creating a subset of the <a href="https://ispc.github.io/">Intel SPMD</a> compiler as a <a href="https://github.com/ekmett/rts">C++ library</a>. The library uses template specialization to provide architecture-specific implementations (like AVX) of vectorized ops that map to minimal assembly instructions. I used to play around with expression templates and metaprogramming in C++, so this was a fascinating and unexpected talk! There is a lot to unpack in <code>rts</code>. We all had a chuckle at snippets like <a href="https://github.com/ekmett/rts/blob/2ca93a6ec4914e71e77f8d4b01f9fac760b7aab9/src/rts/soa.hpp#L71">this</a> where Edward has macros to code gen his vector ops via preprocessor, and considering those vector ops are templates, they are compile-time instantiated, resulting in more code gen. It was not entirely unrelated to Haskell though - the name of the project hints that it may influence GHC some day…</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Keynote by Edward Kmett on “Haskell” <a href="https://twitter.com/hashtag/haskell?src=hash">#haskell</a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> <a href="https://twitter.com/hashtag/classicbaitandswitch?src=hash">#classicbaitandswitch</a> <a href="https://t.co/l4cNNcjk9n">pic.twitter.com/l4cNNcjk9n</a>
+</p>
+— ZuriHac (<span class="citation">@ZuriHac</span>) <a href="https://twitter.com/ZuriHac/status/873817776502263808">June 11, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="project-demos---sunday-june-11-1600">Project Demos - Sunday, June 11 @ 16:00</h3>
+<p>I missed this portion as Marco and I were actively learning and hacking <a href="https://github.com/haskell-foundation/foundation">foundation</a>. It sounds like there was a neat multiplayer “ZuriHac Plays Mario” game in the vein of “Twitch Plays…”. Code available <a href="https://github.com/bitonic/zurihac-plays">here</a>.</p>
+<blockquote class="twitter-tweet tw-align-center" data-lang="en">
+<p lang="en" dir="ltr">
+Collaborative Mario at <a href="https://twitter.com/ZuriHac"><span class="citation">@ZuriHac</span></a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> fun! :-) <a href="https://t.co/6h3ulZRoZH">pic.twitter.com/6h3ulZRoZH</a>
+</p>
+— Simon Thompson (<span class="citation">@thompson_si</span>) <a href="https://twitter.com/thompson_si/status/873906086444752896">June 11, 2017</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<h3 id="personal-endeavors">Personal Endeavors</h3>
+<h4 id="first-timer">First Timer</h4>
+<p>This was my first time attending ZuriHac and it was too much fun - will definitely be back next year! Big thanks to <a href="https://jaspervdj.be/">Jasper Van der Jeugt</a>, <a href="http://lambda-view.blogspot.ch/">Simon Meier</a>, and all of the HSR folks that made the event happen. Props to the Haskell community too for being friendly and inviting.</p>
+<h4 id="foundation">Foundation</h4>
+<p>I wanted to learn <a href="https://twitter.com/vincenthz">Vincent Hanquez</a>’s <a href="https://github.com/haskell-foundation/foundation">Foundation</a> package as I had only read about it before ZuriHac. I spent a good chunk of my time with Marco Lucensis at ZuriHac exploring pieces of it. We found an <a href="https://github.com/haskell-foundation/foundation/issues/312">issue</a> that required a decent amount of refactoring and gave us something tangible to work on as we dove into the package. We came close to fixing the issue during the event, and more importantly, we learned a great deal about associated types, efficient builders, etc. It was a pleasure working with <a href="https://github.com/NicolasDP">Nicolas Di Prima</a> and Vincent. They are phenomenal and patient teachers!</p>
+<h4 id="nomyx">Nomyx</h4>
+<p>On Saturday, I participated in <a href="http://www.corentindupont.info/">Corentin Dupont</a>’s <a href="https://github.com/nomyx/Nomyx">Nomyx</a> game. We had about 8 players total if I remember correctly. This one is interesting - each player can write the game’s rules in a Haskell DSL. Some examples include writing rules for the win conditions, rules for how player’s vote on new rules (unanimity, majority, etc), rules for concepts in the game world (like bank accounts, planets, professions, etc). The possibilities are nearly limitless! In our game, we played with bank accounts and I gave everyone a salary of 10 money delivered every minute. One player later wrote a rule to make his friend poor and I snuck a rule in to collect taxes from all players. Another player created a rule where you could only vote if you had X amount of money or something along those lines. Meanwhile, a different player was creating a rule that would output the list of players and their passed rule counts. He iterated on this a couple times, submitting each version as a new rule that we all had the opportunity to vote on. The catch though - an active win condition was “Get 10 rules passed” or something like that. The rule he was iterating on was a nice thing to have, but every iteration put him closer to winning if we majority-voted the iteration into the game! The game reminded me a bit of <a href="https://boardgamegeek.com/boardgame/258/fluxx">Fluxx</a>, but from one game of Nomyx, I find Nomyx more fun with higher replay value since the players write the rules. The tax collector rule has been parameterized and submitted in a PR <a href="https://github.com/nomyx/nomyx-library/pull/2">here</a>.</p>
+</div>
+]]></description>
+    <pubDate>Sun, 11 Jun 2017 00:00:00 UT</pubDate>
+    <guid>https://jship.github.io/posts/2017-06-11-zurihac-recap.html</guid>
+    <dc:creator>Jason Shipman</dc:creator>
+</item>
+<item>
     <title>Welcome to my blog</title>
     <link>https://jship.github.io/posts/2017-05-28-welcome.html</link>
     <description><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
