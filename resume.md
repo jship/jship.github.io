@@ -8,7 +8,7 @@ title: Resume
 
 ## Summary
 
-Full stack developer with 4+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
+Developer with 4+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
 
 ## Skills
 
