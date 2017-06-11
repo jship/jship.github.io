@@ -67,8 +67,8 @@ I can think of worse places to have a hackathon. <a href="https://twitter.com/ha
 — cocharles (<span class="citation">@acid2</span>) <a href="https://twitter.com/acid2/status/873287264356499457">June 9, 2017</a>
 </blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="keynote-niel-mitchell---friday-june-9-1000">Keynote: Niel Mitchell - Friday, June 9 @ 10:00</h3>
-<p>The kickoff keynote for the event was presented by <a href="https://twitter.com/ndm_haskell">Niel Mitchell</a>, where he discussed how to make drive-by contributions to Haskell projects. Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions. Slides available <a href="http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf">here</a>.</p>
+<h3 id="keynote-neil-mitchell---friday-june-9-1000">Keynote: Neil Mitchell - Friday, June 9 @ 10:00</h3>
+<p>The kickoff keynote for the event was presented by <a href="https://twitter.com/ndm_haskell">Neil Mitchell</a>, where he discussed how to make drive-by contributions to Haskell projects. Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions. Slides available <a href="http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf">here</a>.</p>
 <blockquote class="twitter-tweet tw-align-center" data-lang="en">
 <p lang="en" dir="ltr">
 Neil Mitchell opening <a href="https://twitter.com/hashtag/Zurihac?src=hash">#Zurihac</a> with advice on how to get started contributing to Haskell projects. Perfect start! <a href="https://t.co/b2kJBflGBA">pic.twitter.com/b2kJBflGBA</a>
