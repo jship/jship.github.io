@@ -31,13 +31,17 @@ gulp build
 rsync _site to ./ on master:
 
 ```
-rsync -a --filter='P _site/'      \
-         --filter='P _cache/'     \
-         --filter='P .git/'       \
-         --filter='P .gitignore'  \
-         --filter='P .stack-work' \
-         --filter='P .gitignore'  \
-         --delete-excluded        \
+rsync -a --filter='P .git/'         \
+         --filter='P .stack-work/'  \
+         --filter='P node_modules/' \
+         --filter='P semantic/'     \
+         --filter='P _cache/'       \
+         --filter='P _site/'        \
+         --filter='P .gitignore'    \
+         --filter='P site.cabal'    \
+         --filter='P LICENSE'       \
+         --filter='P README.md'     \
+         --delete-excluded          \
          _site/ .
 ```
 
