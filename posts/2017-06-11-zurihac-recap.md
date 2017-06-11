@@ -11,9 +11,9 @@ ZuriHac 2017 took place at [Hochschule für Technik Rapperswil](https://www.hsr.
 <blockquote class="twitter-tweet tw-align-center" data-lang="en"><p lang="en" dir="ltr">I can think of worse places to have a hackathon. <a href="https://twitter.com/hashtag/ZuriHac?src=hash">#ZuriHac</a> <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> <a href="https://twitter.com/hashtag/Haskell?src=hash">#Haskell</a> <a href="https://t.co/tEzFENJ7hw">https://t.co/tEzFENJ7hw</a> <a href="https://t.co/iIXOOv3qdj">pic.twitter.com/iIXOOv3qdj</a></p>&mdash; cocharles (@acid2) <a href="https://twitter.com/acid2/status/873287264356499457">June 9, 2017</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-### Keynote: Niel Mitchell - Friday, June 9 @ 10:00
+### Keynote: Neil Mitchell - Friday, June 9 @ 10:00
 
-The kickoff keynote for the event was presented by [Niel Mitchell](https://twitter.com/ndm_haskell), where he discussed how to make drive-by contributions to Haskell projects.  Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions.  Slides available [here](http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf).
+The kickoff keynote for the event was presented by [Neil Mitchell](https://twitter.com/ndm_haskell), where he discussed how to make drive-by contributions to Haskell projects.  Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions.  Slides available [here](http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf).
 
 <blockquote class="twitter-tweet tw-align-center" data-lang="en"><p lang="en" dir="ltr">Neil Mitchell opening <a href="https://twitter.com/hashtag/Zurihac?src=hash">#Zurihac</a> with advice on how to get started contributing to Haskell projects. Perfect start! <a href="https://t.co/b2kJBflGBA">pic.twitter.com/b2kJBflGBA</a></p>&mdash; Monoid Mary (@argumatronic) <a href="https://twitter.com/argumatronic/status/873091270389911553">June 9, 2017</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
