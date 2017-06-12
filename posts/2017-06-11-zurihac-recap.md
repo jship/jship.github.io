@@ -54,7 +54,7 @@ PIZZA TRUCK!!!
 
 ### Keynote: Simon Thompson - Saturday, June 10 @ 17:00
 
-[Simon Thompson](https://twitter.com/smdiehl)'s keynote was on "the eseence of laziness". He discussed the evolution of Haskell's approach to IO, lessons learned from [Miranda](http://miranda.org.uk/), how it began with `interact`, etc.  Simon introduced an interesting DSL that he expanded on throughout the talk.  I cannot find the code or the slides for this one, so please ping me if you know where they are.
+[Simon Thompson](https://twitter.com/smdiehl)'s keynote was on "the essence of laziness". He discussed the evolution of Haskell's approach to IO, lessons learned from [Miranda](http://miranda.org.uk/), how it began with `interact`, etc.  Simon introduced an interesting `Interact` DSL that he expanded on throughout the talk.  Code and slides available [here](https://github.com/simonjohnthompson/Interaction).  Thanks for the link, [Adrian](https://twitter.com/Kensan42)!
 
 <blockquote class="twitter-tweet tw-align-center" data-lang="en"><p lang="en" dir="ltr">Getting to listen to one of my heroes, <a href="https://twitter.com/thompson_si">@thompson_si</a>, talk about laziness and Haskell prehistory. <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> is wonderful. <a href="https://t.co/DczGKfi7q7">pic.twitter.com/DczGKfi7q7</a></p>&mdash; Monoid Mary (@argumatronic) <a href="https://twitter.com/argumatronic/status/873559880472428544">June 10, 2017</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -85,7 +85,7 @@ This was my first time attending ZuriHac and it was too much fun - will definite
 
 #### Foundation
 
-I wanted to learn [Vincent Hanquez](https://twitter.com/vincenthz)'s [Foundation](https://github.com/haskell-foundation/foundation) package as I had only read about it before ZuriHac.  I spent a good chunk of my time with Marco Lucensis at ZuriHac exploring pieces of it.  We found an [issue](https://github.com/haskell-foundation/foundation/issues/312) that required a decent amount of refactoring and gave us something tangible to work on as we dove into the package.  We came close to fixing the issue during the event, and more importantly, we learned a great deal about associated types, efficient builders, etc.  It was a pleasure working with [Nicolas Di Prima](https://github.com/NicolasDP) and Vincent.  They are phenomenal and patient teachers!
+I wanted to learn [Vincent Hanquez](https://twitter.com/vincenthz)'s [Foundation](https://github.com/haskell-foundation/foundation) package as I had only read about it before ZuriHac.  I spent a good chunk of my time with Marco Martinucci at ZuriHac exploring pieces of it.  We found an [issue](https://github.com/haskell-foundation/foundation/issues/312) that required a decent amount of refactoring and gave us something tangible to work on as we dove into the package.  We came close to fixing the issue during the event, and more importantly, we learned a great deal about associated types, efficient builders, etc.  It was a pleasure working with [Nicolas Di Prima](https://github.com/NicolasDP) and Vincent.  They are phenomenal and patient teachers!
 
 #### Nomyx
 
