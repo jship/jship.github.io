@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.Monoid (mappend)
+import GHC.IO.Encoding (setLocaleEncoding, utf8)
 import Hakyll
 import System.FilePath
 
 main :: IO ()
-main =
+main = do
+  setLocaleEncoding utf8
   hakyll $ do
     match "semantic/dist/themes/default/assets/fonts/*" $ do
       route $
