@@ -7,8 +7,502 @@
         <description><![CDATA[This feed provides the latest blog posts from jship]]></description>
         <atom:link href="https://jship.github.io/rss.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Sat, 24 Jun 2017 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Wed, 09 Aug 2017 00:00:00 UT</lastBuildDate>
         <item>
+    <title>Writing Performant Haskell (1 of 6): Intro</title>
+    <link>https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html</link>
+    <description><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Writing Performant Haskell (1 of 6): Intro</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August  9, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Performance.html">Performance</a>, <a href="/tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="performance-haskell">Performance Haskell</h3>
+<p>As Haskell developers, we are fortunate that <a href="https://www.haskell.org/ghc/">GHC</a> is capable of producing extremely fast binaries for us. Often, we can get away with writing programs that are “fast enough” without any manual optimization on our part - i.e. set engines to <code>-O</code> or <code>-O2</code> and blast off! This is a good thing as it allows us to focus on problem solving close to the domain and not the nitty-gritty operational details of our code.</p>
+<p>GHC is not a silver bullet though. If we want to take our code beyond the subjective realm of “fast enough”, we will have to lend the compiler a hand.</p>
+<p>This post series will serve as a guide for a few of the approaches we can take to optimize Haskell programs. We will build a small but complete Haskell package, iteratively improving on its performance. As a result, these posts may be useful for new Haskellers too as multiple areas of package development will be touched on - <code>hpack</code>, testing, benchmarking, etc.</p>
+<p>As a disclaimer, I am not an expert at performance Haskell. If you see any inaccuracies or ways to achieve even more speed, please let me know. Note that speed concerns you spot early on might already be addressed later in the post series. We will start out with slow code after all, or else we would not have anything to optimize!</p>
+<div class="ui icon info message">
+<i class="info icon"></i>
+<p>
+The rest of this post creates a project, fleshes out the initial version of the API, adds tests, and adds benchmarks. Haskellers only interested in the optimization approaches may wish to skip ahead to subsequent posts.
+</p>
+</div>
+<h3 id="initializing-hexy">Initializing Hexy</h3>
+<p>In this post series, we will build a package to pretty-print numbers in hexadecimal. Let’s initialize our project via <code>stack</code>, using the <code>haskeleton</code> template:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> new hexy haskeleton <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> hexy</code></pre></div>
+<p>If <code>stack</code> informs you that it is missing pieces of metadata - items like author name, email, and so on, visit <a href="http://docs.haskellstack.org/en/stable/yaml_configuration/">this link</a> to setup a <code>config.yaml</code> for <code>stack</code> and avoid manually filling in the fields after initializing every project.</p>
+<p>The <code>haskeleton</code> template gives us a nice starting point to build our package:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">ls</span> -1
+<span class="ex">benchmark/</span>
+<span class="ex">CHANGELOG.md</span>
+<span class="ex">executable/</span>
+<span class="ex">hexy.cabal</span>
+<span class="ex">library/</span>
+<span class="ex">LICENSE.md</span>
+<span class="ex">package.yaml</span>
+<span class="ex">README.md</span>
+<span class="ex">Setup.hs</span>
+<span class="ex">stack.yaml</span>
+<span class="ex">test-suite/</span></code></pre></div>
+<p>We have separate directories for our library, test suite, and benchmarking code, as well as a handful of top-level files. Among these files is a <code>package.yaml</code>. Our package uses <a href="https://hackage.haskell.org/package/hpack"><code>hpack</code></a> to generate the project’s <code>hexy.cabal</code> file. <code>stack</code> has seamless support for <code>hpack</code>, so we never have to call the <code>hpack</code> binary ourselves. Building via <code>stack</code> is sufficient:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> build</code></pre></div>
+<p><code>hpack</code>’s <code>package.yaml</code> file format is pure YAML. It is inclusive by default, meaning for example, we tell it our library’s source directory and it treats all Haskell modules in that directory as part of our public API. This is in contrast to the <code>&lt;project_name&gt;.cabal</code> file where we must explicitly specify each Haskell module. I encourage you to form your own opinion of Cabal’s <code>&lt;project_name&gt;.cabal</code> file versus <code>hpack</code>’s <code>package.yaml</code> file. For new Haskellers, please do not feel like you must use <code>hpack</code>. Use whichever you prefer!</p>
+<h3 id="hexys-api">Hexy’s API</h3>
+<p>Let’s get rid of <code>haskeleton</code>’s default library file <code>Example.hs</code> and make our own:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">rm</span> library/Example.hs
+$ <span class="fu">rm</span> -r executable/
+$ <span class="bu">echo</span> <span class="st">&quot;module Hexy () where&quot;</span> <span class="op">&gt;</span> library/Hexy.hs
+$ <span class="fu">mkdir</span> library/Hexy
+$ <span class="bu">echo</span> <span class="st">&quot;module Hexy.Internal () where&quot;</span> <span class="op">&gt;</span> library/Hexy/Internal.hs</code></pre></div>
+<p>Be sure to remove the whole <code>executables</code> section from the <code>package.yaml</code> file too or else you will get a build error.</p>
+<p>Now we will flesh out the types of our API’s initial dev version in <code>library/Hexy.hs</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy</span>
+  ( <span class="dt">HexShow</span>(<span class="fu">..</span>)
+  , xshowp
+  , xshowpu
+  ) <span class="kw">where</span>
+
+<span class="co">-- | Conversion of values to hexadecimal &#39;String&#39;s.</span>
+<span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+  <span class="co">-- | Builds a zero-padded, lowercase hexadecimal `String` from a value.</span>
+  <span class="co">--</span>
+  <span class="co">-- @</span>
+  <span class="co">-- xshow (0x1f :: Word32) = &quot;0000001f&quot;</span>
+  <span class="co">-- @</span>
+<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+
+  <span class="co">-- | Builds a zero-padded, uppercase hexadecimal `String` from a value.</span>
+  <span class="co">--</span>
+  <span class="co">-- @</span>
+  <span class="co">-- xshowu (0x1f :: Word32) = &quot;0000001F&quot;</span>
+  <span class="co">-- @</span>
+<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+
+<span class="co">-- | Converts a value to a zero-padded, prefixed, lowercase hexadecimal `String`.</span>
+<span class="co">--</span>
+<span class="co">-- @</span>
+<span class="co">-- xshowp (0x1f :: Word32) = &quot;0x0000001f&quot;</span>
+<span class="co">-- @</span>
+<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowp <span class="fu">=</span> undefined
+
+<span class="co">-- | Converts a value to a zero-padded, prefixed, uppercase hexadecimal `String`.</span>
+<span class="co">--</span>
+<span class="co">-- @</span>
+<span class="co">-- xshowpu (0x1f :: Word32) = &quot;0x0000001F&quot;</span>
+<span class="co">-- @</span>
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowpu <span class="fu">=</span> undefined</code></pre></div>
+<p>We have a <code>HexShow</code> typeclass that lets us build lowercase hexadecimal strings via <code>xshow</code> and uppercase ones via <code>xshowu</code>. The idea of having lowercase and uppercase as separate typeclass functions is that instances can potentially have optimized functions for each case. The remaining functions have input that is constrained to instances of <code>HexShow</code> and will give us the hexadecimal string in various formats.</p>
+<p>The above functions follow a convention to save our users precious horizontal screen space. If the function is suffixed with a <code>p</code>, the output <code>String</code> will be prefixed with <code>0x</code>. If the function is suffixed with a <code>u</code>, the output <code>String</code> will use uppercase <code>A-F</code> instead of lowercase <code>a-f</code>. If the function is suffixed with both a <code>p</code> and a <code>u</code>, the output <code>String</code> will both be prefixed with <code>0x</code> and it will be uppercased.</p>
+<p>Our goal will be to implement <code>xshow</code> and <code>xshowu</code> for various <code>Integral</code> data types and then we can write the remaining <code>undefined</code> functions in terms of <code>xshow</code> and <code>xshowu</code>.</p>
+<h3 id="hexys-initial-implementation">Hexy’s Initial Implementation</h3>
+<p>Let’s implement the <code>HexShow</code> typeclass for <code>Word32</code> to get started. We will do this in our <code>Hexy.Internal</code> module to keep the implementation details hidden from our public API in the <code>Hexy</code> module:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy.Internal</span>
+  ( xshowWord32
+  , xshowuWord32
+  ) <span class="kw">where</span>
+
+<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word32</span>)
+<span class="kw">import qualified</span> <span class="dt">Numeric</span>
+
+<span class="ot">xshowWord32 ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowWord32 w <span class="fu">=</span> zeroPaddedHex (Numeric.showHex w <span class="st">&quot;&quot;</span>)
+ <span class="kw">where</span>
+  zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
+   <span class="kw">where</span>
+    go <span class="dv">0</span> s <span class="fu">=</span> s
+    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">&#39;0&#39;</span> <span class="fu">:</span> s)
+    numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> length hex
+    <span class="co">-- 4 bytes in a Word32 means we need 8 characters to store the nibbles</span>
+    lengthWithoutPrefix <span class="fu">=</span> <span class="dv">8</span>
+
+<span class="ot">xshowuWord32 ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowuWord32 <span class="fu">=</span> fmap <span class="dt">Char</span><span class="fu">.</span>toUpper <span class="fu">.</span> xshowWord32</code></pre></div>
+<p>As a warning, the above is an intentionally naïve implementation. We are using the <code>Numeric</code> module’s <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/Numeric.html#v:showHex"><code>showHex</code></a> function from <code>base</code> to do all the work for us and then we are zero-padding the result. <code>xshowuWord32</code> is “cheating” too by offloading to <code>xshowWord32</code> and uppercasing the result.</p>
+<p>For new Haskellers, keep in mind that there is nothing wrong with exploring your library design spaces in the way we have done above. It is better to have a working implementation that can be optimized later than to have no implementation at all!</p>
+<p>Now we will hook up our package’s internals to our public API in the <code>Hexy</code> module:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- ...</span>
+<span class="kw">import </span><span class="dt">Hexy.Internal</span>
+
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word32</span>)
+<span class="co">-- ...</span>
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowWord32
+  xshowu <span class="fu">=</span> xshowuWord32</code></pre></div>
+<p>We will do a quick test in GHCi to give us a warm-and-fuzzy on whether or not our implementation is correct:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> ghci
+<span class="ex">Configuring</span> GHCi with the following packages: hexy
+<span class="ex">GHCi</span>, version 8.0.2: http://www.haskell.org/ghc/  :? for help
+[<span class="ex">1</span> of 2] Compiling Hexy.Internal
+[<span class="ex">2</span> of 2] Compiling Hexy
+<span class="ex">Ok</span>, modules loaded: Hexy, Hexy.Internal.
+<span class="ex">Loaded</span> GHCi configuration
+<span class="ex">*Hexy.Internal</span> Hexy Hexy.Internal<span class="op">&gt;</span> xshow (0x1f :: Word32)
+<span class="st">&quot;0000001f&quot;</span>
+<span class="ex">*Hexy.Internal</span> Hexy Hexy.Internal<span class="op">&gt;</span> xshowu (0x1f :: Word32)
+<span class="st">&quot;0000001F&quot;</span></code></pre></div>
+<p>Looks good to me. <code>xshow</code> gave us the lowercase version and <code>xshowu</code> gave us the uppercase version. Both results are zero-padded based on the size in bytes of <code>Word32</code> (i.e. 4 byte value means our string should have 8 characters).</p>
+<p>A single instance is not super useful for our users though. We would like to add instances for all <code>Word</code>, <code>Word8</code>, <code>Word16</code>, <code>Word32</code>, <code>Word64</code>, <code>Int</code>, <code>Int8</code>, <code>Int16</code>, <code>Int32</code>, <code>Int64</code> so we will need functions for each one… Wait, for real? It would be a pain to write all those and surely we can do better. Let’s put Haskell’s typeclasses and polymorphism to work and get back to hacking on <code>Hexy.Internal</code>!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy.Internal</span>
+  ( xshowStorable
+  , xshowuStorable
+  , prefixHex
+  ) <span class="kw">where</span>
+
+<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
+<span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>)
+<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span>
+<span class="kw">import qualified</span> <span class="dt">Numeric</span>
+
+<span class="ot">xshowStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowStorable v <span class="fu">=</span> zeroPaddedHex (Numeric.showHex v <span class="st">&quot;&quot;</span>)
+ <span class="kw">where</span>
+  zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
+   <span class="kw">where</span>
+    go <span class="dv">0</span> s <span class="fu">=</span> s
+    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">&#39;0&#39;</span> <span class="fu">:</span> s)
+    numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> length hex
+    lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf v
+
+<span class="ot">xshowuStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowuStorable <span class="fu">=</span> fmap <span class="dt">Char</span><span class="fu">.</span>toUpper <span class="fu">.</span> xshowStorable
+
+<span class="ot">prefixHex ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
+prefixHex hex <span class="fu">=</span> <span class="ch">&#39;0&#39;</span> <span class="fu">:</span> <span class="ch">&#39;x&#39;</span> <span class="fu">:</span> hex</code></pre></div>
+<p>The <code>xshowStorable</code> function’s type signature is saying “gimme an integral, storable value and I’ll give you the hexadecimal string representation”. We use the <code>Storable</code> constraint so we can use the <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Storable.html#v:sizeOf"><code>sizeOf</code></a> function instead of hard-coding our character count to 8 for <code>Word32</code>. We also take on the <a href="http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#t:Integral"><code>Integral</code></a> constraint because we only want to deal with integral types and not types like <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Ptr.html#t:FunPtr"><code>FunPtr</code></a>. The <a href="http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#t:Show"><code>Show</code></a> constraint is only there because <code>showHex</code> requires it.</p>
+<p>We went ahead and added a <code>prefixHex</code> function too that slaps a <code>0x</code> on the front of the input string.</p>
+<p>Now back in <code>Hexy</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable</code></pre></div>
+<p>Test this in GHCi to gain some confidence that it works like the previous concrete <code>Word32</code> implementation.</p>
+<p>We may be tempted to try to get all our remaining instances in one fell swoop by swapping out the instance for <code>Word32</code> with this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable</code></pre></div>
+<p>The above would require the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#undecidable-instances"><code>UndecidableInstances</code></a> extension though so we will roll our sleeves up and add all our instances (a.k.a. spam copy-paste and find/replace until it builds):</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Int</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Int8</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Int16</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Int32</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Int64</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word8</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word16</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word64</span> <span class="kw">where</span>
+  xshow <span class="fu">=</span> xshowStorable
+  xshowu <span class="fu">=</span> xshowuStorable</code></pre></div>
+<p>We will test in GHCi to see if our functions work for a few of the different types:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="fu">$</span> stack ghci
+<span class="dt">Configuring</span> <span class="dt">GHCi</span> with the following packages<span class="fu">:</span> hexy
+<span class="dt">GHCi</span>, version <span class="fl">8.0</span><span class="fu">.</span><span class="dv">2</span><span class="fu">:</span> http<span class="fu">://</span>www<span class="fu">.</span>haskell<span class="fu">.</span>org<span class="fu">/</span>ghc<span class="fu">/</span>  <span class="fu">:?</span> for help
+[<span class="dv">1</span> <span class="kw">of</span> <span class="dv">2</span>] <span class="dt">Compiling</span> <span class="dt">Hexy.Internal</span>
+[<span class="dv">2</span> <span class="kw">of</span> <span class="dv">2</span>] <span class="dt">Compiling</span> <span class="dt">Hexy</span>
+<span class="dt">Ok</span>, modules loaded<span class="fu">:</span> <span class="dt">Hexy</span>, <span class="dt">Hexy.Internal</span><span class="fu">.</span>
+<span class="dt">Loaded</span> <span class="dt">GHCi</span> configuration
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span><span class="fu">&gt;</span> <span class="kw">import </span><span class="dt">Data.Int</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span><span class="fu">&gt;</span> <span class="kw">import </span><span class="dt">Data.Word</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshow (<span class="bn">0xdeadbeef</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+<span class="st">&quot;00000000deadbeef&quot;</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshow (<span class="bn">0xdeadbeef</span><span class="ot"> ::</span> <span class="dt">Int64</span>)
+<span class="st">&quot;00000000deadbeef&quot;</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshowu (<span class="bn">0xdeadbeef</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+<span class="st">&quot;DEADBEEF&quot;</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshow (<span class="bn">0xabcd</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+<span class="st">&quot;abcd&quot;</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshowu (<span class="bn">0xff</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+<span class="st">&quot;FF&quot;</span>
+<span class="fu">*</span><span class="dt">Hexy.Internal</span> <span class="dt">Hexy</span> <span class="dt">Hexy.Internal</span> <span class="dt">Data.Int</span> <span class="dt">Data.Word</span><span class="fu">&gt;</span> xshowu (<span class="bn">0x7f</span><span class="ot"> ::</span> <span class="dt">Int8</span>)
+<span class="st">&quot;7F&quot;</span></code></pre></div>
+<p>Now we need to finish implementing our API’s functions:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowp <span class="fu">=</span> prefixHex <span class="fu">.</span> xshow
+
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+xshowpu <span class="fu">=</span> prefixHex <span class="fu">.</span> xshowu</code></pre></div>
+<p>These ones are nice because we get to leverage <code>HexShow</code>’s functions. The only additional work we have to do is prepending the <code>0x</code>. Feel free to test these in GHCi to make sure they check out.</p>
+<p>And with that, we have completed our initial implementation of the <code>Hexy</code> library!</p>
+<h3 id="testing">Testing</h3>
+<p>It is hard to trust code without tests. Having a test suite will also make our optimization iterations <em>significantly</em> safer as we can hit our experimental changes up against it. Remember: working code is always better than faster but broken code!</p>
+<p>Let’s add some tests. We will start by changing up our test suite’s dependencies in our <code>package.yaml</code>. The <code>tests</code> section should look like this when we are done:</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">tests:</span>
+  <span class="fu">hexy-test-suite:</span>
+    <span class="fu">dependencies:</span>
+    <span class="kw">-</span> base
+    <span class="kw">-</span> hexy
+    <span class="kw">-</span> quickcheck-instances
+    <span class="kw">-</span> tasty
+    <span class="kw">-</span> tasty-auto
+    <span class="kw">-</span> tasty-quickcheck
+    <span class="fu">ghc-options:</span>
+    <span class="kw">-</span> -rtsopts
+    <span class="kw">-</span> -threaded
+    <span class="kw">-</span> -with-rtsopts=-N
+    <span class="fu">main:</span><span class="at"> Main.hs</span>
+    <span class="fu">source-dirs:</span><span class="at"> test-suite</span></code></pre></div>
+<p>We will be using <a href="https://hackage.haskell.org/package/tasty-auto-0.2.0.0"><code>tasty-auto</code></a> to get nice auto-discovery of our test functions. <code>tasty-auto</code> is deprecated in favor of <a href="https://hackage.haskell.org/package/tasty-discover-3.0.2"><code>tasty-discover</code></a>, but the version of <code>tasty-discover</code> in the Stackage <a href="https://www.stackage.org/lts-8.23">LTS snapshot</a> we are using is older so we will stick with <code>tasty-auto</code> for now.</p>
+<p>For our purposes, we will also be using <code>QuickCheck</code> generative property-based testing, so we have taken on the <code>tasty-quickcheck</code> dependency. <code>tasty</code> is a great testing framework that lets us pretty seamlessly blend property tests, unit tests, spec (BDD) tests, and so on, all in the same test suite.</p>
+<p>We will now wire up <code>tasty-auto</code> like this in <code>test-suite/Main.hs</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# OPTIONS_GHC -F -pgmF tasty-auto #-}</span></code></pre></div>
+<p>This tells GHC to call the <code>tasty-auto</code> binary during preprocessing via the <a href="http://ghc.readthedocs.io/en/8.0.2/phases.html#ghc-flag--pgmF"><code>-pgmF</code></a> flag. <code>tasty-auto</code> will recurse down our <code>test-suite</code> directory and pick up any files suffixed with <code>Test.hs</code> or <code>Test.lhs</code>.</p>
+<p>Now we add a test file:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">mkdir</span> test-suite/Test
+$ <span class="bu">echo</span> <span class="st">&quot;module Test.HexyTest where&quot;</span> <span class="op">&gt;</span> test-suite/Test/HexyTest.hs</code></pre></div>
+<p>Running <code>stack test</code> at this point should succeed even though we have no test functions defined. Here is the abridged contents of our <code>test-suite/Test/HexyTest.hs</code> file:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Test.HexyTest</span> <span class="kw">where</span>
+
+<span class="kw">import </span><span class="dt">Hexy</span>
+
+<span class="co">-- More imports...</span>
+
+<span class="kw">data</span> <span class="dt">Casing</span> <span class="fu">=</span> <span class="dt">Casing&#39;Lower</span> <span class="fu">|</span> <span class="dt">Casing&#39;Upper</span>
+
+<span class="ot">prop_xshow_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshow_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Lower</span> v
+
+<span class="ot">prop_xshow_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshow_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Lower</span>
+
+<span class="co">-- More properties testing xshow for the remaining instances...</span>
+
+<span class="ot">prop_xshowu_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Upper</span> v
+
+<span class="ot">prop_xshowu_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowu_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Upper</span>
+
+<span class="co">-- More properties testing xshowu for the remaining instances...</span>
+
+<span class="ot">prop_xshowp_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowp_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Lower</span> v
+
+<span class="ot">prop_xshowp_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowp_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Lower</span>
+
+<span class="co">-- More properties testing xshowp for the remaining instances...</span>
+
+<span class="ot">prop_xshowpu_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowpu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Upper</span> v
+
+<span class="ot">prop_xshowpu_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+prop_xshowpu_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Upper</span>
+
+<span class="co">-- More properties testing xshowpu for the remaining instances...</span>
+
+<span class="ot">xshowEqShowHexStorable ::</span> (<span class="dt">HexShow</span> a, <span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> <span class="dt">Casing</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+xshowEqShowHexStorable c v <span class="fu">=</span> showHexy c v <span class="fu">==</span> paddedHexViaShowHex c v
+
+<span class="ot">xshowpEqShowHexStorable ::</span> (<span class="dt">HexShow</span> a, <span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> <span class="dt">Casing</span> <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Bool</span>
+xshowpEqShowHexStorable c v <span class="fu">=</span> showHexyWithPrefix c v <span class="fu">==</span> <span class="st">&quot;0x&quot;</span> <span class="fu">&lt;&gt;</span> paddedHexViaShowHex c v
+
+<span class="co">-- Functions to get results from the Hexy API</span>
+<span class="co">-- ...</span>
+
+<span class="co">-- Functions to get results from base Numeric module</span>
+<span class="co">-- ...</span></code></pre></div>
+<p>Running <code>stack test</code> now will give us:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">test-suite</span>\Main.hs
+  <span class="ex">xshow</span> Int:      OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">xshow</span> Word:     OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">...</span>
+  <span class="ex">xshowu</span> Int:     OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">xshowu</span> Word:    OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">...</span>
+  <span class="ex">xshowp</span> Int:     OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">xshowp</span> Word:    OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">...</span>
+  <span class="ex">xshowpu</span> Int:    OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">xshowpu</span> Word:   OK
+    <span class="ex">+++</span> OK, passed 100 tests.
+  <span class="ex">...</span>
+
+<span class="ex">All</span> 40 tests passed (0.02s)</code></pre></div>
+<p>Cool - <code>QuickCheck</code> has generated hundreds of test cases for us and they all pass! Our test code uses the <code>showHex</code> function from <code>base</code> as a reference implementation, ensuring that in all the generated tests, our Hexy API matches up with <code>showHex</code>’s results. The power-to-weight ratio of <code>QuickCheck</code> is amazing. Props (heh) to <code>tasty-auto</code> as well for automatically picking up all of our test functions with a <code>prop_</code> prefix.</p>
+<p>If you wish to see the full test file, view it on <a href="https://github.com/jship/hexy/blob/fab8bce4aad7651875455d96f4c3fcd33a35251a/test-suite/Test/HexyTest.hs">GitHub</a>.</p>
+<h3 id="benchmarking">Benchmarking</h3>
+<p>Our implementation checks out - both from interacting with it via GHCi and in our property tests. Now we need to write a benchmark suite.</p>
+<p>We will begin with a group of benchmarks that test various ways to get a hex string for <code>Word32</code> only. Focusing on a single data type to start will help us keep our sanity. Copy the contents below into <code>benchmark/Main.hs</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Criterion.Main</span>
+
+<span class="kw">import </span><span class="dt">Hexy</span>
+
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word32</span>)
+<span class="kw">import </span><span class="dt">Numeric</span> (showHex)
+<span class="kw">import </span><span class="dt">Text.Printf</span> (printf)
+
+<span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> defaultMain
+  [ bgroup <span class="st">&quot;Word32&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>  <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span> <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshow&quot;</span>   <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>  <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>  <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span> <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    ]
+  ]</code></pre></div>
+<p>We are using the excellent <a href="https://hackage.haskell.org/package/criterion-1.1.4.0"><code>criterion</code></a> package for our benchmarking. There is an <a href="http://www.serpentine.com/criterion/tutorial.html">official tutorial</a> that is definitely worth a read.</p>
+<p>With <code>criterion</code>, we group our benchmarks with the <code>bgroup</code> function. Above, we have named our benchmark group <code>Word32</code>. We then pass in a list of <code>Benchmarkable</code>. Our <code>Benchmarkable</code>s consist of two reference implementations - <code>printf</code> and <code>showHex</code> from <code>base</code> - as well as our four <code>Hexy</code> API functions.</p>
+<div class="ui icon message">
+<i class="sticky note outline icon"></i>
+<p>
+We are lucky that we get to vet the performance of our library functions against a couple functions from <code>base</code>, though we will keep in mind that the <code>showHex</code> function does not provide zero-padding.
+</p>
+</div>
+<p>The <code>nf</code> function has type:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">nf ::</span> <span class="dt">NFData</span> b <span class="ot">=&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Benchmarkable</span></code></pre></div>
+<p>This might seem strange as we are passing in our functions to <code>nf</code> with all but their last argument filled in. Our “almost-saturated” benchmark functions fit the <code>(a -&gt; b)</code> and each benchmark function’s last argument fits the <code>a</code>. The result type of our benchmark functions must be an instance of <code>NFData</code>, which means it can be deeply evaluated. More formally, it can be evaluated to <a href="http://www.serpentine.com/criterion/tutorial.html#benchmarking-an-io-action">normal form</a>. What we are saying in these <code>bench</code> calls is “test the time of evaluating this function, including evaluating the result to normal form”. We must pass our pure functions in “almost-saturated” so that the evaluation results are not memoized. Behind the scenes, <code>criterion</code> runs our functions many times to determine an accurate execution time. If we passed in our functions “saturated”, the result would be cached and we would not be benchmarking much of anything!</p>
+<p>For info on laziness, weak-head normal form, and normal form, I recommend reading <a href="http://www.serpentine.com/criterion/tutorial.html#benchmarking-pure-functions">this bit</a> of the Criterion tutorial and <a href="http://chimera.labs.oreilly.com/books/1230000000929/ch02.html#sec_par-eval-whnf">this section</a> of Simon Marlow’s <em>Parallel and Concurrent Programming in Haskell</em>.</p>
+<p>Note that <code>criterion</code> also provides a <code>whnf</code> function that is identical to <code>nf</code> except it only evaluates the result to weak-head normal form (i.e. first constructor). It can be tricky knowing when to evaluate to weak-head normal form or going all the way to normal form. In our case, our API is intended to provide human-readable hex strings printed out to a screen, file, etc. Our users will need the fully evaluated hex strings, so we used <code>nf</code>.</p>
+<p>We will run our benchmarks via <code>stack</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<p>We have told <code>criterion</code> to give us pretty HTML output. <code>criterion</code> will also print the result summary to the screen:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span>
+<span class="ex">hexy-0.0.0</span>: benchmarks
+<span class="ex">Running</span> 1 benchmarks...
+<span class="ex">Benchmark</span> hexy-benchmarks: RUNNING...
+<span class="ex">benchmarking</span> Word32/printf
+<span class="bu">time</span>                 1.605 us   (1.590 us .. 1.624 us)
+                     <span class="ex">0.999</span> R²   (0.999 R² .. 0.999 R²)
+<span class="ex">mean</span>                 1.625 us   (1.611 us .. 1.641 us)
+<span class="ex">std</span> dev              55.32 ns   (47.10 ns .. 71.64 ns)
+<span class="ex">variance</span> introduced by outliers: 46% (moderately inflated)
+
+<span class="ex">benchmarking</span> Word32/showHex
+<span class="bu">time</span>                 130.5 ns   (129.2 ns .. 131.8 ns)
+                     <span class="ex">0.999</span> R²   (0.999 R² .. 1.000 R²)
+<span class="ex">mean</span>                 131.8 ns   (130.7 ns .. 133.3 ns)
+<span class="ex">std</span> dev              4.049 ns   (3.476 ns .. 4.644 ns)
+<span class="ex">variance</span> introduced by outliers: 47% (moderately inflated)
+
+<span class="ex">benchmarking</span> Word32/xshow
+<span class="bu">time</span>                 196.1 ns   (194.6 ns .. 197.9 ns)
+                     <span class="ex">0.999</span> R²   (0.999 R² .. 1.000 R²)
+<span class="ex">mean</span>                 196.1 ns   (194.3 ns .. 198.5 ns)
+<span class="ex">std</span> dev              7.402 ns   (5.765 ns .. 9.874 ns)
+<span class="ex">variance</span> introduced by outliers: 56% (severely inflated)
+
+<span class="ex">benchmarking</span> Word32/xshowp
+<span class="bu">time</span>                 206.6 ns   (205.4 ns .. 208.0 ns)
+                     <span class="ex">1.000</span> R²   (0.999 R² .. 1.000 R²)
+<span class="ex">mean</span>                 208.2 ns   (206.5 ns .. 210.0 ns)
+<span class="ex">std</span> dev              5.899 ns   (4.414 ns .. 7.315 ns)
+<span class="ex">variance</span> introduced by outliers: 42% (moderately inflated)
+
+<span class="ex">benchmarking</span> Word32/xshowu
+<span class="bu">time</span>                 571.7 ns   (569.1 ns .. 574.5 ns)
+                     <span class="ex">1.000</span> R²   (1.000 R² .. 1.000 R²)
+<span class="ex">mean</span>                 572.4 ns   (569.6 ns .. 576.0 ns)
+<span class="ex">std</span> dev              10.78 ns   (9.069 ns .. 13.47 ns)
+<span class="ex">variance</span> introduced by outliers: 22% (moderately inflated)
+
+<span class="ex">benchmarking</span> Word32/xshowpu
+<span class="bu">time</span>                 580.4 ns   (577.2 ns .. 584.1 ns)
+                     <span class="ex">1.000</span> R²   (0.999 R² .. 1.000 R²)
+<span class="ex">mean</span>                 584.2 ns   (580.7 ns .. 589.1 ns)
+<span class="ex">std</span> dev              13.71 ns   (11.59 ns .. 16.43 ns)
+<span class="ex">variance</span> introduced by outliers: 31% (moderately inflated)
+
+<span class="ex">Benchmark</span> hexy-benchmarks: FINISH</code></pre></div>
+<p>The text output is nice for quick benchmark-checking, and the HTML report gives us a great visual representation. You can view the benchmark report from this run <a href="/html/writing-performant-haskell-part-1-bench.html">here</a>.</p>
+<p>The bottom of the report gives us info on how to interpret the report’s graphs. For our purposes, we will stick to the summary view at the top. This gives us a consolidated bar graph of the timings of our functions:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-1-bench-summary.png"></p>
+<p>We see the following results:</p>
+<ul>
+<li><code>printf</code>: 1.62 microseconds (micro, not nano!!!)</li>
+<li><code>showHex</code>: 132 nanoseconds</li>
+<li><code>xshow</code>: 196 nanoseconds</li>
+<li><code>xshowp</code>: 208 nanoseconds</li>
+<li><code>xshowu</code>: 572 nanoseconds</li>
+<li><code>xshowpu</code>: 584 nanoseconds</li>
+</ul>
+<p>It is important to think about whether or not the numbers from a benchmarking run actually make sense. <code>showHex</code> was the fastest. It makes sense that our API functions are slower than <code>showHex</code> - even though they are implemented with <code>showHex</code> - because they also zero-pad. Looking at <code>xshow</code> and <code>xshowp</code> in isolation, it makes sense that <code>xshow</code> is faster because it skips prefixing with <code>0x</code>. Same with <code>xshowu</code> and <code>xshowpu</code>. Comparing <code>xshow</code> to <code>xshowu</code> or <code>xshowp</code> to <code>xshowpu</code>, the lowercase versions are significantly faster. Reminder: I mentioned we were “cheating” in the uppercase implementations because we just uppercased the results from the lowercase versions. Lastly, <code>printf</code> from <code>base</code> is incredibly slow relative to the other functions, but we will cut <code>printf</code> some slack. <code>printf</code> can handle all kinds of crazy formats but <code>showHex</code> and our <code>Hexy</code> functions can only pretty-print hex.</p>
+<p>Based on this benchmarking run, we should be able to considerably speed up our functions.</p>
+<h3 id="whats-next">What’s next?</h3>
+<p>In the next post, we will take stock of the core result type used in our API - <code>String</code> - and see if we can make a better choice.</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/fab8bce4aad7651875455d96f4c3fcd33a35251a">GitHub</a>.</p>
+</div>
+]]></description>
+    <pubDate>Wed, 09 Aug 2017 00:00:00 UT</pubDate>
+    <guid>https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html</guid>
+    <dc:creator>Jason Shipman</dc:creator>
+</item>
+<item>
     <title>RecordWildCards and Binary Parsing</title>
     <link>https://jship.github.io/posts/2017-06-24-record-wildcards-and-binary-parsing.html</link>
     <description><![CDATA[<div class="ui raised padded text container segment" id="blog_content">

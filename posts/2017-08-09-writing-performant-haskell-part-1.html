@@ -1,21 +1,95 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-    <title>jship's Personal Blog</title>
-    <link href="https://jship.github.io/atom.xml" rel="self" />
-    <link href="https://jship.github.io" />
-    <id>https://jship.github.io/atom.xml</id>
-    <author>
-        <name>Jason Shipman</name>
-        <email>jasonpshipman@gmail.com</email>
-    </author>
-    <updated>2017-08-09T00:00:00Z</updated>
-    <entry>
-    <title>Writing Performant Haskell (1 of 6): Intro</title>
-    <link href="https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html" />
-    <id>https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html</id>
-    <published>2017-08-09T00:00:00Z</published>
-    <updated>2017-08-09T00:00:00Z</updated>
-    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <!-- Site Properties -->
+  <title>jship - Writing Performant Haskell (1 of 6): Intro</title>
+  <link rel="stylesheet" type="text/css" href="../css/reset.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/site.min.css">
+
+  <link rel="stylesheet" type="text/css" href="../css/button.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/card.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/container.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/divider.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/dropdown.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/feed.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/grid.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/header.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/icon.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/image.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/list.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/message.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/menu.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/rail.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/segment.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sidebar.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sticky.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/transition.min.css">
+
+  <!-- This page's CSS. -->
+  <link rel="stylesheet" type="text/css" href="../css/default.css">
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css">
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/visibility.min.js"></script>
+  <script src="../js/sidebar.min.js"></script>
+  <script src="../js/sticky.min.js"></script>
+  <script src="../js/transition.min.js"></script>
+
+  <!-- This script wires up a few pieces of the UI. -->
+  <script src="../js/default.js"></script>
+</head>
+<body>
+  <!-- Following Menu -->
+  <div class="ui large top fixed hidden menu">
+    <div class="ui container">
+      <div class="header item">
+        jship
+      </div>
+      <a class="item" href="../index.html">Home</a>
+      <a class="item" href="../archive.html">Blog</a>
+      <a class="item" href="../about.html">About</a>
+      <a class="item" href="../contact.html">Contact</a>
+      <a class="item" href="../resume.html">Resume</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="ui vertical inverted sidebar menu">
+    <div class="header item">
+      jship
+    </div>
+    <a class="item" href="../index.html">Home</a>
+    <a class="item" href="../archive.html">Blog</a>
+    <a class="item" href="../about.html">About</a>
+    <a class="item" href="../contact.html">Contact</a>
+    <a class="item" href="../resume.html">Resume</a>
+  </div>
+
+  <!-- Page Contents -->
+  <div class="pusher page-background-gradient">
+    <div class="ui vertical center aligned segment top-menu-segment">
+      <div class="ui container">
+        <div class="ui large secondary inverted pointing menu top-pointing-menu">
+          <a class="toc item">
+            <i class="sidebar icon"></i>
+          </a>
+          <div class="header item">
+            jship
+          </div>
+          <a class="item" href="../index.html">Home</a>
+          <a class="item" href="../archive.html">Blog</a>
+          <a class="item" href="../about.html">About</a>
+          <a class="item" href="../contact.html">Contact</a>
+          <a class="item" href="../resume.html">Resume</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui raised padded text container segment" id="blog_content">
   <h2 class="ui header">Writing Performant Haskell (1 of 6): Intro</h2>
   <div class="ui right rail">
     <div class="ui sticky">
@@ -24,11 +98,11 @@
           <i class="twitter icon"></i>
           Twitter
         </a>
-        <a class="item" href="/rss.xml">
+        <a class="item" href="../rss.xml">
           <i class="rss icon"></i>
           RSS
         </a>
-        <a class="item" href="/atom.xml">
+        <a class="item" href="../atom.xml">
           <i class="rss square icon"></i>
           Atom
         </a>
@@ -38,11 +112,11 @@
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="../images/headshot.png">
       </div>
       <div class="content">
         <div class="summary">
-          <a class="user" href="/about.html">
+          <a class="user" href="../about.html">
             Jason Shipman
           </a>
           <div class="date">
@@ -52,7 +126,7 @@
         <div class="meta">
           <i class="tags icon"></i>
           
-            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Performance.html">Performance</a>, <a href="/tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
           
         </div>
       </div>
@@ -104,7 +178,7 @@ $ <span class="bu">echo</span> <span class="st">&quot;module Hexy.Internal () wh
   , xshowpu
   ) <span class="kw">where</span>
 
-<span class="co">-- | Conversion of values to hexadecimal &#39;String&#39;s.</span>
+<span class="co">-- | Conversion of values to hexadecimal 'String's.</span>
 <span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
   <span class="co">-- | Builds a zero-padded, lowercase hexadecimal `String` from a value.</span>
   <span class="co">--</span>
@@ -155,7 +229,7 @@ xshowWord32 w <span class="fu">=</span> zeroPaddedHex (Numeric.showHex w <span c
   zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
    <span class="kw">where</span>
     go <span class="dv">0</span> s <span class="fu">=</span> s
-    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">&#39;0&#39;</span> <span class="fu">:</span> s)
+    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">'0'</span> <span class="fu">:</span> s)
     numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> length hex
     <span class="co">-- 4 bytes in a Word32 means we need 8 characters to store the nibbles</span>
     lengthWithoutPrefix <span class="fu">=</span> <span class="dv">8</span>
@@ -204,7 +278,7 @@ xshowStorable v <span class="fu">=</span> zeroPaddedHex (Numeric.showHex v <span
   zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
    <span class="kw">where</span>
     go <span class="dv">0</span> s <span class="fu">=</span> s
-    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">&#39;0&#39;</span> <span class="fu">:</span> s)
+    go n s <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (<span class="ch">'0'</span> <span class="fu">:</span> s)
     numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> length hex
     lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf v
 
@@ -212,7 +286,7 @@ xshowStorable v <span class="fu">=</span> zeroPaddedHex (Numeric.showHex v <span
 xshowuStorable <span class="fu">=</span> fmap <span class="dt">Char</span><span class="fu">.</span>toUpper <span class="fu">.</span> xshowStorable
 
 <span class="ot">prefixHex ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">String</span>
-prefixHex hex <span class="fu">=</span> <span class="ch">&#39;0&#39;</span> <span class="fu">:</span> <span class="ch">&#39;x&#39;</span> <span class="fu">:</span> hex</code></pre></div>
+prefixHex hex <span class="fu">=</span> <span class="ch">'0'</span> <span class="fu">:</span> <span class="ch">'x'</span> <span class="fu">:</span> hex</code></pre></div>
 <p>The <code>xshowStorable</code> function’s type signature is saying “gimme an integral, storable value and I’ll give you the hexadecimal string representation”. We use the <code>Storable</code> constraint so we can use the <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Storable.html#v:sizeOf"><code>sizeOf</code></a> function instead of hard-coding our character count to 8 for <code>Word32</code>. We also take on the <a href="http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#t:Integral"><code>Integral</code></a> constraint because we only want to deal with integral types and not types like <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Ptr.html#t:FunPtr"><code>FunPtr</code></a>. The <a href="http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#t:Show"><code>Show</code></a> constraint is only there because <code>showHex</code> requires it.</p>
 <p>We went ahead and added a <code>prefixHex</code> function too that slaps a <code>0x</code> on the front of the input string.</p>
 <p>Now back in <code>Hexy</code>:</p>
@@ -327,37 +401,37 @@ $ <span class="bu">echo</span> <span class="st">&quot;module Test.HexyTest where
 
 <span class="co">-- More imports...</span>
 
-<span class="kw">data</span> <span class="dt">Casing</span> <span class="fu">=</span> <span class="dt">Casing&#39;Lower</span> <span class="fu">|</span> <span class="dt">Casing&#39;Upper</span>
+<span class="kw">data</span> <span class="dt">Casing</span> <span class="fu">=</span> <span class="dt">Casing'Lower</span> <span class="fu">|</span> <span class="dt">Casing'Upper</span>
 
 <span class="ot">prop_xshow_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshow_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Lower</span> v
+prop_xshow_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing'Lower</span> v
 
 <span class="ot">prop_xshow_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshow_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Lower</span>
+prop_xshow_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing'Lower</span>
 
 <span class="co">-- More properties testing xshow for the remaining instances...</span>
 
 <span class="ot">prop_xshowu_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Upper</span> v
+prop_xshowu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing'Upper</span> v
 
 <span class="ot">prop_xshowu_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowu_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing&#39;Upper</span>
+prop_xshowu_Word <span class="fu">=</span> xshowEqShowHexStorable <span class="dt">Casing'Upper</span>
 
 <span class="co">-- More properties testing xshowu for the remaining instances...</span>
 
 <span class="ot">prop_xshowp_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowp_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Lower</span> v
+prop_xshowp_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing'Lower</span> v
 
 <span class="ot">prop_xshowp_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowp_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Lower</span>
+prop_xshowp_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing'Lower</span>
 
 <span class="co">-- More properties testing xshowp for the remaining instances...</span>
 
 <span class="ot">prop_xshowpu_Int ::</span> <span class="dt">Positive</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowpu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Upper</span> v
+prop_xshowpu_Int (<span class="dt">Positive</span> v) <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing'Upper</span> v
 
 <span class="ot">prop_xshowpu_Word ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">Bool</span>
-prop_xshowpu_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing&#39;Upper</span>
+prop_xshowpu_Word <span class="fu">=</span> xshowpEqShowHexStorable <span class="dt">Casing'Upper</span>
 
 <span class="co">-- More properties testing xshowpu for the remaining instances...</span>
 
@@ -483,9 +557,9 @@ We are lucky that we get to vet the performance of our library functions against
 <span class="ex">variance</span> introduced by outliers: 31% (moderately inflated)
 
 <span class="ex">Benchmark</span> hexy-benchmarks: FINISH</code></pre></div>
-<p>The text output is nice for quick benchmark-checking, and the HTML report gives us a great visual representation. You can view the benchmark report from this run <a href="/html/writing-performant-haskell-part-1-bench.html">here</a>.</p>
+<p>The text output is nice for quick benchmark-checking, and the HTML report gives us a great visual representation. You can view the benchmark report from this run <a href="../html/writing-performant-haskell-part-1-bench.html">here</a>.</p>
 <p>The bottom of the report gives us info on how to interpret the report’s graphs. For our purposes, we will stick to the summary view at the top. This gives us a consolidated bar graph of the timings of our functions:</p>
-<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-1-bench-summary.png"></p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-1-bench-summary.png"></p>
 <p>We see the following results:</p>
 <ul>
 <li><code>printf</code>: 1.62 microseconds (micro, not nano!!!)</li>
@@ -501,366 +575,8 @@ We are lucky that we get to vet the performance of our library functions against
 <p>In the next post, we will take stock of the core result type used in our API - <code>String</code> - and see if we can make a better choice.</p>
 <p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/fab8bce4aad7651875455d96f4c3fcd33a35251a">GitHub</a>.</p>
 </div>
-]]></summary>
-</entry>
-<entry>
-    <title>RecordWildCards and Binary Parsing</title>
-    <link href="https://jship.github.io/posts/2017-06-24-record-wildcards-and-binary-parsing.html" />
-    <id>https://jship.github.io/posts/2017-06-24-record-wildcards-and-binary-parsing.html</id>
-    <published>2017-06-24T00:00:00Z</published>
-    <updated>2017-06-24T00:00:00Z</updated>
-    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
-  <h2 class="ui header">RecordWildCards and Binary Parsing</h2>
-  <div class="ui right rail">
-    <div class="ui sticky">
-      <div class="ui labeled icon vertical menu">
-        <a class="item" href="https://twitter.com/jship21347">
-          <i class="twitter icon"></i>
-          Twitter
-        </a>
-        <a class="item" href="/rss.xml">
-          <i class="rss icon"></i>
-          RSS
-        </a>
-        <a class="item" href="/atom.xml">
-          <i class="rss square icon"></i>
-          Atom
-        </a>
-      </div>
-    </div>
+
   </div>
-  <div class="ui feed">
-    <div class="event">
-      <div class="label">
-        <img src="/images/headshot.png">
-      </div>
-      <div class="content">
-        <div class="summary">
-          <a class="user" href="/about.html">
-            Jason Shipman
-          </a>
-          <div class="date">
-            June 24, 2017
-          </div>
-        </div>
-        <div class="meta">
-          <i class="tags icon"></i>
-          
-            <a href="/tags/Cereal.html">Cereal</a>, <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Language%20Extension.html">Language Extension</a>, <a href="/tags/Parsing.html">Parsing</a>, <a href="/tags/Quick%20Tip.html">Quick Tip</a>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-  <h3 id="recordwildcards"><code>RecordWildCards</code></h3>
-<p><code>RecordWildCards</code> is a GHC extension that makes working with Haskell records more convenient. The extension has been <a href="https://ocharles.org.uk/blog/posts/2014-12-04-record-wildcards.html">blogged</a> about in a few <a href="https://kseo.github.io/posts/2014-02-10-record-wildcards.html">places</a> already, so this post intends to provide a different motivating example: binary parsing.</p>
-<p>Kwang’s linked blogpost shows binary serialization using the extension. This post will show the improvements we get with <code>RecordWildCards</code> and binary deserialization, but first…</p>
-<h3 id="what-does-recordwildcards-do">What does <code>RecordWildCards</code> do?</h3>
-<p><code>RecordWildCards</code> provides local bindings for the fields in a record:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
-<span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package text</span>
 
-<span class="ot">{-# LANGUAGE OverloadedStrings #-}</span>
-<span class="ot">{-# LANGUAGE RecordWildCards #-}</span>
-
-<span class="kw">import </span><span class="dt">Data.Monoid</span> ((&lt;&gt;))
-<span class="kw">import </span><span class="dt">Data.Text</span> (<span class="dt">Text</span>, intercalate)
-<span class="kw">import </span><span class="dt">Data.Text.IO</span> (putStrLn)
-<span class="kw">import </span><span class="dt">Prelude</span> <span class="kw">hiding</span> (putStrLn)
-
-<span class="kw">data</span> <span class="dt">BlogPost</span> <span class="fu">=</span> <span class="dt">BlogPost</span>
-  {<span class="ot"> blogPostTitle  ::</span> <span class="dt">Text</span>
-  ,<span class="ot"> blogPostTags   ::</span> [<span class="dt">Text</span>]
-  }
-
-<span class="ot">samplePost ::</span> <span class="dt">BlogPost</span>
-samplePost <span class="fu">=</span> <span class="dt">BlogPost</span> <span class="st">&quot;Foo&quot;</span> [<span class="st">&quot;Bar&quot;</span>, <span class="st">&quot;Baz, Quux&quot;</span>]
-
-<span class="co">-- Pattern matching is convenient but fiddly when new fields are</span>
-<span class="co">-- added or existing fields are rearranged.</span>
-<span class="ot">printViaPatternMatching ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaPatternMatching (<span class="dt">BlogPost</span> title tags) <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> title
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> tags
-
-<span class="co">-- Record accessors are not fiddly when new fields are added or existing fields</span>
-<span class="co">-- are rearranged, but require more keystrokes and horizontal space.</span>
-<span class="ot">printViaRecordAccessors ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaRecordAccessors blogPost <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> blogPostTitle blogPost
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> (blogPostTags blogPost)
-
-<span class="co">-- RecordWildCards offers the best of both worlds with the above two</span>
-<span class="co">-- approaches. We use the field names directly as bindings to the</span>
-<span class="co">-- record&#39;s values.</span>
-<span class="ot">printViaRecordWildCards ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaRecordWildCards <span class="dt">BlogPost</span>{<span class="fu">..</span>} <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> blogPostTitle
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> blogPostTags</code></pre></div>
-<p>You can execute the above script with <code>stack</code> and it will spin up <code>GHCi</code>.</p>
-<h3 id="how-does-it-help-with-binary-parsing">How does it help with binary parsing?</h3>
-<p>Let’s use <a href="https://www.stackage.org/lts-8.20/package/cereal-0.5.4.0">cereal</a> as our binary parsing library. Here are the imports we’ll need:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
-<span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package bytestring --package cereal</span>
-
-<span class="ot">{-# LANGUAGE RecordWildCards #-}</span>
-
-<span class="kw">import </span><span class="dt">Data.ByteString</span> (<span class="dt">ByteString</span>)
-<span class="kw">import </span><span class="dt">Data.Serialize.Get</span> (<span class="dt">Get</span>, getWord8, getWord16le, runGet)
-<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word8</span>, <span class="dt">Word16</span>)</code></pre></div>
-<p>We will keep the domain fun and pretend we have a simple video game configuration we need to parse out of a file. Why we are using a binary file format for this is above our paygrade apparently:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">GameConfig</span> <span class="fu">=</span> <span class="dt">GameConfig</span>
-  {<span class="ot"> gameConfigScreenWidth  ::</span> <span class="dt">Word16</span>
-  ,<span class="ot"> gameConfigScreenHeight ::</span> <span class="dt">Word16</span>
-  ,<span class="ot"> gameConfigVolume       ::</span> <span class="dt">Word8</span>
-  } <span class="kw">deriving</span> (<span class="dt">Show</span>)
-
-<span class="ot">decodeGameConfig ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span> <span class="ot">-&gt;</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">GameConfig</span>
-decodeGameConfig <span class="fu">=</span> runGet</code></pre></div>
-<p>Now we need to provide a <code>Get GameConfig</code> and we’ll be off to the races. There are multiple ways we can tackle this, and the <a href="https://hackage.haskell.org/package/cereal-0.5.4.0/docs/Data-Serialize-Get.html#t:Get">docs</a> indicate <code>Get</code> has instances for <code>Applicative</code> and <code>Monad</code>.</p>
-<p>I typically reach for <code>Applicative</code> by default when I need to parse something simple:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">applicativeGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-applicativeGetter <span class="fu">=</span> <span class="dt">GameConfig</span> <span class="fu">&lt;$&gt;</span> getWord16le <span class="fu">&lt;*&gt;</span> getWord16le <span class="fu">&lt;*&gt;</span> getWord8</code></pre></div>
-<p>This has a drawback though: the pieces being parsed are not named. If we look at the parser in isolation, all we know is that a <code>GameConfig</code> wraps two <code>Word16</code>s and one <code>Word8</code> and the fields are laid out in that order in the data declaration.</p>
-<p>Another option would be to monadically parse the <code>GameConfig</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetter <span class="fu">=</span> <span class="kw">do</span>
-  screenWidth <span class="ot">&lt;-</span> getWord16le
-  screenHeight <span class="ot">&lt;-</span> getWord16le
-  volume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span> screenWidth screenHeight volume</code></pre></div>
-<p>This provides instant understanding of the meaning of the fields we are parsing. We know what a <code>GameConfig</code> represents without flipping over to its declaration. The disadvantage over the <code>Applicative</code> approach is that we must ensure we are passing the field values in the correct order to the <code>GameConfig</code> constructor. What if we got sleepy and wrote the last line like this?</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  pure <span class="fu">$</span> <span class="dt">GameConfig</span> screenHeight screenWidth volume</code></pre></div>
-<p>A third approach would be to still parse monadically but use record syntax at the end:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetterWithRecordSyntax ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetterWithRecordSyntax <span class="fu">=</span> <span class="kw">do</span>
-  screenWidth <span class="ot">&lt;-</span> getWord16le
-  screenHeight <span class="ot">&lt;-</span> getWord16le
-  volume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span>
-    { gameConfigScreenWidth <span class="fu">=</span> screenWidth
-    , gameConfigScreenHeight <span class="fu">=</span> screenHeight
-    , gameConfigVolume <span class="fu">=</span> volume
-    }</code></pre></div>
-<p>This somewhat helps alleviate the problem of the sleepy dev, but now the parser is almost twice as many lines and we could still incorrectly write the last bit like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  pure <span class="fu">$</span> <span class="dt">GameConfig</span>
-    { gameConfigScreenWidth <span class="fu">=</span> screenHeight
-    , gameConfigScreenHeight <span class="fu">=</span> screenWidth
-    , gameConfigVolume <span class="fu">=</span> volume
-    }</code></pre></div>
-<p>Let’s see what we can do now that we have <code>RecordWildCards</code> in our toolbelt:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetterWithRecordWildCards ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetterWithRecordWildCards <span class="fu">=</span> <span class="kw">do</span>
-  gameConfigScreenWidth <span class="ot">&lt;-</span> getWord16le
-  gameConfigScreenHeight <span class="ot">&lt;-</span> getWord16le
-  gameConfigVolume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span>{<span class="fu">..</span>}</code></pre></div>
-<p>We have solved the problem of the sleepy dev! That aside, the big win here is that we can look at the parser in complete isolation - no flipping to the data declaration. All we have to worry about is that we parse the fields in the correct order, which is the main problem we were solving anyways! We don’t have to worry about the fields in the data structure being laid out in the same order as the bytes in the file.</p>
-</div>
-]]></summary>
-</entry>
-<entry>
-    <title>ZuriHac Recap: 2017</title>
-    <link href="https://jship.github.io/posts/2017-06-11-zurihac-recap.html" />
-    <id>https://jship.github.io/posts/2017-06-11-zurihac-recap.html</id>
-    <published>2017-06-11T00:00:00Z</published>
-    <updated>2017-06-11T00:00:00Z</updated>
-    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
-  <h2 class="ui header">ZuriHac Recap: 2017</h2>
-  <div class="ui right rail">
-    <div class="ui sticky">
-      <div class="ui labeled icon vertical menu">
-        <a class="item" href="https://twitter.com/jship21347">
-          <i class="twitter icon"></i>
-          Twitter
-        </a>
-        <a class="item" href="/rss.xml">
-          <i class="rss icon"></i>
-          RSS
-        </a>
-        <a class="item" href="/atom.xml">
-          <i class="rss square icon"></i>
-          Atom
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="ui feed">
-    <div class="event">
-      <div class="label">
-        <img src="/images/headshot.png">
-      </div>
-      <div class="content">
-        <div class="summary">
-          <a class="user" href="/about.html">
-            Jason Shipman
-          </a>
-          <div class="date">
-            June 11, 2017
-          </div>
-        </div>
-        <div class="meta">
-          <i class="tags icon"></i>
-          
-            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/ZuriHac.html">ZuriHac</a>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-  <h3 id="location">Location</h3>
-<p>ZuriHac 2017 took place at <a href="https://www.hsr.ch/Home.home.0.html">Hochschule für Technik Rapperswil</a>, a university in the beautiful Rapperswil-Jona area of Switzerland. Rapperswil-Jona is southeast of Zürich, and the HSR is <a href="https://www.google.ch/maps/place/HSR+Hochschule+f%C3%BCr+Technik+Rapperswil/@47.2233607,8.815174,17z/data=!3m1!4b1!4m5!3m4!1s0x479ab6e12facc7ad:0x711fa65bf58f9c0f!8m2!3d47.2233607!4d8.8173627">here</a> on Google Maps. The university is located right on the lake and the view was absolutely stunning:</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-I can think of worse places to have a hackathon. <a href="https://twitter.com/hashtag/ZuriHac?src=hash">#ZuriHac</a> <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> <a href="https://twitter.com/hashtag/Haskell?src=hash">#Haskell</a> <a href="https://t.co/tEzFENJ7hw">https://t.co/tEzFENJ7hw</a> <a href="https://t.co/iIXOOv3qdj">pic.twitter.com/iIXOOv3qdj</a>
-</p>
-— cocharles (<span class="citation">@acid2</span>) <a href="https://twitter.com/acid2/status/873287264356499457">June 9, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="keynote-neil-mitchell---friday-june-9-1000">Keynote: Neil Mitchell - Friday, June 9 @ 10:00</h3>
-<p>The kickoff keynote for the event was presented by <a href="https://twitter.com/ndm_haskell">Neil Mitchell</a>, where he discussed how to make drive-by contributions to Haskell projects. Things like adding documentation, filing bug reports, fixing Hlint/Weeder warnings, writing tests, HPC, CI, optimization, etc in an effort to work towards larger contributions. Slides available <a href="http://ndmitchell.com/downloads/slides-drive-by_haskell_contributions-09_jun_2017.pdf">here</a>.</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Neil Mitchell opening <a href="https://twitter.com/hashtag/Zurihac?src=hash">#Zurihac</a> with advice on how to get started contributing to Haskell projects. Perfect start! <a href="https://t.co/b2kJBflGBA">pic.twitter.com/b2kJBflGBA</a>
-</p>
-— Monoid Mary (<span class="citation">@argumatronic</span>) <a href="https://twitter.com/argumatronic/status/873091270389911553">June 9, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="project-pitches---friday-june-9-1100">Project Pitches - Friday, June 9 @ 11:00</h3>
-<p>After the first keynote, the Haskellers working on their own projects for ZuriHac gave short pitches advertising what is available to hack on, if their projects are beginner friendly, and so on. Some examples: <a href="https://github.com/haskell-servant/servant">servant</a>, <a href="https://github.com/LumiGuide/haskell-opencv">haskell-opencv</a>, <a href="https://github.com/jcmincke/Blast">Blast</a>, and <a href="https://github.com/haskell-foundation/foundation">foundation</a>. Then we all dispersed to begin hacking.</p>
-<p>Here is Pasqualino Titto Assini pitching his <a href="http://quid2.org/">Quid-2</a> project:</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-A room full of Haskellers <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> <a href="https://t.co/T0qbLwIPHq">pic.twitter.com/T0qbLwIPHq</a>
-</p>
-— Mikhail Glushenkov (<span class="citation">@refold</span>) <a href="https://twitter.com/refold/status/873117989695913986">June 9, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="talk-mario-meili-cyrill-schenkel---friday-june-9-1600">Talk: Mario Meili &amp; Cyrill Schenkel - Friday, June 9 @ 16:00</h3>
-<p>Mario Meili and Cyrill Schenkel, students at the HSR, gave a joint presentation. Mario’s portion dicussed what is blocking Haskell’s adoption and Cyrill’s portion discussed what is lacking in Haskell tooling. Multiple attendees were there to work on different aspects of tooling, so I hope Cyrill, Mario, and the tooling Haskellers got together during the weekend!</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Mario Meili's talk at <a href="https://twitter.com/hashtag/ZuriHac2017?src=hash">#ZuriHac2017</a> about what holds up Haskell adoption <a href="https://t.co/z37IQteHGr">pic.twitter.com/z37IQteHGr</a>
-</p>
-— Jens Petersen (<span class="citation">@juhp</span>) <a href="https://twitter.com/juhp/status/873202283193876481">June 9, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="keynote-julie-moronuki---friday-june-9-1700">Keynote: Julie Moronuki - Friday, June 9 @ 17:00</h3>
-<p><a href="https://twitter.com/argumatronic">Julie Moronuki</a> delivered a keynote on teaching Haskell and also teaching in general. Slides available <a href="https://docs.google.com/presentation/d/1_I5mYXivG5NbOHnICld_Xo41uOyAT57Yade5qfz2toQ/edit">here</a>. The points in this talk resonated strongly for me and outline problems I have seen and experienced with education (at least in the US, not sure about elsewhere). Teachers often encourage blind memorization instead of fundamental understanding, particularly in math courses, and this can significantly hamper students’ future learning. A mathematician friend of mine from college described math as a “universal language for connecting ideas”. If students do not understand the fundamentals, they have more difficulty grokking the concepts built on top of these fundamentals. No one should be deprived of this universal language!</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Teaching should be so good that concepts are internalized as naturally as beliefs. <a href="https://twitter.com/hashtag/zurihac?src=hash">#zurihac</a> <a href="https://t.co/q1nWCZlg1U">pic.twitter.com/q1nWCZlg1U</a>
-</p>
-— tmpz (<span class="citation">@tmpz</span>) <a href="https://twitter.com/tmpz/status/873203035836747776">June 9, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="dinner---friday-june-9-1800">Dinner - Friday, June 9 @ 18:00</h3>
-<p>PIZZA TRUCK!!!</p>
-<h3 id="keynote-stephen-diehl---saturday-june-10-1000">Keynote: Stephen Diehl - Saturday, June 10 @ 10:00</h3>
-<p><a href="https://twitter.com/smdiehl">Stephen Diehl</a> gave his keynote on elliptic curve crypto in Haskell. This talk had a crash course on a bit of abstract algebra/elliptic curves, and the rest of the talk was on using Haskell to establish trust between two parties using commitment schemes, zero knowledge proofs, verifiable computation, etc. My experience with cryptography is limited to basic usage of secret-key stuff in <a href="https://github.com/jedisct1/libsodium">libsodium</a>, so this provided me with plenty of future reading material. Code available <a href="https://github.com/sdiehl/zurihac-crypto">here</a>.</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="de" dir="ltr">
-Keynote by Stephen Diehl on Modern Cryptography in Haskell <a href="https://twitter.com/hashtag/haskell?src=hash">#haskell</a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> <a href="https://t.co/uEjx1zBj62">pic.twitter.com/uEjx1zBj62</a>
-</p>
-— ZuriHac (<span class="citation">@ZuriHac</span>) <a href="https://twitter.com/ZuriHac/status/873453982383001600">June 10, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="keynote-simon-thompson---saturday-june-10-1700">Keynote: Simon Thompson - Saturday, June 10 @ 17:00</h3>
-<p><a href="https://twitter.com/smdiehl">Simon Thompson</a>’s keynote was on “the essence of laziness”. He discussed the evolution of Haskell’s approach to IO, lessons learned from <a href="http://miranda.org.uk/">Miranda</a>, how it began with <code>interact</code>, etc. Simon introduced an interesting <code>Interact</code> DSL that he expanded on throughout the talk. Code and slides available <a href="https://github.com/simonjohnthompson/Interaction">here</a>. Thanks for the link, <a href="https://twitter.com/Kensan42">Adrian</a>!</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Getting to listen to one of my heroes, <a href="https://twitter.com/thompson_si"><span class="citation">@thompson_si</span></a>, talk about laziness and Haskell prehistory. <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> is wonderful. <a href="https://t.co/DczGKfi7q7">pic.twitter.com/DczGKfi7q7</a>
-</p>
-— Monoid Mary (<span class="citation">@argumatronic</span>) <a href="https://twitter.com/argumatronic/status/873559880472428544">June 10, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="dinner---saturday-june-10-1800">Dinner - Saturday, June 10 @ 18:00</h3>
-<p>BYOBBQ!!!</p>
-<h3 id="keynote-edward-kmett---sunday-june-11-1000">Keynote: Edward Kmett - Sunday, June 11 @ 10:00</h3>
-<p><a href="https://twitter.com/kmett">Edward Kmett</a> gave the final keynote and pulled a fast one on all the Haskellers - it had virtually no Haskell! His talk was on creating a subset of the <a href="https://ispc.github.io/">Intel SPMD</a> compiler as a <a href="https://github.com/ekmett/rts">C++ library</a>. The library uses template specialization to provide architecture-specific implementations (like AVX) of vectorized ops that map to minimal assembly instructions. I used to play around with expression templates and metaprogramming in C++, so this was a fascinating and unexpected talk! There is a lot to unpack in <code>rts</code>. We all had a chuckle at snippets like <a href="https://github.com/ekmett/rts/blob/2ca93a6ec4914e71e77f8d4b01f9fac760b7aab9/src/rts/soa.hpp#L71">this</a> where Edward has macros to code gen his vector ops via preprocessor, and considering those vector ops are templates, they are compile-time instantiated, resulting in more code gen. It was not entirely unrelated to Haskell though - the name of the project hints that it may influence GHC some day…</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Keynote by Edward Kmett on “Haskell” <a href="https://twitter.com/hashtag/haskell?src=hash">#haskell</a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> <a href="https://twitter.com/hashtag/classicbaitandswitch?src=hash">#classicbaitandswitch</a> <a href="https://t.co/l4cNNcjk9n">pic.twitter.com/l4cNNcjk9n</a>
-</p>
-— ZuriHac (<span class="citation">@ZuriHac</span>) <a href="https://twitter.com/ZuriHac/status/873817776502263808">June 11, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="project-demos---sunday-june-11-1600">Project Demos - Sunday, June 11 @ 16:00</h3>
-<p>I missed this portion as Marco and I were actively learning and hacking <a href="https://github.com/haskell-foundation/foundation">foundation</a>. It sounds like there was a neat multiplayer “ZuriHac Plays Mario” game in the vein of “Twitch Plays…”. Code available <a href="https://github.com/bitonic/zurihac-plays">here</a>.</p>
-<blockquote class="twitter-tweet tw-align-center" data-lang="en">
-<p lang="en" dir="ltr">
-Collaborative Mario at <a href="https://twitter.com/ZuriHac"><span class="citation">@ZuriHac</span></a> <a href="https://twitter.com/hashtag/zurihac2017?src=hash">#zurihac2017</a> fun! :-) <a href="https://t.co/6h3ulZRoZH">pic.twitter.com/6h3ulZRoZH</a>
-</p>
-— Simon Thompson (<span class="citation">@thompson_si</span>) <a href="https://twitter.com/thompson_si/status/873906086444752896">June 11, 2017</a>
-</blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<h3 id="personal-endeavors">Personal Endeavors</h3>
-<h4 id="first-timer">First Timer</h4>
-<p>This was my first time attending ZuriHac and it was too much fun - will definitely be back next year! Big thanks to <a href="https://jaspervdj.be/">Jasper Van der Jeugt</a>, <a href="http://lambda-view.blogspot.ch/">Simon Meier</a>, and all of the HSR folks that made the event happen. Props to the Haskell community too for being friendly and inviting.</p>
-<h4 id="foundation">Foundation</h4>
-<p>I wanted to learn <a href="https://twitter.com/vincenthz">Vincent Hanquez</a>’s <a href="https://github.com/haskell-foundation/foundation">Foundation</a> package as I had only read about it before ZuriHac. I spent a good chunk of my time with Marco Martinucci at ZuriHac exploring pieces of it. We found an <a href="https://github.com/haskell-foundation/foundation/issues/312">issue</a> that required a decent amount of refactoring and gave us something tangible to work on as we dove into the package. We came close to fixing the issue during the event, and more importantly, we learned a great deal about associated types, efficient builders, etc. It was a pleasure working with <a href="https://github.com/NicolasDP">Nicolas Di Prima</a> and Vincent. They are phenomenal and patient teachers!</p>
-<h4 id="nomyx">Nomyx</h4>
-<p>On Saturday, I participated in <a href="http://www.corentindupont.info/">Corentin Dupont</a>’s <a href="https://github.com/nomyx/Nomyx">Nomyx</a> game. We had about 8 players total if I remember correctly. This one is interesting - each player can write the game’s rules in a Haskell DSL. Some examples include writing rules for the win conditions, rules for how player’s vote on new rules (unanimity, majority, etc), rules for concepts in the game world (like bank accounts, planets, professions, etc). The possibilities are nearly limitless! In our game, we played with bank accounts and I gave everyone a salary of 10 money delivered every minute. One player later wrote a rule to make his friend poor and I snuck a rule in to collect taxes from all players. Another player created a rule where you could only vote if you had X amount of money or something along those lines. Meanwhile, a different player was creating a rule that would output the list of players and their passed rule counts. He iterated on this a couple times, submitting each version as a new rule that we all had the opportunity to vote on. The catch though - an active win condition was “Get 10 rules passed” or something like that. The rule he was iterating on was a nice thing to have, but every iteration put him closer to winning if we majority-voted the iteration into the game! The game reminded me a bit of <a href="https://boardgamegeek.com/boardgame/258/fluxx">Fluxx</a>, but from one game of Nomyx, I find Nomyx more fun with higher replay value since the players write the rules. The tax collector rule has been parameterized and submitted in a PR <a href="https://github.com/nomyx/nomyx-library/pull/2">here</a>.</p>
-</div>
-]]></summary>
-</entry>
-<entry>
-    <title>Welcome to my blog</title>
-    <link href="https://jship.github.io/posts/2017-05-28-welcome.html" />
-    <id>https://jship.github.io/posts/2017-05-28-welcome.html</id>
-    <published>2017-05-28T00:00:00Z</published>
-    <updated>2017-05-28T00:00:00Z</updated>
-    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
-  <h2 class="ui header">Welcome to my blog</h2>
-  <div class="ui right rail">
-    <div class="ui sticky">
-      <div class="ui labeled icon vertical menu">
-        <a class="item" href="https://twitter.com/jship21347">
-          <i class="twitter icon"></i>
-          Twitter
-        </a>
-        <a class="item" href="/rss.xml">
-          <i class="rss icon"></i>
-          RSS
-        </a>
-        <a class="item" href="/atom.xml">
-          <i class="rss square icon"></i>
-          Atom
-        </a>
-      </div>
-    </div>
-  </div>
-  <div class="ui feed">
-    <div class="event">
-      <div class="label">
-        <img src="/images/headshot.png">
-      </div>
-      <div class="content">
-        <div class="summary">
-          <a class="user" href="/about.html">
-            Jason Shipman
-          </a>
-          <div class="date">
-            May 28, 2017
-          </div>
-        </div>
-        <div class="meta">
-          <i class="tags icon"></i>
-          
-            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Hakyll.html">Hakyll</a>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-  <p>Welcome, all. I am Jason Shipman, a software engineer in the Tampa/St. Petersburg area. You can find out more about me <a href="/about.html">here</a>. I have been itching to create a blog for a while and now it has begun!</p>
-<p>This blog will be rooted pretty heavily in statically-typed functional programming, specifically with <a href="https://www.haskell.org/">Haskell</a> and possibly some <a href="http://www.purescript.org/">Purescript</a>, <a href="https://www.idris-lang.org/">Idris</a>, &lt;insert some other ML-influenced language here&gt;, etc. That being said, I enjoy programming regardless of static or dynamic typing. I intend to learn a dynamic functional language at some point, so expect some posts about that too. Whether that winds up being <a href="https://clojure.org/">Clojure</a>, <a href="https://www.erlang.org/">Erlang</a>, or <a href="https://elixir-lang.org/">Elixir</a> remains to be seen. More common languages like C++ and Javascript will likely crop up on this blog now and again as well.</p>
-<p>This blog is powered by <a href="https://jaspervdj.be/hakyll/index.html">Hakyll</a>, a fantastic static site generator.</p>
-<p>A two-line Haskell program is worth a thousand words:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
-main <span class="fu">=</span> putStrLn <span class="st">&quot;Welcome!&quot;</span></code></pre></div>
-</div>
-]]></summary>
-</entry>
-
-</feed>
+</body>
+</html>
