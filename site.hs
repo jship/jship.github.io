@@ -30,6 +30,9 @@ main = do
     match "images/*" $ do
       route idRoute
       compile copyFileCompiler
+    match "html/*" $ do
+      route idRoute
+      compile copyFileCompiler
     tags <- buildTags "posts/*" (fromCapture "tags/*.html")
     tagsRules tags $ \tag pattern -> do
       let title = "Posts tagged with \"" ++ tag ++ "\""
