@@ -576,6 +576,6 @@ Based on this benchmarking run, we should be able to considerably speed up our f
 
 ### What's next?
 
-In the next post, we will take stock of the core result type used in our API - `String` - and see if we can make a better choice.
+In the [next post](/posts/2017-08-10-writing-performant-haskell-part-2.html), we will take stock of the core result type used in our API - `String` - and see if we can make a better choice.
 
 All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/fab8bce4aad7651875455d96f4c3fcd33a35251a).
