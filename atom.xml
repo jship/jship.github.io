@@ -8,8 +8,268 @@
         <name>Jason Shipman</name>
         <email>jasonpshipman@gmail.com</email>
     </author>
-    <updated>2017-08-09T00:00:00Z</updated>
+    <updated>2017-08-10T00:00:00Z</updated>
     <entry>
+    <title>Writing Performant Haskell (2 of 6): Strings</title>
+    <link href="https://jship.github.io/posts/2017-08-10-writing-performant-haskell-part-2.html" />
+    <id>https://jship.github.io/posts/2017-08-10-writing-performant-haskell-part-2.html</id>
+    <published>2017-08-10T00:00:00Z</published>
+    <updated>2017-08-10T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Writing Performant Haskell (2 of 6): Strings</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 10, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Performance.html">Performance</a>, <a href="/tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="recap">Recap</h3>
+<p>In the <a href="/posts/2017-08-09-writing-performant-haskell-part-1.html">previous post</a>, we built our initial version of <code>hexy</code>, a hexadecimal pretty printing library. Our API looked like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+
+<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span>
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">String</span></code></pre></div>
+<p>We added some unit tests as well as some benchmarks. The <a href="/html/writing-performant-haskell-part-1-bench.html">benchmark report</a>’s summary looked like this:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-1-bench-summary.png"></p>
+<h3 id="result-type">Result Type</h3>
+<p>The result type for all functions in our API is <code>String</code>. We remember that <code>String</code> is a type synonym for <code>[Char]</code>, so <code>String</code> is a list of characters. The list is ubiquitous in Haskell code, but it is not always the most performant choice for text data. Lists in Haskell are linked lists, and their memory representation is illustrated on <a href="http://image.slidesharecdn.com/slides-100930074853-phpapp01/95/highperformance-haskell-43-728.jpg">this slide</a> from Johan Tibell’s High-Performance Haskell. The whole High-Performance Haskell deck is well worth a read.</p>
+<p>In GHC, the <code>Char</code> data type is <a href="https://github.com/ghc/ghc/blob/d08b9ccdf2812e8f8fa34d0c89275deee574524c/libraries/ghc-prim/GHC/Types.hs#L135">defined</a> as follows:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="ot">{-# CTYPE &quot;HsChar&quot; #-}</span> <span class="dt">Char</span> <span class="fu">=</span> <span class="dt">C</span><span class="fu">#</span> <span class="dt">Char</span><span class="fu">#</span></code></pre></div>
+<p>Don’t worry about the <code>#</code> symbols and the <code>CTYPE</code> bit for now. From Johan Tibell’s slides and some GHC digging, we know that the head of every cons (a.k.a. <code>:</code>) in our <code>String</code> is 2 machine words - 1 for the <code>C#</code> constructor and 1 for the <code>Char#</code> value. The cons constructor itself requires 1 machine word. Cons also requires 1 pointer to the head and 1 pointer to the tail, which is 2 more machine words. This means that for a single character in our <code>String</code>, we need 5 machine words! We also have 1 additional machine word from the <code>[]</code> constructor at the end of the list.</p>
+<p>Let’s invoke our API’s <code>xshowp</code> function with a <code>Word32</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">ghci<span class="fu">&gt;</span> xshowp (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+<span class="st">&quot;0x0000001f&quot;</span></code></pre></div>
+<p>Representing <code>&quot;0x0000001f&quot;</code> as a <code>String</code> means we are using 51 machine words for a 10-character string. Oh, the memory overhead!!! Keep in mind, memory overhead does not always result in poor execution time. When working with <code>String</code>s though, we have to follow a new pointer for every character in the string when the string is evaluated. The <code>String</code>’s characters are not necessarily stored contiguously in memory, so we are hopping around in memory from cons constructor to cons constructor until we hit <code>[]</code>. Once we get to a new cons in the string, we must follow a separate pointer just to get to the character value. That is quite a few hops in memory even for something small like a 10-character string!</p>
+<p>Our benchmarks are creating the <code>String</code> and not actually using it - to print to the screen, log somewhere, etc. - so even though <code>xshow</code> and <code>xshowp</code> are not horrendously slow, we have effectively pushed performance problems onto our users when they go to use the <code>String</code>s we provide. We have some evidence of this in our benchmarking runs for <code>xshowu</code> and <code>xshowpu</code>. These functions take the results from <code>xshow</code> and <code>xshowp</code> respectively, then traverse the <code>String</code>’s characters, uppercasing each one if necessary. I did mention that we “cheated” when we implemented it like this, but it may be surprising that <code>xshow</code> and <code>xshowp</code> are about 3 times faster than <code>xshowu</code> and <code>xshowpu</code>. All <code>xshowu</code> and <code>xshowpu</code> are doing on top is uppercasing!</p>
+<p><img class="ui centered image" src="/images/this_is_unacceptable_cat.jpg"></p>
+<h3 id="string-i-banish-thee"><code>String</code>, I Banish Thee!</h3>
+<p>If <code>String</code> gives poor performance, what are our options? The most popular <code>String</code> alternatives are:</p>
+<ul>
+<li><a href="https://hackage.haskell.org/package/text-1.2.2.1"><code>text</code></a></li>
+<li><a href="https://hackage.haskell.org/package/bytestring-0.10.8.1"><code>bytestring</code></a></li>
+</ul>
+<p>The <code>text</code> package provides packed UTF-16 string types, while the <code>bytestring</code> package provides string types that are packed sequences of bytes. As a rule of thumb, strive to use <code>text</code> when working with textual data and use <code>bytestring</code> when working with binary data. Our API’s result type is textual data so we will pick <code>text</code>.</p>
+<p>If we crack open the <a href="https://hackage.haskell.org/package/text-1.2.2.1"><code>text</code> docs</a>, we are immediately hit with another decision: Will our API use strict <code>Text</code> or lazy <code>Text</code>? A strict <code>Text</code> is a packed array, while a lazy <code>Text</code> is a list of packed arrays. We might be tempted to think “List? Bad!”, but it really depends on the use cases of our users. We will follow in the footsteps of the <a href="https://hackage.haskell.org/package/text-show-3.4.1.1/docs/TextShow.html"><code>text-show</code></a> package and put the choice on the users of <code>Hexy</code>.</p>
+<p>The <code>text</code> package provides a <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Lazy-Builder.html#t:Builder"><code>Builder</code></a> type that can be converted to both strict and lazy <code>Text</code>. We will update <code>Hexy</code> to use the <code>Builder</code> type in the <code>HexShow</code> typeclass, and then provide <code>xshow</code>-like methods for both strict and lazy <code>Text</code>s that will handle the <code>Builder</code> to <code>Text</code> conversions.</p>
+<h3 id="replacing-string-with-text">Replacing <code>String</code> with <code>Text</code></h3>
+<p>We first need to update our <code>package.yaml</code> to take on <code>text</code> as a dependency. Our library, test suite, and benchmark suite will all need access to the <code>text</code> package, so we will use <code>hpack</code>’s root-level dependencies feature to avoid repeating ourselves. We will go ahead and move <code>base</code> here too. The below is abbreviated, showing only the updated top-level sections:</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">benchmarks:</span>
+  <span class="fu">hexy-benchmarks:</span>
+    <span class="fu">dependencies:</span>
+    <span class="kw">-</span> hexy
+    <span class="kw">-</span> criterion
+    <span class="fu">ghc-options:</span>
+    <span class="kw">-</span> -rtsopts
+    <span class="kw">-</span> -threaded
+    <span class="kw">-</span> -with-rtsopts=-N
+    <span class="fu">main:</span><span class="at"> Main.hs</span>
+    <span class="fu">source-dirs:</span><span class="at"> benchmark</span>
+<span class="fu">dependencies:</span>
+<span class="kw">-</span> base
+<span class="kw">-</span> text
+<span class="fu">library:</span>
+  <span class="fu">dependencies:</span><span class="at"> </span><span class="kw">[]</span>
+  <span class="fu">source-dirs:</span><span class="at"> library</span>
+<span class="fu">tests:</span>
+  <span class="fu">hexy-test-suite:</span>
+    <span class="fu">dependencies:</span>
+    <span class="kw">-</span> hexy
+    <span class="kw">-</span> quickcheck-instances
+    <span class="kw">-</span> tasty
+    <span class="kw">-</span> tasty-auto
+    <span class="kw">-</span> tasty-quickcheck
+    <span class="fu">ghc-options:</span>
+    <span class="kw">-</span> -rtsopts
+    <span class="kw">-</span> -threaded
+    <span class="kw">-</span> -with-rtsopts=-N
+    <span class="fu">main:</span><span class="at"> Main.hs</span>
+    <span class="fu">source-dirs:</span><span class="at"> test-suite</span></code></pre></div>
+<p>Now we will update the <code>Hexy</code> module to use <code>Text</code> instead of <code>String</code> in the result types:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy</span>
+  ( <span class="dt">HexShow</span>(<span class="fu">..</span>)
+  , xshow
+  , xshowp
+  , xshowu
+  , xshowpu
+  , xshowl
+  , xshowlp
+  , xshowlu
+  , xshowlpu
+  ) <span class="kw">where</span>
+
+<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>, <span class="dt">Int8</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">Text.Lazy</span>
+<span class="kw">import </span><span class="dt">Data.Text.Lazy.Builder</span> (<span class="dt">Builder</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy.Builder</span> <span class="kw">as</span> <span class="dt">Text.Lazy.Builder</span>
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>, <span class="dt">Word8</span>)
+
+<span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+
+<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+xshow <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowl
+
+<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+xshowp <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowlp
+
+<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+xshowu <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowlu
+
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+xshowpu <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowlpu
+
+<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+xshowl <span class="fu">=</span> Text.Lazy.Builder.toLazyText <span class="fu">.</span> xbuild
+
+<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+xshowlp <span class="fu">=</span> Text.Lazy.Builder.toLazyText <span class="fu">.</span> prefixHex <span class="fu">.</span> xbuild
+
+<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+xshowlu <span class="fu">=</span> Text.Lazy.Builder.toLazyText <span class="fu">.</span> xbuildu
+
+<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+xshowlpu <span class="fu">=</span> Text.Lazy.Builder.toLazyText <span class="fu">.</span> prefixHex <span class="fu">.</span> xbuildu
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xbuild <span class="fu">=</span> xbuildStorable
+  xbuildu <span class="fu">=</span> xbuilduStorable
+
+<span class="co">-- bunch of other instances...</span></code></pre></div>
+<p>The <code>HexShow</code> typeclass used to have the <code>xshow</code> and <code>xshowu</code> functions. Those have been moved out and <code>HexShow</code> provides functions returning <code>Builder</code> values instead. All of the functions outside of the <code>HexShow</code> typeclass are defined in terms of <code>HexShow</code>’s functions. <code>xshow</code> and its variants are here, but now we have 4 additional functions:</p>
+<ul>
+<li><code>xshowl :: HexShow a =&gt; a -&gt; Text.Lazy.Text</code></li>
+<li><code>xshowlp :: HexShow a =&gt; a -&gt; Text.Lazy.Text</code></li>
+<li><code>xshowlu :: HexShow a =&gt; a -&gt; Text.Lazy.Text</code></li>
+<li><code>xshowlpu :: HexShow a =&gt; a -&gt; Text.Lazy.Text</code></li>
+</ul>
+<p>These are identical to their <code>xshow</code> counterparts except they provide a lazy <code>Text</code> (from module <code>Data.Text.Lazy</code>) instead of a strict <code>Text</code> (from module <code>Data.Text</code>). This is purely to make the interface easier to work with for our users. Users can directly work with <code>Builder</code> if they want, or they can get strict or lazy <code>Text</code> without worrying about manually doing the conversion dance from <code>Builder</code>.</p>
+<p>The above will not compile just yet because we need to implement the <code>xbuildStorable</code> and <code>xbuilduStorable</code> functions. Here is our updated <code>Hexy.Internal</code> module contents:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span>
+
+<span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
+
+<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
+<span class="kw">import </span><span class="dt">Data.Monoid</span> ((&lt;&gt;))
+<span class="kw">import </span><span class="dt">Data.Text.Lazy.Builder</span> (<span class="dt">Builder</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">Text.Lazy</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy.Builder</span> <span class="kw">as</span> <span class="dt">Text.Lazy.Builder</span>
+<span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span>
+
+<span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+xbuildStorable v <span class="fu">=</span> zeroPaddedHex <span class="fu">.</span> buildHex <span class="dt">Char</span><span class="fu">.</span>intToDigit <span class="fu">$</span> v
+ <span class="kw">where</span>
+  zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
+   <span class="kw">where</span>
+    go <span class="dv">0</span> b <span class="fu">=</span> b
+    go n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">&#39;0&#39;</span> <span class="fu">&lt;&gt;</span> b)
+    numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> hexLength
+    lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf v
+    hexLength <span class="fu">=</span> Text.Lazy.length <span class="fu">.</span> Text.Lazy.Builder.toLazyText <span class="fu">$</span> hex
+
+<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+xbuilduStorable v <span class="fu">=</span> zeroPaddedHex <span class="fu">.</span> buildHex (<span class="dt">Char</span><span class="fu">.</span>toUpper <span class="fu">.</span> <span class="dt">Char</span><span class="fu">.</span>intToDigit) <span class="fu">$</span> v
+ <span class="kw">where</span>
+  zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
+   <span class="kw">where</span>
+    go <span class="dv">0</span> b <span class="fu">=</span> b
+    go n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">&#39;0&#39;</span> <span class="fu">&lt;&gt;</span> b)
+    numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> hexLength
+    lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf v
+    hexLength <span class="fu">=</span> Text.Lazy.length <span class="fu">.</span> Text.Lazy.Builder.toLazyText <span class="fu">$</span> hex
+
+<span class="ot">prefixHex ::</span> <span class="dt">Builder</span> <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+prefixHex b <span class="fu">=</span> <span class="st">&quot;0x&quot;</span> <span class="fu">&lt;&gt;</span> b
+
+<span class="ot">buildHex ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+buildHex <span class="fu">=</span> buildWordAtBase <span class="dv">16</span>
+
+<span class="ot">buildWordAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+buildWordAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> buildIt (quotRem n0 base) mempty
+     <span class="kw">where</span>
+      buildIt (n, d) b <span class="fu">=</span> seq c <span class="fu">$</span>
+        <span class="kw">case</span> n <span class="kw">of</span>
+          <span class="dv">0</span> <span class="ot">-&gt;</span> b&#39;
+          _ <span class="ot">-&gt;</span> buildIt (quotRem n base) b&#39;
+       <span class="kw">where</span>
+        c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+        b&#39; <span class="fu">=</span> Text.Lazy.Builder.singleton c <span class="fu">&lt;&gt;</span> b</code></pre></div>
+<p><code>xbuildStorable</code> looks awfully similar to our previous <code>xshowStorable</code> function. The flow is exactly the same and we are using <code>text</code>’s <code>Builder</code> API instead of Haskell’s list API. We have a copy-paste uppercase version of <code>xbuildStorable</code> in <code>xbuilduStorable</code>. The only difference is the uppercasing character conversion function. We will worry about DRY-ing these up in a subsequent post.</p>
+<p>We are no longer using <code>showHex</code> from the <code>Numeric</code> module in <code>base</code> to do all the hexadecimal conversion work for us. <code>buildHex</code> replaces <code>showHex</code>, and <code>buildHex</code> offloads to the new <code>buildWordAtBase</code> function at the bottom. The definition of <code>buildWordAtBase</code> looks like <a href="https://hackage.haskell.org/package/base-4.9.1.0/docs/src/Numeric.html#showIntAtBase"><code>showIntAtBase</code></a> from <code>base</code> and is hauntingly similar to <code>showbIntAtBase</code> from the <a href="https://hackage.haskell.org/package/text-show-3.4.1.1/docs/src/TextShow-Data-Integral.html#showbIntAtBase"><code>text-show</code></a> package. This function keeps <a href="http://hackage.haskell.org/package/base-4.9.1.0/docs/Prelude.html#v:quotRem"><code>quotRem</code></a>-ing by 16 the input value down to 0, keeping track of the hex characters from the remainders along the way, and building the text from least significant to most significant digit.</p>
+<p>The <code>seq</code> function used above might look a little strange:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">seq<span class="ot"> ::</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> b</code></pre></div>
+<p><code>seq</code> evaluates its first argument to <a href="http://chimera.labs.oreilly.com/books/1230000000929/ch02.html#sec_par-eval-whnf">weak head normal form</a> then returns its second argument. Don’t worry about the use of <code>seq</code> here - the code came straight from <code>base</code>’s definition for <code>showIntAtBase</code> and was edited to work for <code>Builder</code> instead of <code>String</code>. In a later post, we will touch on bang patterns which are a convenient sugar on top of <code>seq</code>.</p>
+<p>The final updated piece in the code above is <code>prefixHex</code>. <code>Builder</code>s have a <code>Monoid</code> instance, so we use <code>&lt;&gt;</code> to prepend <code>&quot;0x&quot;</code> on the input builder. We switched on the <code>OverloadedStrings</code> language extension so that we can treat the string literal of <code>&quot;0x&quot;</code> as a <code>Builder</code> value.</p>
+<h3 id="test-check">Test Check</h3>
+<p>Our unit tests will need some minor updates to work with the new API. The test suite diff is available on <a href="https://github.com/jship/hexy/commit/7d844aae57489769945f03f91a03e0923c9fa54a#diff-5a2a189d6fbb4d7c4ac540574581731d">GitHub</a>.</p>
+<h3 id="performance-check">Performance Check</h3>
+<p>We updated our API to use <code>Text</code> instead of <code>String</code>. We should now re-run our benchmarks. We will make a small tweak to our benchmarks to support our new <code>Hexy</code> functions. The benchmark suite diff is available here on <a href="https://github.com/jship/hexy/commit/7d844aae57489769945f03f91a03e0923c9fa54a#diff-fe5bbc61e13cd369b5e9c33dd827dae6">GitHub</a>.</p>
+<p>First, the <a href="/html/writing-performant-haskell-part-1-bench.html">benchmark results</a> from the <a href="/posts/2017-08-09-writing-performant-haskell-part-1.html">previous post</a> so we can compare:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-1-bench-summary.png"></p>
+<p>Now we will run the benchmarks for this post’s changes:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<p>View the full report from this run <a href="/html/writing-performant-haskell-part-2-bench.html">here</a>. The summary looks like this (scales are not the same due to <code>printf</code>):</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-2-bench-summary.png"></p>
+<p>Oh no! We successfully made all of our functions slower, not faster! For example, <code>xshow</code> took about 200 nanoseconds in our <code>String</code>-based API and now it takes about 500 nanoseconds. Ouch… Keep in mind that <code>xshow</code> now has to convert the underlying <code>Builder</code> result to a lazy <code>Text</code> before finally converting to a strict <code>Text</code>. Remember this note too from the previous post:</p>
+<div class="ui icon message">
+<i class="sticky note outline icon"></i>
+<p>
+We are lucky that we get to vet the performance of our library functions against a couple functions from <code>base</code>, though we will keep in mind that the <code>showHex</code> function does not provide zero-padding.
+</p>
+</div>
+<p>These benchmark results are not all bad though. For one, our API is no longer pushing the performance problems of working with <code>String</code> values on our users. The other saving grace is that the uppercase versions no longer take almost 3 times as long as the lowercase versions. The performance of the uppercase versions is not terribly far off from the performance of the uppercase versions in our previous <code>String</code>-based iteration of the API. The latter point is not a strong one though as our use of <code>Builder</code> forced us away from “cheating” with the uppercase versions - i.e. we are uppercasing as we build the string as opposed to a traversal pass after building the string.</p>
+<p>We are also doing something strange in our new <code>xbuildStorable</code> and <code>xbuilduStorable</code> functions. See if you spot it! We will address the strange bit in a later post. (Hint: it hurts performance!)</p>
+<p>Our users may be happy that they can do fast things with <code>Hexy</code>’s <code>Text</code> results once they have them, but they likely will not be too happy about having to wait so long on <code>Hexy</code> to dish them out!</p>
+<h3 id="whats-next">What’s next?</h3>
+<p>At this point, you may be thinking this post series is a big bait-and-switch and that <code>String</code> is faster than <code>Text</code>. I will ask you to trust me that switching from <code>String</code> to <code>Text</code> will pay off for us eventually. It will ultimately give us more flexibility for optimization and is a more performance-friendly result type for our users.</p>
+<p>In the next post, we will take a break from the <code>String</code> versus <code>Text</code> cage match. We will turn our attention to GHC’s <code>SPECIALIZE</code> pragma.</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/7d844aae57489769945f03f91a03e0923c9fa54a">GitHub</a>.</p>
+</div>
+]]></summary>
+</entry>
+<entry>
     <title>Writing Performant Haskell (1 of 6): Intro</title>
     <link href="https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html" />
     <id>https://jship.github.io/posts/2017-08-09-writing-performant-haskell-part-1.html</id>
@@ -498,7 +758,7 @@ We are lucky that we get to vet the performance of our library functions against
 <p>It is important to think about whether or not the numbers from a benchmarking run actually make sense. <code>showHex</code> was the fastest. It makes sense that our API functions are slower than <code>showHex</code> - even though they are implemented with <code>showHex</code> - because they also zero-pad. Looking at <code>xshow</code> and <code>xshowp</code> in isolation, it makes sense that <code>xshow</code> is faster because it skips prefixing with <code>0x</code>. Same with <code>xshowu</code> and <code>xshowpu</code>. Comparing <code>xshow</code> to <code>xshowu</code> or <code>xshowp</code> to <code>xshowpu</code>, the lowercase versions are significantly faster. Reminder: I mentioned we were “cheating” in the uppercase implementations because we just uppercased the results from the lowercase versions. Lastly, <code>printf</code> from <code>base</code> is incredibly slow relative to the other functions, but we will cut <code>printf</code> some slack. <code>printf</code> can handle all kinds of crazy formats but <code>showHex</code> and our <code>Hexy</code> functions can only pretty-print hex.</p>
 <p>Based on this benchmarking run, we should be able to considerably speed up our functions.</p>
 <h3 id="whats-next">What’s next?</h3>
-<p>In the next post, we will take stock of the core result type used in our API - <code>String</code> - and see if we can make a better choice.</p>
+<p>In the <a href="/posts/2017-08-10-writing-performant-haskell-part-2.html">next post</a>, we will take stock of the core result type used in our API - <code>String</code> - and see if we can make a better choice.</p>
 <p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/fab8bce4aad7651875455d96f4c3fcd33a35251a">GitHub</a>.</p>
 </div>
 ]]></summary>
