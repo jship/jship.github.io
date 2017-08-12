@@ -274,6 +274,6 @@ Our users may be happy that they can do fast things with `Hexy`'s `Text` results
 
 At this point, you may be thinking this post series is a big bait-and-switch and that `String` is faster than `Text`.  I will ask you to trust me that switching from `String` to `Text` will pay off for us eventually.  It will ultimately give us more flexibility for optimization and is a more performance-friendly result type for our users.
 
-In the next post, we will take a break from the `String` versus `Text` cage match.  We will turn our attention to GHC's `SPECIALIZE` pragma.
+In the [next post](/posts/2017-08-11-writing-performant-haskell-part-3.html), we will take a break from the `String` versus `Text` cage match.  We will turn our attention to GHC's `SPECIALIZE` pragma.
 
 All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/7d844aae57489769945f03f91a03e0923c9fa54a).
