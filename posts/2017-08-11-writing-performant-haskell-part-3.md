@@ -4,6 +4,11 @@ author: Jason Shipman
 tags: Haskell, Performance, Hexy Tutorial
 ---
 
+<div class="ui icon info message">
+  <i class="info icon"></i>
+  <div class="content"><div class="header">Edited: August 12, 2017</div><p>Thanks to <a href="https://www.reddit.com/user/dramforever">/u/dramforever</a> over on <a href="https://www.reddit.com/r/haskell/comments/6t5ui7/writing_performant_haskell_3_of_6_specialize/dlibhsd/">Reddit</a> for helping to clarify content in this post!</p></div>
+</div>
+
 ### Recap
 
 In the [previous post](/posts/2017-08-10-writing-performant-haskell-part-2.html), we overhauled `hexy`'s API to return `Text` values instead of `String`.  Our API looked like this:
@@ -71,7 +76,11 @@ The compiler replaces the `HexShow` constraint on `xshow` with a `HexShowRec` va
 xshowHexShowRec :: HexShowRec a -> a -> Text.Text
 ```
 
-If GHC knows at compile-time what type `a` is for a given call to `xshow`, conceptually, it can directly pass in `word32HexShowInstanceDictionary` as the first parameter to `xshowHexShowRec`.  If GHC does not know what `a` is at compile-time, it has to look up which method dictionary to use at runtime.  The runtime dictionary lookup is expensive and probably deserves its own post outside this series.
+Whenever we call `xshow`, behind the scenes we are calling `xshowHexShowRec`.  GHC implicitly passes the correct method dictionary as the first parameter for us.
+
+If GHC knows at compile-time that type `a` is `Word32` for a given call to `xshow`, then conceptually, the underlying call to `xshowHexShowRec` will know it was passed `word32HexShowInstanceDictionary` specifically.
+
+If GHC does not know what `a` is at compile-time for a given call to `xshow`, then the underlying call to `xshowHexShowRec` will have no knowledge that it was specifically passed the `Word32` method dictionary or some other instance's method dictionary.  This makes it difficult for GHC to perform important optimizations like inlining, so calling a function provided by the dictionary is expensive.
 
 Fortunately for us, GHC will probably know what `a` is based on how our users will likely use the library.  For example:
 
@@ -82,7 +91,7 @@ showHexColor (r, g, b) = mconcat ["#", xshow r, xshow g, xshow b]
 -- showHexColor (0, 255, 0) == "#00ff00", i.e. way too green
 ```
 
-On the other hand, our `HexShow` instances offload all the real work to `xbuildStorable` and `xbuilduStorable`.  Their types:
+On the other hand, our `HexShow` instances offload all the real work to `xbuildStorable` and `xbuilduStorable` in our internal module.  Their types:
 
 ```haskell
 xbuildStorable :: (Integral a, Show a, Storable a) => a -> Builder
@@ -92,11 +101,11 @@ xbuilduStorable :: (Integral a, Show a, Storable a) => a -> Builder
 xbuilduStorable v = -- ...
 ```
 
-These functions use typeclass constraints too, meaning that the typeclasses will be desugared to corresponding record values just like we saw with our `xshow` function.  GHC will probably not know the concrete type for `a` in these functions at compile time, so when we use any of the functions from `Integral`, `Show`, or `Storable`, the correct method dictionaries to use will have to be looked up at runtime.
+These functions use typeclass constraints too, meaning that the typeclasses will be desugared to corresponding record values just like we saw with our `xshow` function.  GHC will probably not know the concrete type for `a` in these functions at compile time, so we will take a performance hit when we use any of the functions from `Integral`, `Show`, or `Storable`.
 
 <div class="ui icon message">
   <i class="sticky note outline icon"></i>
-  <p>I intentionally used the word "probably" a couple times above.  The only way to know for sure if GHC skips the runtime lookup or not is to look at the core output.  We will not explore core output in this blog series, though I imagine I will write about it in the future as I explore it more myself.</p>
+  <p>I intentionally used the word "probably" a couple times above.  The only way to know for sure if GHC eliminates the runtime cost of calling typeclass functions or not is to look at the core output.  We will not explore core output in this blog series, though I imagine I will write about it in the future as I explore it more myself.</p>
 </div>
 
 There are a couple great StackOverflow answers about this typeclass stuff [here](https://stackoverflow.com/questions/10148897/is-there-a-runtime-penalty-associated-with-typeclasses) and [here](https://stackoverflow.com/questions/12645254/ghc-code-generation-for-type-class-function-calls).
@@ -135,9 +144,9 @@ xbuilduStorable :: (Integral a, Show a, Storable a) => a -> Builder
 xbuilduStorable v = -- ...
 ```
 
-To use the `SPECIALIZE` pragma, we give it an additonal type signature that is less polymorphic than the type signature of the function we are specializing.  In our case, less polymorphic means monomorphic - we are using all concrete types in our specializations.  This means GHC can know at compile-time which method dictionaries to use and we avoid the runtime lookup costs for things like `Storable.sizeOf`.
+To use the `SPECIALIZE` pragma, we give it an additonal type signature that is less polymorphic than the type signature of the function we are specializing.  In our case, less polymorphic means monomorphic - we are using all concrete types in our specializations.  This means GHC can know at compile-time specifically which method dictionaries it is working with and can optimize accordingly.  We avoid the runtime cost of calling things like `Storable.sizeOf`.
 
-As we are not diving into the core output in these posts, we will go ahead and add specialized versions for `xshow` and its variants in the public API.  The updates to the code are available on [GitHub](https://github.com/jship/hexy/commit/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2).  We are doing this to rule out the chance of paying the runtime lookup cost here too, even though we have a hunch GHC would likely know which dictionaries to use at compile-time for these functions.  When we get to benchmarking below, I encourage you to experiment with removing the specializations on `xshow` and its variants in the public API.  In my testing, any performance differences were negligible.
+As we are not diving into the core output in these posts, we will go ahead and add specialized versions for `xshow` and its variants in the public API.  The updates to the code are available on [GitHub](https://github.com/jship/hexy/commit/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2).  We are doing this to rule out the chance of paying the runtime costs here too, even though we have a hunch GHC would likely know which dictionaries to use at compile-time for these functions.  When we get to benchmarking below, I encourage you to experiment with removing the specializations on `xshow` and its variants in the public API.  In my testing, any performance differences were negligible.
 
 Writing SPECIALIZE pragmas by-hand is error-prone and tiresome.  We can stitch together a quick-and-dirty script to do it for us:
 
