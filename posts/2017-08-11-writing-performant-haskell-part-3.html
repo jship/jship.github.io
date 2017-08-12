@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <!-- Site Properties -->
+  <title>jship - Writing Performant Haskell (3 of 6): SPECIALIZE</title>
+  <link rel="stylesheet" type="text/css" href="../css/reset.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/site.min.css">
+
+  <link rel="stylesheet" type="text/css" href="../css/button.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/card.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/container.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/divider.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/dropdown.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/feed.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/grid.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/header.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/icon.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/image.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/list.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/message.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/menu.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/rail.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/segment.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sidebar.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sticky.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/transition.min.css">
+
+  <!-- This page's CSS. -->
+  <link rel="stylesheet" type="text/css" href="../css/default.css">
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css">
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/visibility.min.js"></script>
+  <script src="../js/sidebar.min.js"></script>
+  <script src="../js/sticky.min.js"></script>
+  <script src="../js/transition.min.js"></script>
+
+  <!-- This script wires up a few pieces of the UI. -->
+  <script src="../js/default.js"></script>
+</head>
+<body>
+  <!-- Following Menu -->
+  <div class="ui large top fixed hidden menu">
+    <div class="ui container">
+      <div class="header item">
+        jship
+      </div>
+      <a class="item" href="../index.html">Home</a>
+      <a class="item" href="../archive.html">Blog</a>
+      <a class="item" href="../about.html">About</a>
+      <a class="item" href="../contact.html">Contact</a>
+      <a class="item" href="../resume.html">Resume</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="ui vertical inverted sidebar menu">
+    <div class="header item">
+      jship
+    </div>
+    <a class="item" href="../index.html">Home</a>
+    <a class="item" href="../archive.html">Blog</a>
+    <a class="item" href="../about.html">About</a>
+    <a class="item" href="../contact.html">Contact</a>
+    <a class="item" href="../resume.html">Resume</a>
+  </div>
+
+  <!-- Page Contents -->
+  <div class="pusher page-background-gradient">
+    <div class="ui vertical center aligned segment top-menu-segment">
+      <div class="ui container">
+        <div class="ui large secondary inverted pointing menu top-pointing-menu">
+          <a class="toc item">
+            <i class="sidebar icon"></i>
+          </a>
+          <div class="header item">
+            jship
+          </div>
+          <a class="item" href="../index.html">Home</a>
+          <a class="item" href="../archive.html">Blog</a>
+          <a class="item" href="../about.html">About</a>
+          <a class="item" href="../contact.html">Contact</a>
+          <a class="item" href="../resume.html">Resume</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Writing Performant Haskell (3 of 6): SPECIALIZE</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="../rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="../atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="../images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="../about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 11, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="recap">Recap</h3>
+<p>In the <a href="../posts/2017-08-10-writing-performant-haskell-part-2.html">previous post</a>, we overhauled <code>hexy</code>’s API to return <code>Text</code> values instead of <code>String</code>. Our API looked like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+
+<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></code></pre></div>
+<p>After this change, the <a href="../html/writing-performant-haskell-part-2-bench.html">benchmark report</a>’s summary looked like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-2-bench-summary.png"></p>
+<p>Our initial iteration of using <code>Text</code> instead of <code>String</code> made about half of our functions run significantly slower (i.e. the lowercase ones). I mentioned that using <code>Text</code> instead of <code>String</code> will eventually pay off for the optimization flexibility it gives us, but we are not going to explore that just yet. We will see how we can get a nice performance boost via a GHC language pragma in this post.</p>
+<h3 id="typeclass-desugaring">Typeclass Desugaring</h3>
+<p>There is a great post on <a href="https://www.schoolofhaskell.com/user/jfischoff/instances-and-dictionaries">School of Haskell</a> describing how typeclasses are desugared. Where we last left off, our <code>HexShow</code> typeclass, the <code>xshow</code> function, and the <code>Word32</code> instance looked like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xbuild <span class="fu">=</span> xbuildStorable
+  xbuildu <span class="fu">=</span> xbuilduStorable
+
+<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+xshow <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowl</code></pre></div>
+<p>Our typeclass gets desugared into a record:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">HexShowRec</span> a <span class="fu">=</span> <span class="dt">HexShowRec</span>
+  {<span class="ot"> hexShowRecXBuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+  ,<span class="ot"> hexShowRecXBuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+  }</code></pre></div>
+<p>For every instance, GHC creates a dictionary using the <code>HexShowRec</code> record:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">word32HexShowInstanceDictionary ::</span> <span class="dt">HexShowRec</span> <span class="dt">Word32</span>
+word32HexShowInstanceDictionary <span class="fu">=</span> <span class="dt">HexShowRec</span>
+  { xbuild  <span class="fu">=</span> xbuildStorable
+  , xbuildu <span class="fu">=</span> xbuilduStorable
+  }</code></pre></div>
+<p>The compiler replaces the <code>HexShow</code> constraint on <code>xshow</code> with a <code>HexShowRec</code> value as a “method dictionary”:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xshowHexShowRec ::</span> <span class="dt">HexShowRec</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></code></pre></div>
+<p>If GHC knows at compile-time what type <code>a</code> is for a given call to <code>xshow</code>, conceptually, it can directly pass in <code>word32HexShowInstanceDictionary</code> as the first parameter to <code>xshowHexShowRec</code>. If GHC does not know what <code>a</code> is at compile-time, it has to look up which method dictionary to use at runtime. The runtime dictionary lookup is expensive and probably deserves its own post outside this series.</p>
+<p>Fortunately for us, GHC will probably know what <code>a</code> is based on how our users will likely use the library. For example:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">showHexColor ::</span> (<span class="dt">Word8</span>, <span class="dt">Word8</span>, <span class="dt">Word8</span>) <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+showHexColor (r, g, b) <span class="fu">=</span> mconcat [<span class="st">&quot;#&quot;</span>, xshow r, xshow g, xshow b]
+
+<span class="co">-- showHexColor (0, 255, 0) == &quot;#00ff00&quot;, i.e. way too green</span></code></pre></div>
+<p>On the other hand, our <code>HexShow</code> instances offload all the real work to <code>xbuildStorable</code> and <code>xbuilduStorable</code>. Their types:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+xbuildStorable v <span class="fu">=</span> <span class="co">-- ...</span>
+
+<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+xbuilduStorable v <span class="fu">=</span> <span class="co">-- ...</span></code></pre></div>
+<p>These functions use typeclass constraints too, meaning that the typeclasses will be desugared to corresponding record values just like we saw with our <code>xshow</code> function. GHC will probably not know the concrete type for <code>a</code> in these functions at compile time, so when we use any of the functions from <code>Integral</code>, <code>Show</code>, or <code>Storable</code>, the correct method dictionaries to use will have to be looked up at runtime.</p>
+<div class="ui icon message">
+<i class="sticky note outline icon"></i>
+<p>
+I intentionally used the word “probably” a couple times above. The only way to know for sure if GHC skips the runtime lookup or not is to look at the core output. We will not explore core output in this blog series, though I imagine I will write about it in the future as I explore it more myself.
+</p>
+</div>
+<p>There are a couple great StackOverflow answers about this typeclass stuff <a href="https://stackoverflow.com/questions/10148897/is-there-a-runtime-penalty-associated-with-typeclasses">here</a> and <a href="https://stackoverflow.com/questions/12645254/ghc-code-generation-for-type-class-function-calls">here</a>.</p>
+<h3 id="specialize-to-the-rescue"><code>SPECIALIZE</code> To The Rescue!</h3>
+<p>GHC offers a language pragma - <a href="https://downloads.haskell.org/~ghc/8.0.2/docs/html/users_guide/glasgow_exts.html#specialize-pragma"><code>SPECIALIZE</code></a> - that in certain circumstances can help us get around the runtime hit of calling typeclass functions. This is an aptly-named extension as it allows us to create “extra [function] versions specialised to particular types”.</p>
+<p><code>Hexy</code> provides instances for the <code>Word</code>-y and <code>Int</code>-y data types, so let’s specialize <code>xbuildStorable</code> and <code>xbuilduStorable</code> for those:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Int -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Int8 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Int16 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Int32 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Int64 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Word -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Word8 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Word16 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Word32 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuildStorable :: Word64 -&gt; Builder #-}</span>
+xbuildStorable v <span class="fu">=</span> <span class="co">-- ..</span>
+
+<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int8 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int16 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int32 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int64 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word8 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word16 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word32 -&gt; Builder #-}</span>
+<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word64 -&gt; Builder #-}</span>
+xbuilduStorable v <span class="fu">=</span> <span class="co">-- ...</span></code></pre></div>
+<p>To use the <code>SPECIALIZE</code> pragma, we give it an additonal type signature that is less polymorphic than the type signature of the function we are specializing. In our case, less polymorphic means monomorphic - we are using all concrete types in our specializations. This means GHC can know at compile-time which method dictionaries to use and we avoid the runtime lookup costs for things like <code>Storable.sizeOf</code>.</p>
+<p>As we are not diving into the core output in these posts, we will go ahead and add specialized versions for <code>xshow</code> and its variants in the public API. The updates to the code are available on <a href="https://github.com/jship/hexy/commit/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2">GitHub</a>. We are doing this to rule out the chance of paying the runtime lookup cost here too, even though we have a hunch GHC would likely know which dictionaries to use at compile-time for these functions. When we get to benchmarking below, I encourage you to experiment with removing the specializations on <code>xshow</code> and its variants in the public API. In my testing, any performance differences were negligible.</p>
+<p>Writing SPECIALIZE pragmas by-hand is error-prone and tiresome. We can stitch together a quick-and-dirty script to do it for us:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack script --resolver lts-8.23 --package aeson --package aeson-qq --package stache --package text</span>
+
+<span class="ot">{-# LANGUAGE QuasiQuotes #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Aeson</span> (<span class="dt">Value</span>)
+<span class="kw">import </span><span class="dt">Data.Aeson.QQ</span> (aesonQQ)
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy.IO</span> <span class="kw">as</span> <span class="dt">Text.Lazy.IO</span>
+<span class="kw">import </span><span class="dt">Text.Mustache</span> (<span class="dt">Template</span>, renderMustache)
+<span class="kw">import </span><span class="dt">Text.Mustache.Compile.TH</span> (mustache)
+
+<span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> Text.Lazy.IO.putStr <span class="fu">.</span> renderMustache template <span class="fu">$</span> json
+
+<span class="ot">template ::</span> <span class="dt">Template</span>
+template <span class="fu">=</span> [mustache|{{#types}}
+{-# SPECIALIZE xbuildStorable :: {{a}} -&gt; Builder #-}
+{{/types}}
+|]
+
+<span class="ot">json ::</span> <span class="dt">Value</span>
+json <span class="fu">=</span> [aesonQQ|{
+  types: [
+    {a: &quot;Int&quot;},
+    {a: &quot;Int8&quot;},
+    {a: &quot;Int16&quot;},
+    {a: &quot;Int32&quot;},
+    {a: &quot;Int64&quot;},
+    {a: &quot;Word&quot;},
+    {a: &quot;Word8&quot;},
+    {a: &quot;Word16&quot;},
+    {a: &quot;Word32&quot;},
+    {a: &quot;Word64&quot;}
+  ]
+}|]</code></pre></div>
+<p>We put the contents above into a file called <code>GimmeSpecializeLines.hs</code> and run it with <code>stack</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> GimmeSpecializeLines.hs
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
+{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></code></pre></div>
+<p>When we need specialize lines for another function, we update the script’s inline <a href="https://mustache.github.io/">Mustache</a> template. It is refreshing to write an unconfigurable script every now and then!</p>
+<h3 id="test-check">Test Check</h3>
+<p>Our API has not changed so our unit tests do not need to be updated. Feel free to run them to make sure they still pass!</p>
+<h3 id="performance-check">Performance Check</h3>
+<p>In the previous post, our <a href="../html/writing-performant-haskell-part-2-bench.html">benchmark results</a> looked like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-2-bench-summary.png"></p>
+<p>Let’s run the benchmarks again now that we have specialized our functions:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<p>View the full report from this run <a href="../html/writing-performant-haskell-part-3-bench.html">here</a>. The summary looks like this (scales are not the same due to <code>printf</code>):</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-3-bench-summary.png"></p>
+<p>Whoa… By using the <code>SPECIALIZE</code> pragma to make monomorphic versions of our functions, every function in <code>Hexy</code>’s public API is now faster by at least 100 nanoseconds, and in some cases 150-160 nanoseconds!</p>
+<h3 id="whats-next">What’s next?</h3>
+<p>In the next post, we will revisit our use of <code>Builder</code> and take a brief dive into strictness.</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2">GitHub</a>.</p>
+</div>
+
+  </div>
+
+</body>
+</html>
