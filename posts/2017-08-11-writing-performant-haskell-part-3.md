@@ -230,6 +230,6 @@ Whoa...  By using the `SPECIALIZE` pragma to make monomorphic versions of our fu
 
 ### What's next?
 
-In the next post, we will revisit our use of `Builder` and take a brief dive into strictness.
+In the [next post](/posts/2017-08-12-writing-performant-haskell-part-4.html), we will revisit our use of `Builder` and take a brief dive into strictness.
 
 All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2).
