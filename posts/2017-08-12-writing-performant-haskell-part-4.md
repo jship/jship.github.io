@@ -331,6 +331,6 @@ We will revert the changes made to our benchmark suite to bring it back to just 
 
 <img class="ui fluid image" src="/images/writing-performant-haskell-part-4-bench-4-summary.png">
 
-In the next post, we will dive into the internals of the `text` package.  From the work we did in this post to track `Builder` length, we might be starting to wonder if `Builder` was the best choice for our use case...
+In the [next post](/posts/2017-08-14-writing-performant-haskell-part-5.html), we will dive into the internals of the `text` package.  From the work we did in this post to track `Builder` length, we might be starting to wonder if `Builder` was the best choice for our use case...
 
 All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/e3530765891768a98a4718c9c80ec2727f909145).
