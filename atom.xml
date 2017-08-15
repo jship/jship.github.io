@@ -8,8 +8,482 @@
         <name>Jason Shipman</name>
         <email>jasonpshipman@gmail.com</email>
     </author>
-    <updated>2017-08-12T00:00:00Z</updated>
+    <updated>2017-08-14T00:00:00Z</updated>
     <entry>
+    <title>Writing Performant Haskell (5 of 6): Dive Into Text</title>
+    <link href="https://jship.github.io/posts/2017-08-14-writing-performant-haskell-part-5.html" />
+    <id>https://jship.github.io/posts/2017-08-14-writing-performant-haskell-part-5.html</id>
+    <published>2017-08-14T00:00:00Z</published>
+    <updated>2017-08-14T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Writing Performant Haskell (5 of 6): Dive Into Text</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 14, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Performance.html">Performance</a>, <a href="/tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="recap">Recap</h3>
+<p>In the <a href="/posts/2017-08-12-writing-performant-haskell-part-4.html">previous post</a>, we improved our usage of <code>Builder</code> by introducing a new data type that kept track of a <code>Builder</code> value and its length. We also learned a bit about strictness. Our API looked like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
+
+<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></code></pre></div>
+<p>After we improved our usage of <code>Builder</code>, the <a href="/html/writing-performant-haskell-part-4-bench-4.html">benchmark report</a>’s summary looked like this:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-4-bench-4-summary.png"></p>
+<p>We chopped off anywhere from roughly 100 to 200 nanoseconds for each of the functions in <code>Hexy</code>’s public API.</p>
+<p>In this post, we finally return to the proposition from the <a href="/posts/2017-08-10-writing-performant-haskell-part-2.html">second post</a> that using <code>text</code> gives us more optimization flexibility. We will dive into the internals of the <code>text</code> package and hopefully come out with some seriously fast functions.</p>
+<h3 id="text-and-arrays"><code>text</code> and Arrays</h3>
+<p>The <code>text</code> package is using packed arrays under the hood. As a reminder, a strict <code>Text</code> is a packed array, while a lazy <code>Text</code> is a list of packed arrays. If arrays drive <code>text</code>’s performance, it sure would be nice if we could make like a C programmer and <code>malloc</code> precisely the amount of storage we need for our hex strings:</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span>
+<span class="pp">#include </span><span class="im">&lt;string.h&gt;</span>
+
+<span class="dt">const</span> <span class="dt">char</span>* xbuild(<span class="dt">uint32_t</span> v)
+{
+  <span class="dt">char</span>* s = malloc(<span class="dv">2</span> * <span class="kw">sizeof</span>(v) + <span class="dv">1</span>);
+  <span class="co">// implementation details...</span>
+  <span class="cf">return</span> s;
+}</code></pre></div>
+<p>This would allow us to work on fixed-size buffers and the contents of each buffer would be contiguous in memory. An approach like this directly opposes the API we have built so far. Our API leverages <code>Builder</code> and dynamically builds up the hex strings. The user then chooses whether they want a <code>Builder</code> value, a strict <code>Text</code> value, or a lazy <code>Text</code> value. For all instances of our <code>HexShow</code> typeclass, we know exactly how much storage we need for the result strings: Twice the size in bytes of the input type, and maybe a couple characters for the <code>0x</code> prefix. We are not taking full advantage of this knowledge.</p>
+<p>Let’s dig down into some “low-level” Haskell and the internals of <code>text</code> - I promise we will maintain most of our sanity!</p>
+<h3 id="evolving-the-api">Evolving the API</h3>
+<p>If we want to get away from <code>Builder</code> and move to manually allocating storage for strict <code>Text</code> values, we need to alter our API. We will scrap returning <code>Builder</code> altogether:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+
+  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span></code></pre></div>
+<p>We have also bundled all our functions under the <code>HexShow</code> typeclass. To implement instances, we only need to implement <code>xshowp</code> and <code>xshowpu</code> then we will get the rest of the functions for free. Remember that <code>xshowp</code> converts its input to a lowercase hex string, zero-padded based on the size of the input type, and prefixed with <code>0x</code>. <code>xshowpu</code> is identical to <code>xshowp</code> except its returned hex string is uppercase.</p>
+<p>In a way, we have turned our API upside-down. Previously, we were building the zero-padded hex string and then, if needed, tacking on the <code>0x</code> prefix. Now we are requiring that instances implement the functions to build the full zero-padded, <code>0x</code>-prefixed hex string and then instances will get the remaining variants for free.</p>
+<p>This is in line with our goal of allocating just the amount of space we need for the hex string. Going ahead and allocating for the 2 additonal <code>0x</code> prefix characters regardless of whether or not our users want to use the prefix variants will save us from a possible reallocation for the prefix later.</p>
+<p>Sometimes we have to make breaking API changes in the name of performance!</p>
+<h3 id="internal-implementation">Internal Implementation</h3>
+<p>Let’s get hacking on <code>Hexy.Internal</code>! First some language pragmas:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span>
+<span class="ot">{-# LANGUAGE MagicHash #-}</span></code></pre></div>
+<p>We briefly touched on the <code>BangPatterns</code> extension in the <a href="/posts/2017-08-12-writing-performant-haskell-part-4.html">previous post</a>. We have not yet encountered the <code>MagicHash</code> extension. Contrary to the name, <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#the-magic-hash"><code>MagicHash</code></a> is not magic at all! The extension allows the <code>#</code> character to be used as a suffix for identifiers and also introduces a few new literals for unboxed types.</p>
+<p>We saw this <code>#</code> character suffix when we examined the <code>Char</code> data type’s <a href="https://github.com/ghc/ghc/blob/d08b9ccdf2812e8f8fa34d0c89275deee574524c/libraries/ghc-prim/GHC/Types.hs#L135">definition</a> back in the <a href="/posts/2017-08-10-writing-performant-haskell-part-2.html">second post</a>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="ot">{-# CTYPE &quot;HsChar&quot; #-}</span> <span class="dt">Char</span> <span class="fu">=</span> <span class="dt">C</span><span class="fu">#</span> <span class="dt">Char</span><span class="fu">#</span></code></pre></div>
+<p>Both the <code>C#</code> data constructor and the <code>Char#</code> type use the <code>#</code> suffix. Without the <code>MagicHash</code> extension, GHC does not allow us to suffix identifiers like this. GHC often uses <code>#</code> suffixes for unboxed types and values but this is purely a convention. The <code>#</code> on identifiers does not mean anything extra.</p>
+<p>Here is an example of a new literal form we get with <code>MagicHash</code> enabled:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">x <span class="fu">=</span> <span class="dv">42</span><span class="fu">#</span>  <span class="co">-- x :: Int#</span></code></pre></div>
+<p>Adding a <code>#</code> to an integer literal creates an unboxed <code>Int#</code> value instead of a boxed <code>Int</code> value. We have not touched on boxed versus unboxed types in this post series, so I encourage you to check out this <a href="https://www.fpcomplete.com/blog/2015/02/primitive-haskell">FPComplete post</a>.</p>
+<p>The quick explanation from the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unboxed-types">GHC docs</a>:</p>
+<p>“Most types in GHC are boxed, which means that values of that type are represented by a pointer to a heap object. The representation of a Haskell <code>Int</code>, for example, is a two-word heap object. An unboxed type, however, is represented by the value itself, no pointers or heap allocation are involved.”</p>
+<p>Let’s get back to hacking. The extremely interesting module line and imports:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.ST</span> (<span class="dt">ST</span>)
+<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Array</span> <span class="kw">as</span> <span class="dt">Text.Array</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal</span> <span class="kw">as</span> <span class="dt">Text.Internal</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal.Private</span> <span class="kw">as</span> <span class="dt">Text.Internal.Private</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal.Unsafe.Char</span> <span class="kw">as</span> <span class="dt">Text.Internal.Unsafe.Char</span>
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
+<span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span>
+
+<span class="kw">import </span><span class="dt">GHC.Base</span> (<span class="dt">Char</span>(..), <span class="dt">Int</span>(..), (&lt;=#), (&gt;=#), chr#, isTrue#)</code></pre></div>
+<p>There is that <code>MagicHash</code> again! We are importing some functions from the GHC internals. Remember that these are just regular functions though. The <code>#</code> suffix on identifiers does not add any new semantics.</p>
+<p>Below we have a couple new functions that will be core to implementing our <code>HexShow</code> typeclass instances:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">showHexTextLower ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+showHexTextLower <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitLower
+
+<span class="ot">showHexTextUpper ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+showHexTextUpper <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitUpper</code></pre></div>
+<p>Note that unlike <code>xbuild</code> and <code>xbuildu</code>, these are returning strict <code>Text</code> values.</p>
+<p>Let’s go ahead and define those lowercase and uppercase functions:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitLower (<span class="dt">I</span><span class="fu">#</span> i)
+  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">0</span><span class="fu">#</span>)  <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span>  <span class="dv">9</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">48</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i)
+  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">10</span><span class="fu">#</span>) <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span> <span class="dv">15</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">97</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show (<span class="dt">I</span><span class="fu">#</span> i))
+
+<span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitUpper (<span class="dt">I</span><span class="fu">#</span> i)
+  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">0</span><span class="fu">#</span>)  <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span>  <span class="dv">9</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">48</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i)
+  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">10</span><span class="fu">#</span>) <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span> <span class="dv">15</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">65</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show (<span class="dt">I</span><span class="fu">#</span> i))</code></pre></div>
+<p><code>intToDigitLower</code> is a slightly modified copy of the <code>intToDigit</code> function from <code>base</code>’s <code>Data.Char</code> module. These functions might look a little noisy with all the <code>#</code> spam. What they are doing is comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range. Depending upon which range the input value is in, the function returns the ASCII-adjusted hex <code>Char</code> representation of the <code>Int</code> value.</p>
+<p>These functions are operating at a primitive level relative to the typical Haskell functions we write. For example, <code>isTrue#</code> has type <code>Int# -&gt; Bool</code>. It returns <code>True</code> if the unboxed input <code>Int#</code> value is <code>1#</code>. If the input <code>Int#</code> value is <code>0#</code>, it returns <code>False</code>. The <code>(&gt;=#)</code> and <code>(&lt;=#)</code> functions return unboxed <code>Int#</code> values - either <code>1#</code> or <code>0#</code>. <code>unsafeChr</code> converts its input <code>Int</code> to a <code>Char</code> value - there is no bounds checking.</p>
+<p><code>unsafeChr</code> is defined like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeChr ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+unsafeChr (<span class="dt">I</span><span class="fu">#</span> i<span class="fu">#</span>) <span class="fu">=</span> <span class="dt">C</span><span class="fu">#</span> (chr<span class="fu">#</span> i<span class="fu">#</span>)</code></pre></div>
+<p>Think of <code>unsafeChr</code> like a cast from C:</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="dt">int</span> i = <span class="dv">42</span>;
+<span class="dt">char</span> c = (<span class="dt">char</span>) i;</code></pre></div>
+<p>We can mentally get rid of the <code>#</code> spam and the primitive operations via conceptually thinking of these functions like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitLower i
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;a&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show i)
+
+<span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitUpper i
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;A&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show i)</code></pre></div>
+<p>Thankfully, <code>intToDigitLower</code> and <code>intToDigitUpper</code> are our <em>only</em> new functions using primitive stuff from the internals of GHC.</p>
+<p>Now we will implement our most important function:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">&#39;0&#39;</span>
+                zeroPadLoop i&#39;
+      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
+      k <span class="ot">&lt;-</span> zeroPadLoop j
+      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">&#39;x&#39;</span>
+      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">&#39;0&#39;</span>
+      done buffer size</code></pre></div>
+<p><code>textShowIntAtBase</code> looks a good bit different from the previous incarnation’s <code>buildWordAtBase</code> and is a lot to take in. We will break this down.</p>
+<p>Our 2 initial guards are identical to the <code>buildWordAtBase</code> version:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)</code></pre></div>
+<p>The <code>otherwise</code> guard is where things get interesting:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="co">-- ...</span></code></pre></div>
+<p>The <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Private.html#runText"><code>runText</code></a> function is coming from the internals of the <code>text</code> package. Haskell libaries (including <code>Hexy</code>!) often provide a clear divide between what is the public API and what is internal to the library. “Internal to the library” means the functions are used in the library but are not necessarily expected to be used by clients of the library. Any internal modules are subject to change and may not respect invariants so if we decide to use them, we must do so at our own risk!</p>
+<p>Package modules are conventionally marked as internal modules via placing them under a subdirectory called <code>Internal</code> or being housed entirely in a <code>Internal.hs</code> module. Authors generally still export these internal modules for client use so users can, for example, eke out more performance or use the package in ways the authors never anticipated. If you are authoring a package, note that choosing to not export internal modules is generally frowned upon in the community as it can limit what users can do with your package.</p>
+<p>Fortunately for us, the internal modules in <code>text</code> are exported and clearly marked with an <code>Internal</code> somewhere in the module name, i.e.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Data.Text.Internal</span>
+<span class="dt">Data.Text.Internal.Fusion</span>
+<span class="dt">Data.Text.Lazy.Internal</span>
+<span class="co">-- and so on...</span></code></pre></div>
+<p>Have a look at the <a href="https://hackage.haskell.org/package/text">docs</a> to see the various internal modules.</p>
+<p>What does <code>runText</code> do though? Let’s start with its type:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<p>That type is notably scary and gives rise to a few questions. What is an <code>MArray</code>? What is <code>ST</code>? Why is there a <code>forall s</code>?</p>
+<p>At a high level, <code>runText</code> is taking in 1 gnarly parameter and returning a strict <code>Text</code> value. We should break this down further:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                             <span class="dt">The</span> output value, a strict <span class="ot">`Text`</span> <span class="fu">-------+</span>
+                                                                      <span class="fu">|</span>
+                                                                      v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">           <span class="fu">+-------</span> <span class="dt">The</span> single gnarly input value, this is a
+           <span class="fu">|</span>        function we define
+           v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> function we define must produce a strict <span class="dt">Text</span> <span class="fu">------+</span>
+<span class="kw">in</span> the <span class="dt">ST</span> monad                                         <span class="fu">|</span>
+                                                        v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                      <span class="fu">+-------</span> <span class="dt">Utility</span> function that is passed to the function
+                      <span class="fu">|</span>        we define<span class="fu">.</span> <span class="dt">We</span> call this at the end <span class="kw">of</span> the
+                      <span class="fu">|</span>        function we define to get our <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>,
+                      <span class="fu">|</span>        hence why we named it <span class="ch">&#39;done&#39;</span> above<span class="fu">.</span>
+                      v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                       <span class="fu">+-------</span> <span class="dt">The</span> mutable array we must build <span class="kw">in</span> the
+                       <span class="fu">|</span>        function we define
+                       v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> length <span class="kw">of</span> the mutable array <span class="fu">---+</span>
+                                   <span class="fu">|</span>
+                                   v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> utility function returns the <span class="fu">---------+</span>
+result <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>                         <span class="fu">|</span>
+                                          v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                   <span class="fu">+-------</span> <span class="dt">Phantom</span> <span class="kw">type</span> for the <span class="dt">ST</span> monad that prevents
+                   <span class="fu">|</span>        the internal state from being accessible
+                   <span class="fu">|</span>        outside <span class="kw">of</span> the computation
+                   v
+<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<hr />
+<p>We will not go into details in this blog post series on how the <code>ST</code> monad works, so try not to get hung up on the <code>s</code> type parameter. For our purposes, it suffices to think of <code>ST</code> as a <code>State</code> monad that allows for in-place mutation. Unlike when we are in <code>IO</code>, the mutation we do in <code>ST</code> is not externally visible to other parts of our program, so extracting results from <code>ST</code> is pure.</p>
+<p>The mutation we are doing is on <code>MArray s</code> values. These are mutable arrays <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Array.html">provided</a> by the <code>text</code> package.</p>
+<div class="ui icon negative message">
+<i class="warning icon"></i>
+<p>
+Look out world! We are about to put on our imperative Haskell hats.
+</p>
+</div>
+<p>Let’s view a bit more of our <code>textShowIntAtBase</code>. The first thing we do is determine the array size we will need. The only difference in our size calculation now versus the one from previous posts is that we now add <code>2</code> to account for the <code>0x</code> prefix:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>Now we allocate an array with the computed size and bind it to <code>buffer</code>. The type of <code>new</code> is <code>Int -&gt; ST s (MArray s)</code>. We give it an <code>Int</code> value representing the size of the array we want and it spits out an uninitialized array of that size.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>We then define a <code>hexLoop</code> function with type <code>Int -&gt; (a, a) -&gt; ST s Int</code>. <code>hexLoop</code> is the spiritual successor to <a href="https://github.com/jship/hexy/blob/e3530765891768a98a4718c9c80ec2727f909145/library/Hexy/Internal.hs#L92"><code>buildIt</code></a> from the previous post. It takes in a write index and the current <code>quotRem</code> result, and in-place writes to <code>buffer</code> as it <code>quotRem</code>’s down <code>n0</code>. It uses a function we have not defined yet - <code>unsafeWriteRev</code> - to write each character. <code>unsafeWriteRev</code> returns the write index given to it minus 1, hence the <code>...Rev</code> suffix. We are writing to the array from back to front. When <code>hexLoop</code> is done, it returns the next index to begin writing to for zero-padding.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>Next, we define a <code>zeroPadLoop</code> function with type <code>Int -&gt; ST s Int</code>. <code>zeroPadLoop</code> recursively fills the rest of the array with <code>'0'</code> characters, going from where <code>hexLoop</code> will leave off. <code>zeroPadLoop</code> stops before writing to index 0 and 1, as that is where the <code>0x</code> prefix will be written. When <code>zeroPadLoop</code> is done, it returns the next index to begin writing to for the <code>0x</code> prefix.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">&#39;0&#39;</span>
+                zeroPadLoop i&#39;
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>Let’s call our <code>hexLoop</code> and <code>zeroPadLoop</code> functions, making sure to respect the write indices they return:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">&#39;0&#39;</span>
+                zeroPadLoop i&#39;
+      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
+      k <span class="ot">&lt;-</span> zeroPadLoop j
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>Now we will write the <code>0x</code> prefix, respecting write indices from <code>unsafeWriteRev</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">&#39;0&#39;</span>
+                zeroPadLoop i&#39;
+      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
+      k <span class="ot">&lt;-</span> zeroPadLoop j
+      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">&#39;x&#39;</span>
+      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">&#39;0&#39;</span>
+      <span class="co">-- implementation details...</span></code></pre></div>
+<p>The final bit we need to complete our function is to call the <code>done</code> utility passed into our function. This <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Private.html#runText">utility function</a> will “freeze” up the mutable array we give it, i.e. converting it into an immutable array. It then creates a <code>Text</code> for us in <code>ST</code> using the immutable array and the size:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      buffer <span class="ot">&lt;-</span> Text.Array.new size
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i&#39;
+              _ <span class="ot">-&gt;</span> hexLoop i&#39; (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i&#39; <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">&#39;0&#39;</span>
+                zeroPadLoop i&#39;
+      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
+      k <span class="ot">&lt;-</span> zeroPadLoop j
+      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">&#39;x&#39;</span>
+      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">&#39;0&#39;</span>
+      done buffer size  <span class="co">-- done :: MArray s -&gt; Int -&gt; ST s Text</span></code></pre></div>
+<p>Below is the definition for <code>unsafeWriteRev</code>. It uses <code>unsafeWrite</code> from <code>text</code> and then returns the preceding write index:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeWriteRev ::</span> <span class="dt">Text.Array.MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Int</span>
+unsafeWriteRev buffer i c <span class="fu">=</span> <span class="kw">do</span>
+  Text.Array.unsafeWrite buffer i (fromIntegral (Text.Internal.Unsafe.Char.ord c))
+  pure (i <span class="fu">-</span> <span class="dv">1</span>)</code></pre></div>
+<p>The last piece of functionality we need to complete our <code>Hexy.Internal</code> module is a means to drop the hex prefix, for use by functions like <code>xshow</code> and <code>xshowu</code>. Here we will use the internal constructor for strict <code>Text</code> values, which takes an immutable array, an offset into the array, and the length of the array:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeDropHexPrefix ::</span> <span class="dt">Text.Text</span> <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+unsafeDropHexPrefix (<span class="dt">Text.Internal.Text</span> arr _ len) <span class="fu">=</span> <span class="dt">Text.Internal.Text</span> arr <span class="dv">2</span> (len <span class="fu">-</span> <span class="dv">2</span>)</code></pre></div>
+<p>Note that we could have used <code>Data.Text</code>’s <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text.html#drop"><code>drop</code></a> function from <code>text</code>’s public API, but the above definition should be a bit faster. Try benchmarking the two different functions to see if there is any difference.</p>
+<h3 id="public-api">Public API</h3>
+<p>We will need to update our public API in the <code>Hexy</code> module to use our new internal functions:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy</span>
+  ( <span class="dt">HexShow</span>(<span class="fu">..</span>)
+  ) <span class="kw">where</span>
+
+<span class="kw">import </span><span class="dt">Hexy.Internal</span> (showHexTextLower, showHexTextUpper, unsafeDropHexPrefix)
+
+<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>, <span class="dt">Int8</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">Text.Lazy</span>
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
+
+<span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+  xshow <span class="fu">=</span> unsafeDropHexPrefix <span class="fu">.</span> xshowp
+
+<span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+
+<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+  xshowu <span class="fu">=</span> unsafeDropHexPrefix <span class="fu">.</span> xshowpu
+
+<span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+
+<span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+  xshowl <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshow
+
+<span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+  xshowlp <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowp
+
+<span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+  xshowlu <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowu
+
+<span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+  xshowlpu <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowpu
+
+  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span>
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xshowp  <span class="fu">=</span> showHexTextLower
+  xshowpu <span class="fu">=</span> showHexTextUpper
+
+<span class="co">-- remaining instances</span></code></pre></div>
+<h3 id="test-check">Test Check</h3>
+<p>Our public API has changed so our unit tests need some work. Have a look at the full test suite on <a href="https://github.com/jship/hexy/blob/23321173371a5bfa77459f366ede8e9b2c05a5a3/test-suite/Test/HexyTest.hs">GitHub</a> if you like.</p>
+<h3 id="performance-check">Performance Check</h3>
+<p>In the previous post, our <a href="/html/writing-performant-haskell-part-4-bench-4.html">benchmark results</a> looked like this:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-4-bench-4-summary.png"></p>
+<p>Let’s run the benchmarks again:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<p>View the full report from this run <a href="/html/writing-performant-haskell-part-5-bench.html">here</a>. The summary looks like this:</p>
+<p><img class="ui fluid image" src="/images/writing-performant-haskell-part-5-bench-summary.png"></p>
+<p>This is our greatest performance improvement yet - all of our functions clock in at approximately 50 nanoseconds! They are roughly 5 times faster than their previous iterations. Our users can call either the strict or the lazy variants with no penalty. Furthermore, our functions are about 2.65 times faster than <code>base</code>’s <code>showHex</code> and are doing more work via zero-padding and prefixing with <code>0x</code></p>
+<p><img class="ui centered image" src="/images/mission_accomplished_baby.jpg"></p>
+<h3 id="maintenance">Maintenance</h3>
+<p>While our performance gains were fantastic, we should take note that the performance comes at a maintenance cost. We have chosen to use the internals of <code>text</code> and <code>text</code> makes no guarantees the functions we have used will be available in future versions. Fortunately, the portions we are using of <code>text</code>’s internal API have seemingly been stable for quite some time (years), so we feel relatively comfortable with our changes.</p>
+<h3 id="safety">Safety</h3>
+<p>Multiple functions were used above that were prefixed with <code>unsafe...</code>. These functions do not do any bounds checking so we have to be very careful when working with them to avoid access violations. Testing is always important, but it is even more so when we are going imperative like we did above.</p>
+<p>Another callout is that <code>text</code>’s arrays are <em>packed</em> UTF-16. We took advantage of the fact that the hex characters we write have small enough integral values that we can always get away with 1 write instead of 2. If we <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Unsafe-Char.html#unsafeWrite">poke around</a> in the bowels of <code>text</code>, we can see a few places where the code decides whether to write 1 or 2 <code>Word16</code> values for a given write of 1 <code>Char</code> value. We are not doing this at all in our code.</p>
+<h3 id="whats-next">What’s next?</h3>
+<p>In the next and final post, we will update our benchmark suite to cover all the data types <code>Hexy</code> supports and take stock of our performance gains overall.</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/23321173371a5bfa77459f366ede8e9b2c05a5a3">GitHub</a>.</p>
+</div>
+]]></summary>
+</entry>
+<entry>
     <title>Writing Performant Haskell (4 of 6): Builder Revisited</title>
     <link href="https://jship.github.io/posts/2017-08-12-writing-performant-haskell-part-4.html" />
     <id>https://jship.github.io/posts/2017-08-12-writing-performant-haskell-part-4.html</id>
@@ -268,7 +742,7 @@ go <span class="fu">!</span>n b <span class="fu">=</span> go (n <span class="fu"
 <h3 id="whats-next">What’s next?</h3>
 <p>We will revert the changes made to our benchmark suite to bring it back to just the <code>Word32</code> benchmark group as this will simplify our analysis in the next post. The full report with the strictness annotation and only the <code>Word32</code> benchmark group is available <a href="/html/writing-performant-haskell-part-4-bench-4.html">here</a>. The summary looks like this:</p>
 <p><img class="ui fluid image" src="/images/writing-performant-haskell-part-4-bench-4-summary.png"></p>
-<p>In the next post, we will dive into the internals of the <code>text</code> package. From the work we did in this post to track <code>Builder</code> length, we might be starting to wonder if <code>Builder</code> was the best choice for our use case…</p>
+<p>In the <a href="/posts/2017-08-14-writing-performant-haskell-part-5.html">next post</a>, we will dive into the internals of the <code>text</code> package. From the work we did in this post to track <code>Builder</code> length, we might be starting to wonder if <code>Builder</code> was the best choice for our use case…</p>
 <p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/e3530765891768a98a4718c9c80ec2727f909145">GitHub</a>.</p>
 </div>
 ]]></summary>
