@@ -4,6 +4,11 @@ author: Jason Shipman
 tags: Haskell, Performance, Hexy Tutorial
 ---
 
+<div class="ui icon info message">
+  <i class="info icon"></i>
+  <div class="content"><div class="header">Edited: August 15, 2017</div><p>Thanks to <a href="https://www.reddit.com/user/bos">/u/bos</a> and <a href="https://www.reddit.com/user/mrkkrp">/u/mrkkrp</a> over on <a href="https://www.reddit.com/r/haskell/comments/6trxhs/writing_performant_haskell_5_of_6_dive_into_text/">Reddit</a> for helping to improve the quality of this post!  The previous version was unnecessarily using GHC primops.</p></div>
+</div>
+
 ### Recap
 
 In the [previous post](/posts/2017-08-12-writing-performant-haskell-part-4.html), we improved our usage of `Builder` by introducing a new data type that kept track of a `Builder` value and its length.  We also learned a bit about strictness.  Our API looked like this:
@@ -50,7 +55,7 @@ const char* xbuild(uint32_t v)
 
 This would allow us to work on fixed-size buffers and the contents of each buffer would be contiguous in memory.  An approach like this directly opposes the API we have built so far.  Our API leverages `Builder` and dynamically builds up the hex strings.  The user then chooses whether they want a `Builder` value, a strict `Text` value, or a lazy `Text` value.  For all instances of our `HexShow` typeclass, we know exactly how much storage we need for the result strings:  Twice the size in bytes of the input type, and maybe a couple characters for the `0x` prefix.  We are not taking full advantage of this knowledge.
 
-Let's dig down into some "low-level" Haskell and the internals of `text` - I promise we will maintain most of our sanity!
+Let's dig down into the internals of `text` - I promise we will maintain most of our sanity!
 
 ### Evolving the API
 
@@ -80,41 +85,15 @@ Sometimes we have to make breaking API changes in the name of performance!
 
 ### Internal Implementation
 
-Let's get hacking on `Hexy.Internal`!  First some language pragmas:
+Let's get to hacking on `Hexy.Internal`.  The extremely interesting top portion of the module:
 
 ```haskell
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE MagicHash #-}
-```
 
-We briefly touched on the `BangPatterns` extension in the [previous post](/posts/2017-08-12-writing-performant-haskell-part-4.html).  We have not yet encountered the `MagicHash` extension.  Contrary to the name, [`MagicHash`](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#the-magic-hash) is not magic at all!  The extension allows the `#` character to be used as a suffix for identifiers and also introduces a few new literals for unboxed types.
-
-We saw this `#` character suffix when we examined the `Char` data type's [definition](https://github.com/ghc/ghc/blob/d08b9ccdf2812e8f8fa34d0c89275deee574524c/libraries/ghc-prim/GHC/Types.hs#L135) back in the [second post](/posts/2017-08-10-writing-performant-haskell-part-2.html):
-
-```haskell
-data {-# CTYPE "HsChar" #-} Char = C# Char#
-```
-
-Both the `C#` data constructor and the `Char#` type use the `#` suffix.  Without the `MagicHash` extension, GHC does not allow us to suffix identifiers like this.  GHC often uses `#` suffixes for unboxed types and values but this is purely a convention.  The `#` on identifiers does not mean anything extra.
-
-Here is an example of a new literal form we get with `MagicHash` enabled:
-
-```haskell
-x = 42#  -- x :: Int#
-```
-
-Adding a `#` to an integer literal creates an unboxed `Int#` value instead of a boxed `Int` value.  We have not touched on boxed versus unboxed types in this post series, so I encourage you to check out this [FPComplete post](https://www.fpcomplete.com/blog/2015/02/primitive-haskell).
-
-The quick explanation from the [GHC docs](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unboxed-types):
-
-"Most types in GHC are boxed, which means that values of that type are represented by a pointer to a heap object. The representation of a Haskell `Int`, for example, is a two-word heap object. An unboxed type, however, is represented by the value itself, no pointers or heap allocation are involved."
-
-Let's get back to hacking.  The extremely interesting module line and imports:
-
-```haskell
 module Hexy.Internal where
 
 import Control.Monad.ST (ST)
+import qualified Data.Char as Char
 import Data.Int (Int, Int8, Int16, Int32, Int64)
 import qualified Data.Text as Text
 import qualified Data.Text.Array as Text.Array
@@ -124,11 +103,7 @@ import qualified Data.Text.Internal.Unsafe.Char as Text.Internal.Unsafe.Char
 import Data.Word (Word, Word8, Word16, Word32, Word64)
 import Foreign.Storable (Storable(..))
 import qualified Foreign.Storable as Storable
-
-import GHC.Base (Char(..), Int(..), (<=#), (>=#), chr#, isTrue#)
 ```
-
-There is that `MagicHash` again!  We are importing some functions from the GHC internals.  Remember that these are just regular functions though.  The `#` suffix on identifiers does not add any new semantics.
 
 Below we have a couple new functions that will be core to implementing our `HexShow` typeclass instances:
 
@@ -148,53 +123,26 @@ Let's go ahead and define those lowercase and uppercase functions:
 
 ```haskell
 intToDigitLower :: Int -> Char
-intToDigitLower (I# i)
-  | isTrue# (i >=# 0#)  && isTrue# (i <=#  9#) = unsafeChr (48 + I# i)
-  | isTrue# (i >=# 10#) && isTrue# (i <=# 15#) = unsafeChr (97 + I# i - 10)
-  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitLower: not a digit " ++ show (I# i))
+intToDigitLower i
+  | i >=  0 && i <=  9 = Text.Internal.Unsafe.Char.unsafeChr (fromIntegral $ Char.ord '0' + i)
+  | i >= 10 && i <= 15 = Text.Internal.Unsafe.Char.unsafeChr (fromIntegral $ Char.ord 'a' + i - 10)
+  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitLower: not a digit " ++ show i)
 
 intToDigitUpper :: Int -> Char
-intToDigitUpper (I# i)
-  | isTrue# (i >=# 0#)  && isTrue# (i <=#  9#) = unsafeChr (48 + I# i)
-  | isTrue# (i >=# 10#) && isTrue# (i <=# 15#) = unsafeChr (65 + I# i - 10)
-  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitUpper: not a digit " ++ show (I# i))
+intToDigitUpper i
+  | i >=  0 && i <=  9 = Text.Internal.Unsafe.Char.unsafeChr (fromIntegral $ Char.ord '0' + i)
+  | i >= 10 && i <= 15 = Text.Internal.Unsafe.Char.unsafeChr (fromIntegral $ Char.ord 'A' + i - 10)
+  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitUpper: not a digit " ++ show i)
 ```
 
-`intToDigitLower` is a slightly modified copy of the `intToDigit` function from `base`'s `Data.Char` module.  These functions might look a little noisy with all the `#` spam.  What they are doing is comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range.  Depending upon which range the input value is in, the function returns the ASCII-adjusted hex `Char` representation of the `Int` value.
+`intToDigitLower` is a slightly modified copy of the `intToDigit` function from `base`'s `Data.Char` module.  These functions are comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range.  Depending upon which range the input value is in, the function returns the ASCII-adjusted hex `Char` representation of the `Int` value.
 
-These functions are operating at a primitive level relative to the typical Haskell functions we write.  For example, `isTrue#` has type `Int# -> Bool`.  It returns `True` if the unboxed input `Int#` value is `1#`.  If the input `Int#` value is `0#`, it returns `False`.  The `(>=#)` and `(<=#)` functions return unboxed `Int#` values - either `1#` or `0#`.  `unsafeChr` converts its input `Int` to a `Char` value - there is no bounds checking.
-
-`unsafeChr` is defined like this:
-
-```haskell
-unsafeChr :: Int -> Char
-unsafeChr (I# i#) = C# (chr# i#)
-```
-
-Think of `unsafeChr` like a cast from C:
+The `unsafeChr` function from `text` converts its input `Int` to a `Char` value - there is no bounds checking.  Think of `unsafeChr` like a cast from C:
 
 ```c
 int i = 42;
 char c = (char) i;
 ```
-
-We can mentally get rid of the `#` spam and the primitive operations via conceptually thinking of these functions like this:
-
-```haskell
-intToDigitLower :: Int -> Char
-intToDigitLower i
-  | i >=  0 && i <=  9 = unsafeChr (ord '0' + i)
-  | i >= 10 && i <= 15 = unsafeChr (ord 'a' + i - 10)
-  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitLower: not a digit " ++ show i)
-
-intToDigitUpper :: Int -> Char
-intToDigitUpper i
-  | i >=  0 && i <=  9 = unsafeChr (ord '0' + i)
-  | i >= 10 && i <= 15 = unsafeChr (ord 'A' + i - 10)
-  | otherwise = errorWithoutStackTrace ("Hexy.Internal.intToDigitUpper: not a digit " ++ show i)
-```
-
-Thankfully, `intToDigitLower` and `intToDigitUpper` are our _only_ new functions using primitive stuff from the internals of GHC.
 
 Now we will implement our most important function:
 
