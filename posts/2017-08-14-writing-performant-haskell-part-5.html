@@ -535,7 +535,7 @@ unsafeDropHexPrefix (<span class="dt">Text.Internal.Text</span> arr _ len) <span
 <p>Another callout is that <code>text</code>’s arrays are <em>packed</em> UTF-16. We took advantage of the fact that the hex characters we write have small enough integral values that we can always get away with 1 write instead of 2. If we <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Unsafe-Char.html#unsafeWrite">poke around</a> in the bowels of <code>text</code>, we can see a few places where the code decides whether to write 1 or 2 <code>Word16</code> values for a given write of 1 <code>Char</code> value. We are not doing this at all in our code.</p>
 <h3 id="whats-next">What’s next?</h3>
 <p>In the next and final post, we will update our benchmark suite to cover all the data types <code>Hexy</code> supports and take stock of our performance gains overall.</p>
-<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/23321173371a5bfa77459f366ede8e9b2c05a5a3">GitHub</a>.</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/43306166c980ce6359f4c25b2331a5e552cea0e4">GitHub</a>.</p>
 </div>
 
   </div>
