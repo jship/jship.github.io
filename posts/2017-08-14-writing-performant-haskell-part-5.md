@@ -137,7 +137,7 @@ intToDigitUpper i
 
 `intToDigitLower` is a slightly modified copy of the `intToDigit` function from `base`'s `Data.Char` module.  These functions are comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range.  Depending upon which range the input value is in, the function returns the ASCII-adjusted hex `Char` representation of the `Int` value.
 
-The `unsafeChr` function from `text` converts its input `Int` to a `Char` value - there is no bounds checking.  Think of `unsafeChr` like a cast from C:
+The `unsafeChr` function from `text` converts its input `Word16` to a `Char` value - there is no bounds checking.  Think of `unsafeChr` like a cast from C:
 
 ```c
 int i = 42;
