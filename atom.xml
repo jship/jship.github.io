@@ -58,7 +58,18 @@
       </div>
     </div>
   </div>
-  <h3 id="recap">Recap</h3>
+  <div class="ui icon info message">
+<i class="info icon"></i>
+<div class="content">
+<div class="header">
+Edited: August 15, 2017
+</div>
+<p>
+Thanks to <a href="https://www.reddit.com/user/bos">/u/bos</a> and <a href="https://www.reddit.com/user/mrkkrp">/u/mrkkrp</a> over on <a href="https://www.reddit.com/r/haskell/comments/6trxhs/writing_performant_haskell_5_of_6_dive_into_text/">Reddit</a> for helping to improve the quality of this post! The previous version was unnecessarily using GHC primops.
+</p>
+</div>
+</div>
+<h3 id="recap">Recap</h3>
 <p>In the <a href="/posts/2017-08-12-writing-performant-haskell-part-4.html">previous post</a>, we improved our usage of <code>Builder</code> by introducing a new data type that kept track of a <code>Builder</code> value and its length. We also learned a bit about strictness. Our API looked like this:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
 <span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
@@ -89,7 +100,7 @@
   <span class="cf">return</span> s;
 }</code></pre></div>
 <p>This would allow us to work on fixed-size buffers and the contents of each buffer would be contiguous in memory. An approach like this directly opposes the API we have built so far. Our API leverages <code>Builder</code> and dynamically builds up the hex strings. The user then chooses whether they want a <code>Builder</code> value, a strict <code>Text</code> value, or a lazy <code>Text</code> value. For all instances of our <code>HexShow</code> typeclass, we know exactly how much storage we need for the result strings: Twice the size in bytes of the input type, and maybe a couple characters for the <code>0x</code> prefix. We are not taking full advantage of this knowledge.</p>
-<p>Let’s dig down into some “low-level” Haskell and the internals of <code>text</code> - I promise we will maintain most of our sanity!</p>
+<p>Let’s dig down into the internals of <code>text</code> - I promise we will maintain most of our sanity!</p>
 <h3 id="evolving-the-api">Evolving the API</h3>
 <p>If we want to get away from <code>Builder</code> and move to manually allocating storage for strict <code>Text</code> values, we need to alter our API. We will scrap returning <code>Builder</code> altogether:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
@@ -108,22 +119,13 @@
 <p>This is in line with our goal of allocating just the amount of space we need for the hex string. Going ahead and allocating for the 2 additonal <code>0x</code> prefix characters regardless of whether or not our users want to use the prefix variants will save us from a possible reallocation for the prefix later.</p>
 <p>Sometimes we have to make breaking API changes in the name of performance!</p>
 <h3 id="internal-implementation">Internal Implementation</h3>
-<p>Let’s get hacking on <code>Hexy.Internal</code>! First some language pragmas:</p>
+<p>Let’s get to hacking on <code>Hexy.Internal</code>. The extremely interesting top portion of the module:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span>
-<span class="ot">{-# LANGUAGE MagicHash #-}</span></code></pre></div>
-<p>We briefly touched on the <code>BangPatterns</code> extension in the <a href="/posts/2017-08-12-writing-performant-haskell-part-4.html">previous post</a>. We have not yet encountered the <code>MagicHash</code> extension. Contrary to the name, <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#the-magic-hash"><code>MagicHash</code></a> is not magic at all! The extension allows the <code>#</code> character to be used as a suffix for identifiers and also introduces a few new literals for unboxed types.</p>
-<p>We saw this <code>#</code> character suffix when we examined the <code>Char</code> data type’s <a href="https://github.com/ghc/ghc/blob/d08b9ccdf2812e8f8fa34d0c89275deee574524c/libraries/ghc-prim/GHC/Types.hs#L135">definition</a> back in the <a href="/posts/2017-08-10-writing-performant-haskell-part-2.html">second post</a>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="ot">{-# CTYPE &quot;HsChar&quot; #-}</span> <span class="dt">Char</span> <span class="fu">=</span> <span class="dt">C</span><span class="fu">#</span> <span class="dt">Char</span><span class="fu">#</span></code></pre></div>
-<p>Both the <code>C#</code> data constructor and the <code>Char#</code> type use the <code>#</code> suffix. Without the <code>MagicHash</code> extension, GHC does not allow us to suffix identifiers like this. GHC often uses <code>#</code> suffixes for unboxed types and values but this is purely a convention. The <code>#</code> on identifiers does not mean anything extra.</p>
-<p>Here is an example of a new literal form we get with <code>MagicHash</code> enabled:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">x <span class="fu">=</span> <span class="dv">42</span><span class="fu">#</span>  <span class="co">-- x :: Int#</span></code></pre></div>
-<p>Adding a <code>#</code> to an integer literal creates an unboxed <code>Int#</code> value instead of a boxed <code>Int</code> value. We have not touched on boxed versus unboxed types in this post series, so I encourage you to check out this <a href="https://www.fpcomplete.com/blog/2015/02/primitive-haskell">FPComplete post</a>.</p>
-<p>The quick explanation from the <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unboxed-types">GHC docs</a>:</p>
-<p>“Most types in GHC are boxed, which means that values of that type are represented by a pointer to a heap object. The representation of a Haskell <code>Int</code>, for example, is a two-word heap object. An unboxed type, however, is represented by the value itself, no pointers or heap allocation are involved.”</p>
-<p>Let’s get back to hacking. The extremely interesting module line and imports:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
+
+<span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
 
 <span class="kw">import </span><span class="dt">Control.Monad.ST</span> (<span class="dt">ST</span>)
+<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
 <span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)
 <span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
 <span class="kw">import qualified</span> <span class="dt">Data.Text.Array</span> <span class="kw">as</span> <span class="dt">Text.Array</span>
@@ -132,10 +134,7 @@
 <span class="kw">import qualified</span> <span class="dt">Data.Text.Internal.Unsafe.Char</span> <span class="kw">as</span> <span class="dt">Text.Internal.Unsafe.Char</span>
 <span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
 <span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))
-<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span>
-
-<span class="kw">import </span><span class="dt">GHC.Base</span> (<span class="dt">Char</span>(..), <span class="dt">Int</span>(..), (&lt;=#), (&gt;=#), chr#, isTrue#)</code></pre></div>
-<p>There is that <code>MagicHash</code> again! We are importing some functions from the GHC internals. Remember that these are just regular functions though. The <code>#</code> suffix on identifiers does not add any new semantics.</p>
+<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span></code></pre></div>
 <p>Below we have a couple new functions that will be core to implementing our <code>HexShow</code> typeclass instances:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">showHexTextLower ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
 <span class="co">-- a bunch of SPECIALIZE pragmas...</span>
@@ -147,37 +146,20 @@ showHexTextUpper <span class="fu">=</span> textShowIntAtBase <span class="dv">16
 <p>Note that unlike <code>xbuild</code> and <code>xbuildu</code>, these are returning strict <code>Text</code> values.</p>
 <p>Let’s go ahead and define those lowercase and uppercase functions:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
-intToDigitLower (<span class="dt">I</span><span class="fu">#</span> i)
-  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">0</span><span class="fu">#</span>)  <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span>  <span class="dv">9</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">48</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i)
-  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">10</span><span class="fu">#</span>) <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span> <span class="dv">15</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">97</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i <span class="fu">-</span> <span class="dv">10</span>)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show (<span class="dt">I</span><span class="fu">#</span> i))
-
-<span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
-intToDigitUpper (<span class="dt">I</span><span class="fu">#</span> i)
-  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">0</span><span class="fu">#</span>)  <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span>  <span class="dv">9</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">48</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i)
-  <span class="fu">|</span> isTrue<span class="fu">#</span> (i <span class="fu">&gt;=#</span> <span class="dv">10</span><span class="fu">#</span>) <span class="fu">&amp;&amp;</span> isTrue<span class="fu">#</span> (i <span class="fu">&lt;=#</span> <span class="dv">15</span><span class="fu">#</span>) <span class="fu">=</span> unsafeChr (<span class="dv">65</span> <span class="fu">+</span> <span class="dt">I</span><span class="fu">#</span> i <span class="fu">-</span> <span class="dv">10</span>)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show (<span class="dt">I</span><span class="fu">#</span> i))</code></pre></div>
-<p><code>intToDigitLower</code> is a slightly modified copy of the <code>intToDigit</code> function from <code>base</code>’s <code>Data.Char</code> module. These functions might look a little noisy with all the <code>#</code> spam. What they are doing is comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range. Depending upon which range the input value is in, the function returns the ASCII-adjusted hex <code>Char</code> representation of the <code>Int</code> value.</p>
-<p>These functions are operating at a primitive level relative to the typical Haskell functions we write. For example, <code>isTrue#</code> has type <code>Int# -&gt; Bool</code>. It returns <code>True</code> if the unboxed input <code>Int#</code> value is <code>1#</code>. If the input <code>Int#</code> value is <code>0#</code>, it returns <code>False</code>. The <code>(&gt;=#)</code> and <code>(&lt;=#)</code> functions return unboxed <code>Int#</code> values - either <code>1#</code> or <code>0#</code>. <code>unsafeChr</code> converts its input <code>Int</code> to a <code>Char</code> value - there is no bounds checking.</p>
-<p><code>unsafeChr</code> is defined like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeChr ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
-unsafeChr (<span class="dt">I</span><span class="fu">#</span> i<span class="fu">#</span>) <span class="fu">=</span> <span class="dt">C</span><span class="fu">#</span> (chr<span class="fu">#</span> i<span class="fu">#</span>)</code></pre></div>
-<p>Think of <code>unsafeChr</code> like a cast from C:</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="dt">int</span> i = <span class="dv">42</span>;
-<span class="dt">char</span> c = (<span class="dt">char</span>) i;</code></pre></div>
-<p>We can mentally get rid of the <code>#</code> spam and the primitive operations via conceptually thinking of these functions like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
 intToDigitLower i
-  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
-  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;a&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">&#39;a&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
   <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show i)
 
 <span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
 intToDigitUpper i
-  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
-  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> unsafeChr (ord <span class="ch">&#39;A&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">&#39;0&#39;</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">&#39;A&#39;</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
   <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show i)</code></pre></div>
-<p>Thankfully, <code>intToDigitLower</code> and <code>intToDigitUpper</code> are our <em>only</em> new functions using primitive stuff from the internals of GHC.</p>
+<p><code>intToDigitLower</code> is a slightly modified copy of the <code>intToDigit</code> function from <code>base</code>’s <code>Data.Char</code> module. These functions are comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range. Depending upon which range the input value is in, the function returns the ASCII-adjusted hex <code>Char</code> representation of the <code>Int</code> value.</p>
+<p>The <code>unsafeChr</code> function from <code>text</code> converts its input <code>Int</code> to a <code>Char</code> value - there is no bounds checking. Think of <code>unsafeChr</code> like a cast from C:</p>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="dt">int</span> i = <span class="dv">42</span>;
+<span class="dt">char</span> c = (<span class="dt">char</span>) i;</code></pre></div>
 <p>Now we will implement our most important function:</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
 <span class="co">-- a bunch of SPECIALIZE pragmas...</span>
