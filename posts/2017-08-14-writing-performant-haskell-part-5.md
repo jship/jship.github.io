@@ -566,4 +566,4 @@ Another callout is that `text`'s arrays are _packed_ UTF-16.  We took advantage 
 
 In the next and final post, we will update our benchmark suite to cover all the data types `Hexy` supports and take stock of our performance gains overall.
 
-All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/23321173371a5bfa77459f366ede8e9b2c05a5a3).
+All code in this post is available on [GitHub](https://github.com/jship/hexy/tree/43306166c980ce6359f4c25b2331a5e552cea0e4).
