@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <!-- Site Properties -->
+  <title>jship - Writing Performant Haskell (6 of 6): Closing</title>
+  <link rel="stylesheet" type="text/css" href="../css/reset.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/site.min.css">
+
+  <link rel="stylesheet" type="text/css" href="../css/button.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/card.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/container.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/divider.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/dropdown.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/feed.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/grid.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/header.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/icon.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/image.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/list.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/message.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/menu.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/rail.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/segment.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sidebar.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/sticky.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/transition.min.css">
+
+  <!-- This page's CSS. -->
+  <link rel="stylesheet" type="text/css" href="../css/default.css">
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css">
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/visibility.min.js"></script>
+  <script src="../js/sidebar.min.js"></script>
+  <script src="../js/sticky.min.js"></script>
+  <script src="../js/transition.min.js"></script>
+
+  <!-- This script wires up a few pieces of the UI. -->
+  <script src="../js/default.js"></script>
+</head>
+<body>
+  <!-- Following Menu -->
+  <div class="ui large top fixed hidden menu">
+    <div class="ui container">
+      <div class="header item">
+        jship
+      </div>
+      <a class="item" href="../index.html">Home</a>
+      <a class="item" href="../archive.html">Blog</a>
+      <a class="item" href="../about.html">About</a>
+      <a class="item" href="../contact.html">Contact</a>
+      <a class="item" href="../resume.html">Resume</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="ui vertical inverted sidebar menu">
+    <div class="header item">
+      jship
+    </div>
+    <a class="item" href="../index.html">Home</a>
+    <a class="item" href="../archive.html">Blog</a>
+    <a class="item" href="../about.html">About</a>
+    <a class="item" href="../contact.html">Contact</a>
+    <a class="item" href="../resume.html">Resume</a>
+  </div>
+
+  <!-- Page Contents -->
+  <div class="pusher page-background-gradient">
+    <div class="ui vertical center aligned segment top-menu-segment">
+      <div class="ui container">
+        <div class="ui large secondary inverted pointing menu top-pointing-menu">
+          <a class="toc item">
+            <i class="sidebar icon"></i>
+          </a>
+          <div class="header item">
+            jship
+          </div>
+          <a class="item" href="../index.html">Home</a>
+          <a class="item" href="../archive.html">Blog</a>
+          <a class="item" href="../about.html">About</a>
+          <a class="item" href="../contact.html">Contact</a>
+          <a class="item" href="../resume.html">Resume</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Writing Performant Haskell (6 of 6): Closing</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="../rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="../atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="../images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="../about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 19, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3 id="recap">Recap</h3>
+<p>In the <a href="../posts/2017-08-14-writing-performant-haskell-part-5.html">previous post</a>, we significantly improved performance for all of our functions by digging into the internals of the <code>text</code> package. Our API looked like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
+<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
+<span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+<span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
+
+<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
+  xshowp  <span class="fu">=</span> showHexTextLower
+  xshowpu <span class="fu">=</span> showHexTextUpper
+
+<span class="co">-- remaining instances...</span></code></pre></div>
+<p>When we finished our dive into <code>text</code>, the <a href="../html/writing-performant-haskell-part-5-bench.html">benchmark report</a>’s summary looked like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-5-bench-summary.png"></p>
+<p>All of the functions in <code>Hexy</code>’s public API became pretty speedy, clocking in at about 50 nanoseconds each. Each of our functions is about 2.5 times faster than <code>showHex</code> and they are doing more work via zero-padding and prefixing.</p>
+<p>In this post, we will update our benchmark suite to test all the data types <code>Hexy</code> supports and see how our performance updates pan out across the board.</p>
+<h3 id="move-over-word32">Move Over, <code>Word32</code></h3>
+<p>Throughout the post series, we have almost exclusively benchmarked using <code>Word32</code>. <code>Hexy</code> supports 9 other data types! For all we know, our implementation might be fast for <code>Word32</code> and slow for <code>Word8</code>. We will not know until we benchmark, so let’s get to it.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Hexy</span>
+
+<span class="kw">import </span><span class="dt">Criterion.Main</span>
+<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
+<span class="kw">import </span><span class="dt">Numeric</span> (showHex)
+<span class="kw">import </span><span class="dt">Text.Printf</span> (printf)
+
+<span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> defaultMain
+  [ bgroup <span class="st">&quot;Word&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word</span>)
+    ]
+  , bgroup <span class="st">&quot;Word8&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word8</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word8</span>)
+    ]
+  , bgroup <span class="st">&quot;Word16&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word16</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word16</span>)
+    ]
+  , bgroup <span class="st">&quot;Word32&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
+    ]
+  , bgroup <span class="st">&quot;Word64&quot;</span>
+    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word64</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
+    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)) <span class="st">&quot;&quot;</span>
+    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
+    ]
+  <span class="co">-- and so on for the Int data types</span>
+  ]</code></pre></div>
+<p>Let’s run our updated benchmark suite:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<p>View the full report from this run <a href="../html/writing-performant-haskell-part-6-bench.html">here</a>. The <code>Word</code> portion of the summary looks like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-6-bench-summary-word.png"></p>
+<p>The above summary is looking good.</p>
+<p>Our functions operating on <code>Word</code>, <code>Word8</code>, <code>Word16</code>, and <code>Word32</code> all clock in at around 50 nanoseconds. Our functions operating on <code>Word64</code> came in at around 100 nanoseconds. This is reasonable since we are using the value <code>0x1f</code> across the board and the <code>Word64</code> versions have to do twice as much zero-padding as the <code>Word32</code> versions. All of our <code>Word</code>-y functions are faster than the corresponding call to <code>showHex</code> from <code>base</code> and are doing more work.</p>
+<p>The <code>Int</code> portion of the summary looks like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-6-bench-summary-int.png"></p>
+<p>In general, the above <code>Int</code> summary is also looking good.</p>
+<p>All of our <code>Int</code>-y functions are faster than the corresponding call to <code>showHex</code> from <code>base</code>. Our functions operating on <code>Int</code>, <code>Int8</code>, <code>Int16</code>, and <code>Int32</code> all clock in at around 50 nanoseconds just like the <code>Word</code> versions.</p>
+<p>Our functions operating on <code>Int64</code> came in at around 125 nanoseconds. This is unlike our <code>Word64</code> benchmarks which were about 100 nanoseconds each. There may be a way to specifically optimize the <code>Int64</code> implementation, but we will not worry about it in this post series. Our users are unlikely to be frequently pretty-printing 64-bit <em>signed</em> integers anyways.</p>
+<p>We can more confidently say <code>hexy</code> is performant now that we have benchmarked all the types our library supports!</p>
+<h3 id="even-better-benchmarks">Even Better Benchmarks</h3>
+<p>Our benchmarks all test the same hex value - <code>0x1f</code>. This means our code is doing more work on the zero-padding side as opposed to the hex conversion side for most data types.</p>
+<p>Our benchmark suite would be even more complete if we had some cases testing larger hex values too. I leave this as an exercise to the reader. This is a nice way to get familiar with <code>criterion</code> if you have not used it before.</p>
+<h3 id="further-exploration">Further Exploration</h3>
+<p>Throughout this post series, we have run benchmarks many times but have never run profiling. Profiling is often essential to identify hotspots and is an important technique to have at our disposal. A recent <a href="https://codygman.github.io/posts/2017-07-30-faster-command-line-tools-with-haskell.html">blog post</a> from <a href="https://twitter.com/codygman">Cody Goodman</a> is a great walkthrough on getting started with profiling.</p>
+<p>A few additional areas to explore: <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html?highlight=inlineable#inline-pragma"><code>INLINE</code></a>, <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/debugging.html?highlight=inline#ghc-flag--ddump-simpl">core output</a>, etc. Grokking core is what I personally want to learn next in regards to performant Haskell.</p>
+<p>Thanks for reading!</p>
+<p>All code in this post is available on <a href="https://github.com/jship/hexy/tree/fae3e8082c76ab094a455e2ca96cde3ee28ef141">GitHub</a>.</p>
+<hr />
+<h3 id="bonus-stage">Bonus Stage</h3>
+<div class="ui icon negative message">
+<i class="warning icon"></i>
+<div class="content">
+<div class="header">
+Notice
+</div>
+<p>
+We will not get better performance in this bonus stage. This section is here purely to expose readers to an additional alternative to <code>String</code>s from <code>base</code>.
+</p>
+</div>
+</div>
+<p>We recall from the <a href="../posts/2017-08-10-writing-performant-haskell-part-2.html">second post</a> that <a href="https://hackage.haskell.org/package/text-1.2.2.1"><code>text</code></a> and <a href="https://hackage.haskell.org/package/bytestring-0.10.8.1"><code>bytestring</code></a> are regarded as the most popular alternatives to <code>String</code> from <code>base</code>.</p>
+<p><img class="ui centered image" src="../images/new_challenger_foundation.png"></p>
+<p><a href="https://hackage.haskell.org/package/foundation-0.0.13"><code>foundation</code></a> is a relatively new package offering its own solution to <a href="https://www.stackage.org/haddock/lts-8.23/foundation-0.0.13/Foundation-String.html">strings</a> and is garnering some interest from the community. <code>foundation</code> strings are packed UTF8 as opposed to <code>text</code>’s packed UTF16. They only come in a strict flavor. Like <code>text</code>, they are generally always a better choice performance-wise than <code>base</code>’s <code>String</code> (i.e. <code>[Char]</code>). <code>foundation</code> strings are not in widespread use like <code>text</code> or <code>bytestring</code>, but they are still very much worth exploring in my opinion.</p>
+<p>Note that <code>foundation</code> has a rapidly evolving API. We will use <a href="https://hackage.haskell.org/package/foundation-0.0.13"><code>foundation-0.0.13</code></a>.</p>
+<p>We can write the version of <code>hexy</code> from the <a href="../posts/2017-08-14-writing-performant-haskell-part-5.html">previous post</a> targeting <code>foundation</code> instead of <code>text</code> with minimal changes. Here is <code>Hexy.Internal</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span>
+
+<span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.ST</span> (<span class="dt">ST</span>)
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.ST</span> <span class="kw">as</span> <span class="dt">ST</span>
+<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
+<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)
+<span class="kw">import qualified</span> <span class="dt">Foundation</span>
+<span class="kw">import qualified</span> <span class="dt">Foundation.Array</span>
+<span class="kw">import qualified</span> <span class="dt">Foundation.Collection</span>
+<span class="kw">import qualified</span> <span class="dt">Foundation.String</span>
+<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
+<span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span>
+
+<span class="ot">showHexTextLower ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Foundation.String</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+showHexTextLower <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitLower
+
+<span class="ot">showHexTextUpper ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Foundation.String</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+showHexTextUpper <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitUpper
+
+<span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Foundation.String</span>
+<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
+textShowIntAtBase base toChr n0
+  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
+  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> ST.runST <span class="fu">$</span> <span class="kw">do</span>
+      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
+      mutableBuffer <span class="ot">&lt;-</span> Foundation.Collection.mutNew (<span class="dt">Foundation.CountOf</span> size)
+      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
+            i' <span class="ot">&lt;-</span> unsafeWriteRev mutableBuffer i c
+            <span class="kw">case</span> n <span class="kw">of</span>
+              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
+              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
+           <span class="kw">where</span>
+            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
+      <span class="kw">let</span> zeroPadLoop i
+            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
+            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
+                i' <span class="ot">&lt;-</span> unsafeWriteRev mutableBuffer i <span class="ch">'0'</span>
+                zeroPadLoop i'
+      j <span class="ot">&lt;-</span> hexLoop (<span class="dt">Foundation.Offset</span> <span class="fu">$</span> size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
+      k <span class="ot">&lt;-</span> zeroPadLoop j
+      l <span class="ot">&lt;-</span> unsafeWriteRev mutableBuffer k <span class="ch">'x'</span>
+      _ <span class="ot">&lt;-</span> unsafeWriteRev mutableBuffer l <span class="ch">'0'</span>
+      immutableBuffer <span class="ot">&lt;-</span> Foundation.Collection.unsafeFreeze mutableBuffer
+      pure <span class="fu">.</span> Foundation.String.fromBytesUnsafe <span class="fu">$</span> immutableBuffer
+
+<span class="ot">unsafeWriteRev ::</span> <span class="dt">Foundation.Array.MUArray</span> <span class="dt">Word8</span> s <span class="ot">-&gt;</span> <span class="dt">Foundation.Offset</span> <span class="dt">Word8</span> <span class="ot">-&gt;</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s (<span class="dt">Foundation.Offset</span> <span class="dt">Word8</span>)
+unsafeWriteRev buffer i c <span class="fu">=</span> <span class="kw">do</span>
+  Foundation.Collection.mutUnsafeWrite buffer i (fromIntegral <span class="fu">.</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="fu">$</span> c)
+  pure (i <span class="fu">-</span> <span class="dv">1</span>)
+
+<span class="ot">dropHexPrefix ::</span> <span class="dt">Foundation.String</span> <span class="ot">-&gt;</span> <span class="dt">Foundation.String</span>
+dropHexPrefix <span class="fu">=</span> Foundation.drop <span class="dv">2</span>
+
+<span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitLower i
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> <span class="dt">Char</span><span class="fu">.</span>chr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'0'</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> <span class="dt">Char</span><span class="fu">.</span>chr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'a'</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show i)
+
+<span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
+intToDigitUpper i
+  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> <span class="dt">Char</span><span class="fu">.</span>chr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'0'</span> <span class="fu">+</span> i)
+  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> <span class="dt">Char</span><span class="fu">.</span>chr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'A'</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
+  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show i)</code></pre></div>
+<p>We changed some return types, updated <code>unsafeWriteRev</code>/<code>dropHexPrefix</code>, and replaced our <code>done</code> callback with an <code>unsafeFreeze</code> operation followed by a <code>fromBytesUnsafe</code>. The rest is pretty much the same.</p>
+<p><code>hexy-foundation</code> is available on <a href="https://github.com/jship/hexy-foundation/tree/9d3679d5f329ef70e93267d90cab4a2efc49d0bf">GitHub</a>.</p>
+<p>Let’s run benchmarks and see how this performs. View the full report from the <code>hexy-foundation</code> run <a href="../html/writing-performant-haskell-part-6-bench-foundation.html">here</a>.</p>
+<p>The summary looks like this:</p>
+<p><img class="ui fluid image" src="../images/writing-performant-haskell-part-6-bench-summary-foundation.png"></p>
+<p>Most of our functions are roughly 20-30 nanoseconds slower using <code>foundation</code> strings instead of <code>Text</code>. Exceptions are the <code>Word64</code> and <code>Int64</code> variants which are anywhere from 50-100 nanoseconds slower. Our functions are still faster than using <code>showHex</code> from <code>base</code> though (not counting the somewhat inconsistent benchmarks for 64-bit types).</p>
+<p>We should not interpret these results as “<code>text</code> good, <code>foundation</code> bad”, though we will stick with our decision of using <code>text</code> in <code>hexy</code>. <code>foundation</code> still gave great performance compared to using <code>String</code> values from <code>base</code>. The interesting bit is that <code>foundation</code> is not just about strings. The package is intended to be an alternate <code>Prelude</code> and covers a lot of ground. It has an expansive <a href="https://hackage.haskell.org/package/foundation-0.0.13/docs/Foundation-Collection.html">collections API</a>, a more granular <a href="https://hackage.haskell.org/package/foundation-0.0.13/docs/Foundation-Numerical.html">numerical class hierarchy</a>, multiple flavors of <a href="https://hackage.haskell.org/package/foundation-0.0.13/docs/Foundation-Array.html">arrays</a>, and more.</p>
+<p><code>foundation</code>’s features are off-topic for this blog post series, but I encourage you to check it out!</p>
+</div>
+
+  </div>
+
+</body>
+</html>
