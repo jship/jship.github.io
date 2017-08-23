@@ -52,6 +52,11 @@
   border: none !important;
 }
 
+.top-menu-segment > .ui.container {
+  display: inline-block;
+  width:auto;
+}
+
 .top-pointing-menu {
   border-color: transparent !important;
 }
