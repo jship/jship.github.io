@@ -15,8 +15,14 @@ main = do
         (("themes" </> "default" </> "assets" </> "fonts") </>) .
         takeFileName . toFilePath
       compile copyFileCompiler
+    match "semantic/dist/*.min.js" $ do
+      route $ customRoute $ ("js" </>) . takeFileName . toFilePath
+      compile copyFileCompiler
     match "semantic/dist/components/*.min.js" $ do
       route $ customRoute $ ("js" </>) . takeFileName . toFilePath
+      compile copyFileCompiler
+    match "semantic/dist/*.min.css" $ do
+      route $ customRoute $ ("css" </>) . takeFileName . toFilePath
       compile copyFileCompiler
     match "semantic/dist/components/*.min.css" $ do
       route $ customRoute $ ("css" </>) . takeFileName . toFilePath
