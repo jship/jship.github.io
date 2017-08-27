@@ -8,8 +8,302 @@
         <name>Jason Shipman</name>
         <email>jasonpshipman@gmail.com</email>
     </author>
-    <updated>2017-08-19T00:00:00Z</updated>
+    <updated>2017-08-27T00:00:00Z</updated>
     <entry>
+    <title>Monad Transformer Commutativity</title>
+    <link href="https://jship.github.io/posts/2017-08-27-monad-transformer-commutativity.html" />
+    <id>https://jship.github.io/posts/2017-08-27-monad-transformer-commutativity.html</id>
+    <published>2017-08-27T00:00:00Z</published>
+    <updated>2017-08-27T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Monad Transformer Commutativity</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="/rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="/atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="/images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="/about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            August 27, 2017
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="/tags/Haskell.html">Haskell</a>, <a href="/tags/Monads.html">Monads</a>, <a href="/tags/Monad%20Transformers.html">Monad Transformers</a>, <a href="/tags/Quick%20Tip.html">Quick Tip</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui icon info message">
+<i class="info icon"></i>
+<div class="content">
+<p>
+This post is meant to supplement Roman Cheplyaka’s <a href="https://ro-che.info/articles/2012-01-02-composing-monads">“Composing monadic effects”</a>. It was inspired by <a href="https://www.reddit.com/user/tmpz">/u/tmpz</a>’s question on Reddit’s <a href="https://www.reddit.com/r/haskell/comments/6w4kml/weekly_beginner_saturday_hask_anything_1/dm6137p/">[Weekly] Beginner Saturday: Hask Anything - #1</a>. Thanks <a href="https://www.reddit.com/user/tmpz">/u/tmpz</a>!
+</p>
+</div>
+</div>
+<h3 id="what-is-commutativity">What is commutativity?</h3>
+<p>Commutativity means we can switch the order of two things before we smoosh them together and get the same result as if we smooshed them together in their original order. A more rigorous definition is not required for the contents of this post.</p>
+<p>Addition over the reals is commutative - here is one example:</p>
+<pre class="text"><code>1 + 2 = 2 + 1</code></pre>
+<h3 id="what-is-monad-transformer-commutativity">What is monad transformer commutativity?</h3>
+<p>If we stack up two monad transformers, the transformers commute if the stack’s result type has the same “shape” regardless of the order in which we stacked the transformers.</p>
+<p>For me, this is easier to understand with examples. Here is a script we can load directly into GHCi via <code>stack &lt;script_name&gt;.hs</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-9.1 --install-ghc exec ghci --package transformers</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Identity</span> (<span class="dt">IdentityT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Identity</span> <span class="kw">as</span> <span class="dt">Identity</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Writer</span> (<span class="dt">Writer</span>(..), <span class="dt">WriterT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Writer</span> <span class="kw">as</span> <span class="dt">Writer</span>
+<span class="kw">import </span><span class="dt">Data.Functor.Identity</span> (<span class="dt">Identity</span>(..))
+
+<span class="ot">identityWriter ::</span> <span class="dt">IdentityT</span> (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> (a, w)
+identityWriter m <span class="fu">=</span> Writer.runWriter (Identity.runIdentityT m)
+
+<span class="ot">writerIdentity ::</span> <span class="dt">WriterT</span> w <span class="dt">Identity</span> a <span class="ot">-&gt;</span> (a, w)
+writerIdentity m <span class="fu">=</span> runIdentity (Writer.runWriterT m)</code></pre></div>
+<p>In the above, we have implemented the two different ways we can stack <code>IdentityT</code> and <code>WriterT w</code>. The first one has <code>Writer w</code> as the base monad while the second one has <code>Identity</code> as the base monad. The bodies of our functions do not (and cannot!) do anything extra besides running the two transformers in the stack.</p>
+<p>Note that the result type is <code>(a, w)</code> for both functions. The order of our stacks did not change the result type, so stacking <code>IdentityT</code> and <code>WriterT</code> is commutative. This conceptually makes sense - <code>IdentityT</code> wraps a monad but does not do anything else. This means the result type can not suddenly change if we throw an <code>IdentityT</code> into our stacks. We could even say that <code>IdentityT</code> commutes with all other transformers!</p>
+<p>Let’s look at an example that does not use <code>IdentityT</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-9.1 --install-ghc exec ghci --package transformers</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Except</span> (<span class="dt">Except</span>(..), <span class="dt">ExceptT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Except</span> <span class="kw">as</span> <span class="dt">Except</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.State</span> (<span class="dt">State</span>(..), <span class="dt">StateT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.State</span> <span class="kw">as</span> <span class="dt">State</span>
+
+<span class="ot">stateExcept ::</span> <span class="dt">StateT</span> s (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> <span class="dt">Either</span> e (a, s)
+stateExcept m s <span class="fu">=</span> Except.runExcept (State.runStateT m s)
+
+<span class="ot">exceptState ::</span> <span class="dt">ExceptT</span> e (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (<span class="dt">Either</span> e a, s)
+exceptState m s <span class="fu">=</span> State.runState (Except.runExceptT m) s</code></pre></div>
+<p>In the above, we implemented the two different ways we can stack <code>StateT s</code> and <code>ExceptT e</code>. We can immediately see from the return types that stacking these transformers is not commutative.</p>
+<p>If we choose <code>Except e</code> as our base monad, our result type is <code>Either e (a, s)</code>. This means we either have an exception value of type <code>e</code> or we have a pair of our monadic computation’s result and final state. If we do wind up with a <code>Left &lt;something&gt;</code>, we have no access to our computation’s intermediate state.</p>
+<p>If we choose <code>State s</code> as our base monad, our result type is <code>(Either e a, s)</code>. This means we have a pair where the first element is either an exception value of type <code>e</code> or our monadic computation’s result, and the second element is our computation’s final state.</p>
+<p>Which one we choose depends on our use case.</p>
+<h3 id="practice-practice-practice">Practice, Practice, Practice</h3>
+<p>As with most things we learn, gaining an intuition for how to stack transformers in the desired order takes time and practice. When I was first exploring them, I found it very helpful to stack together pairs of transformers and let GHC tell me if I had figured out the correct return types.</p>
+<p>The rest of this post is a big GHCi script that enumerates the different ways we can stack the most common transformers up to stacks of size 2. I recommend writing out this enumeration yourself (it is tedious but effective) and only using the included script as a reference.</p>
+<p>See if you can spot the stacking orders that are not commutative!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-9.1 --install-ghc exec ghci --package transformers</span>
+
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Except</span> (<span class="dt">Except</span>(..), <span class="dt">ExceptT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Except</span> <span class="kw">as</span> <span class="dt">Except</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Identity</span> (<span class="dt">IdentityT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Identity</span> <span class="kw">as</span> <span class="dt">Identity</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Maybe</span> (<span class="dt">MaybeT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Maybe</span> <span class="kw">as</span> <span class="dt">Maybe</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.RWS</span> (<span class="dt">RWS</span>(..), <span class="dt">RWST</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.RWS</span> <span class="kw">as</span> <span class="dt">RWS</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Reader</span> (<span class="dt">Reader</span>(..), <span class="dt">ReaderT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Reader</span> <span class="kw">as</span> <span class="dt">Reader</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.State</span> (<span class="dt">State</span>(..), <span class="dt">StateT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.State</span> <span class="kw">as</span> <span class="dt">State</span>
+<span class="kw">import </span><span class="dt">Control.Monad.Trans.Writer</span> (<span class="dt">Writer</span>(..), <span class="dt">WriterT</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Control.Monad.Trans.Writer</span> <span class="kw">as</span> <span class="dt">Writer</span>
+<span class="kw">import </span><span class="dt">Data.Functor.Identity</span> (<span class="dt">Identity</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Data.Functor.Identity</span> <span class="kw">as</span> <span class="dt">Identity</span>
+<span class="kw">import </span><span class="dt">Data.Maybe</span> (<span class="dt">Maybe</span>(..))
+<span class="kw">import qualified</span> <span class="dt">Data.Maybe</span> <span class="kw">as</span> <span class="dt">Maybe</span>
+
+<span class="ot">plainIdentity ::</span> <span class="dt">Identity</span> a <span class="ot">-&gt;</span> a
+plainIdentity m <span class="fu">=</span> runIdentity m
+
+<span class="ot">plainReader ::</span> <span class="dt">Reader</span> r a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> a
+plainReader m <span class="fu">=</span> Reader.runReader m
+
+<span class="ot">plainWriter ::</span> <span class="dt">Writer</span> w a <span class="ot">-&gt;</span> (a, w)
+plainWriter m <span class="fu">=</span> Writer.runWriter m
+
+<span class="ot">plainState ::</span> <span class="dt">State</span> s a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+plainState m s <span class="fu">=</span> State.runState m s
+
+<span class="ot">plainMaybe ::</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b
+plainMaybe m d f <span class="fu">=</span> maybe d f m
+
+<span class="ot">plainExcept ::</span> <span class="dt">Except</span> e a <span class="ot">-&gt;</span> <span class="dt">Either</span> e a
+plainExcept m <span class="fu">=</span> Except.runExcept m
+
+<span class="ot">plainRWS ::</span> <span class="dt">RWS</span> r w s a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s, w)
+plainRWS m r s <span class="fu">=</span> RWS.runRWS m r s
+
+<span class="ot">identityIdentity ::</span> <span class="dt">IdentityT</span> <span class="dt">Identity</span> a <span class="ot">-&gt;</span> a
+identityIdentity m <span class="fu">=</span> runIdentity (Identity.runIdentityT m)
+
+<span class="ot">identityReader ::</span> <span class="dt">IdentityT</span> (<span class="dt">Reader</span> r) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> a
+identityReader m r <span class="fu">=</span> Reader.runReader (Identity.runIdentityT m) r
+
+<span class="ot">identityWriter ::</span> <span class="dt">IdentityT</span> (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> (a, w)
+identityWriter m <span class="fu">=</span> Writer.runWriter (Identity.runIdentityT m)
+
+<span class="ot">identityState ::</span> <span class="dt">IdentityT</span> (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+identityState m s <span class="fu">=</span> State.runState (Identity.runIdentityT m) s
+
+<span class="ot">identityMaybe ::</span> <span class="dt">IdentityT</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b
+identityMaybe m d f <span class="fu">=</span> maybe d f (Identity.runIdentityT m)
+
+<span class="ot">identityExcept ::</span> <span class="dt">IdentityT</span> (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> <span class="dt">Either</span> e a
+identityExcept m <span class="fu">=</span> Except.runExcept (Identity.runIdentityT m)
+
+<span class="ot">identityRWS ::</span> <span class="dt">IdentityT</span> (<span class="dt">RWS</span> r w s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s, w)
+identityRWS m r s <span class="fu">=</span> RWS.runRWS (Identity.runIdentityT m) r s
+
+<span class="ot">readerIdentity ::</span> <span class="dt">ReaderT</span> r <span class="dt">Identity</span> a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> a
+readerIdentity m r <span class="fu">=</span> runIdentity (Reader.runReaderT m r)
+
+<span class="ot">readerReader ::</span> <span class="dt">ReaderT</span> r (<span class="dt">Reader</span> r&#39;) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> r&#39; <span class="ot">-&gt;</span> a
+readerReader m r r&#39; <span class="fu">=</span> Reader.runReader (Reader.runReaderT m r) r&#39;
+
+<span class="ot">readerWriter ::</span> <span class="dt">ReaderT</span> r (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> (a, w)
+readerWriter m r <span class="fu">=</span> Writer.runWriter (Reader.runReaderT m r)
+
+<span class="ot">readerState ::</span> <span class="dt">ReaderT</span> r (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+readerState m r s <span class="fu">=</span> State.runState (Reader.runReaderT m r) s
+
+<span class="ot">readerMaybe ::</span> <span class="dt">ReaderT</span> r <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> b <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> b
+readerMaybe m r d f <span class="fu">=</span> maybe d f (Reader.runReaderT m r)
+
+<span class="ot">readerExcept ::</span> <span class="dt">ReaderT</span> r (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> <span class="dt">Either</span> e a
+readerExcept m r <span class="fu">=</span> Except.runExcept (Reader.runReaderT m r)
+
+<span class="ot">readerRWS ::</span> <span class="dt">ReaderT</span> r (<span class="dt">RWS</span> r&#39; w s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> r&#39; <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s, w)
+readerRWS m r r&#39; s <span class="fu">=</span> RWS.runRWS (Reader.runReaderT m r) r&#39; s
+
+<span class="ot">writerIdentity ::</span> <span class="dt">WriterT</span> w <span class="dt">Identity</span> a <span class="ot">-&gt;</span> (a, w)
+writerIdentity m <span class="fu">=</span> runIdentity (Writer.runWriterT m)
+
+<span class="ot">writerReader ::</span> <span class="dt">WriterT</span> w (<span class="dt">Reader</span> r) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> (a, w)
+writerReader m r <span class="fu">=</span> Reader.runReader (Writer.runWriterT m) r
+
+<span class="ot">writerWriter ::</span> <span class="dt">WriterT</span> w (<span class="dt">Writer</span> w&#39;) a <span class="ot">-&gt;</span> ((a, w), w&#39;)
+writerWriter m <span class="fu">=</span> Writer.runWriter (Writer.runWriterT m)
+
+<span class="ot">writerState ::</span> <span class="dt">WriterT</span> w (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> ((a, w), s)
+writerState m s <span class="fu">=</span> State.runState (Writer.runWriterT m) s
+
+<span class="ot">writerMaybe ::</span> <span class="dt">WriterT</span> w <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> (b, w&#39;) <span class="ot">-&gt;</span> ((a, w) <span class="ot">-&gt;</span> (b, w&#39;)) <span class="ot">-&gt;</span> (b, w&#39;)
+writerMaybe m d f <span class="fu">=</span> maybe d f (Writer.runWriterT m)
+
+<span class="ot">writerExcept ::</span> <span class="dt">WriterT</span> w (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> <span class="dt">Either</span> e (a, w)
+writerExcept m <span class="fu">=</span> Except.runExcept (Writer.runWriterT m)
+
+<span class="ot">writeRWS ::</span> <span class="dt">WriterT</span> w (<span class="dt">RWS</span> r w&#39; s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> ((a, w), s, w&#39;)
+writeRWS m r s <span class="fu">=</span> RWS.runRWS (Writer.runWriterT m) r s
+
+<span class="ot">stateIdentity ::</span> <span class="dt">StateT</span> s <span class="dt">Identity</span> a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s)
+stateIdentity m s <span class="fu">=</span> runIdentity (State.runStateT m s)
+
+<span class="ot">stateReader ::</span> <span class="dt">StateT</span> s (<span class="dt">Reader</span> r) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> (a, s)
+stateReader m s r <span class="fu">=</span> Reader.runReader (State.runStateT m s) r
+
+<span class="ot">stateWriter ::</span> <span class="dt">StateT</span> s (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> ((a, s), w)
+stateWriter m s <span class="fu">=</span> Writer.runWriter (State.runStateT m s)
+
+<span class="ot">stateState ::</span> <span class="dt">StateT</span> s (<span class="dt">State</span> s&#39;) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> s&#39; <span class="ot">-&gt;</span> ((a, s), s&#39;)
+stateState m s s&#39; <span class="fu">=</span> State.runState (State.runStateT m s) s&#39;
+
+<span class="ot">stateMaybe ::</span> <span class="dt">StateT</span> s <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (b, s&#39;) <span class="ot">-&gt;</span> ((a, s) <span class="ot">-&gt;</span> (b, s&#39;)) <span class="ot">-&gt;</span> (b, s&#39;)
+stateMaybe m s d f <span class="fu">=</span> maybe d f (State.runStateT m s)
+
+<span class="ot">stateExcept ::</span> <span class="dt">StateT</span> s (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> <span class="dt">Either</span> e (a, s)
+stateExcept m s <span class="fu">=</span> Except.runExcept (State.runStateT m s)
+
+<span class="ot">stateRWS ::</span> <span class="dt">StateT</span> s (<span class="dt">RWS</span> r w s&#39;) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s&#39; <span class="ot">-&gt;</span> ((a, s), s&#39;, w)
+stateRWS m s r s&#39; <span class="fu">=</span> RWS.runRWS (State.runStateT m s) r s&#39;
+
+<span class="ot">maybeIdentity ::</span> <span class="dt">MaybeT</span> <span class="dt">Identity</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a
+maybeIdentity m <span class="fu">=</span> runIdentity (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m)
+
+<span class="ot">maybeReader ::</span> <span class="dt">MaybeT</span> (<span class="dt">Reader</span> r) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> <span class="dt">Maybe</span> a
+maybeReader m r <span class="fu">=</span> Reader.runReader (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m) r
+
+<span class="ot">maybeWriter ::</span> <span class="dt">MaybeT</span> (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> (<span class="dt">Maybe</span> a, w)
+maybeWriter m <span class="fu">=</span> Writer.runWriter (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m)
+
+<span class="ot">maybeState ::</span> <span class="dt">MaybeT</span> (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (<span class="dt">Maybe</span> a, s)
+maybeState m s <span class="fu">=</span> State.runState (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m) s
+
+<span class="ot">maybeMaybe ::</span> <span class="dt">MaybeT</span> <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> (<span class="dt">Maybe</span> b) <span class="ot">-&gt;</span> (<span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b) <span class="ot">-&gt;</span> <span class="dt">Maybe</span> b
+maybeMaybe m d f <span class="fu">=</span> maybe d f (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m)
+
+<span class="ot">maybeExcept ::</span> <span class="dt">MaybeT</span> (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> <span class="dt">Either</span> e (<span class="dt">Maybe</span> a)
+maybeExcept m <span class="fu">=</span> Except.runExcept (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m)
+
+<span class="ot">maybeRWS ::</span> <span class="dt">MaybeT</span> (<span class="dt">RWS</span> r w s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> ((<span class="dt">Maybe</span> a), s, w)
+maybeRWS m r s <span class="fu">=</span> RWS.runRWS (<span class="dt">Maybe</span><span class="fu">.</span>runMaybeT m) r s
+
+<span class="ot">exceptIdentity ::</span> <span class="dt">ExceptT</span> e <span class="dt">Identity</span> a <span class="ot">-&gt;</span> <span class="dt">Either</span> e a
+exceptIdentity m <span class="fu">=</span> runIdentity (Except.runExceptT m)
+
+<span class="ot">exceptReader ::</span> <span class="dt">ExceptT</span> e (<span class="dt">Reader</span> r) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> <span class="dt">Either</span> e a
+exceptReader m r <span class="fu">=</span> Reader.runReader (Except.runExceptT m) r
+
+<span class="ot">exceptWriter ::</span> <span class="dt">ExceptT</span> e (<span class="dt">Writer</span> w) a <span class="ot">-&gt;</span> (<span class="dt">Either</span> e a, w)
+exceptWriter m <span class="fu">=</span> Writer.runWriter (Except.runExceptT m)
+
+<span class="ot">exceptState ::</span> <span class="dt">ExceptT</span> e (<span class="dt">State</span> s) a <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (<span class="dt">Either</span> e a, s)
+exceptState m s <span class="fu">=</span> State.runState (Except.runExceptT m) s
+
+<span class="ot">exceptMaybe ::</span> <span class="dt">ExceptT</span> e <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> <span class="dt">Either</span> e&#39; b <span class="ot">-&gt;</span> (<span class="dt">Either</span> e a <span class="ot">-&gt;</span> <span class="dt">Either</span> e&#39; b) <span class="ot">-&gt;</span> <span class="dt">Either</span> e&#39; b
+exceptMaybe m d f <span class="fu">=</span> maybe d f (Except.runExceptT m)
+
+<span class="ot">exceptExcept ::</span> <span class="dt">ExceptT</span> e (<span class="dt">Except</span> e&#39;) a <span class="ot">-&gt;</span> <span class="dt">Either</span> e&#39; (<span class="dt">Either</span> e a)
+exceptExcept m <span class="fu">=</span> Except.runExcept (Except.runExceptT m)
+
+<span class="ot">exceptRWS ::</span> <span class="dt">ExceptT</span> e (<span class="dt">RWS</span> r w s) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (<span class="dt">Either</span> e a, s, w)
+exceptRWS m r s <span class="fu">=</span> RWS.runRWS (Except.runExceptT m) r s
+
+<span class="ot">rwsIdentity ::</span> <span class="dt">RWST</span> r w s <span class="dt">Identity</span> a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (a, s, w)
+rwsIdentity m r s <span class="fu">=</span> runIdentity (RWS.runRWST m r s)
+
+<span class="ot">rwsReader ::</span> <span class="dt">RWST</span> r w s (<span class="dt">Reader</span> r&#39;) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r&#39; <span class="ot">-&gt;</span> (a, s, w)
+rwsReader m r s r&#39; <span class="fu">=</span> Reader.runReader (RWS.runRWST m r s) r&#39;
+
+<span class="ot">rwsWriter ::</span> <span class="dt">RWST</span> r w s (<span class="dt">Writer</span> w&#39;) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> ((a, s, w), w&#39;)
+rwsWriter m r s <span class="fu">=</span> Writer.runWriter (RWS.runRWST m r s)
+
+<span class="ot">rwsState ::</span> <span class="dt">RWST</span> r w s (<span class="dt">State</span> s&#39;) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> s&#39; <span class="ot">-&gt;</span> ((a, s, w), s&#39;)
+rwsState m r s s&#39; <span class="fu">=</span> State.runState (RWS.runRWST m r s) s&#39;
+
+<span class="ot">rwsMaybe ::</span> <span class="dt">RWST</span> r w s <span class="dt">Maybe</span> a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> (b, s&#39;, w&#39;) <span class="ot">-&gt;</span> ((a, s, w) <span class="ot">-&gt;</span> (b, s&#39;, w&#39;)) <span class="ot">-&gt;</span> (b, s&#39;, w&#39;)
+rwsMaybe m r s d f <span class="fu">=</span> maybe d f (RWS.runRWST m r s)
+
+<span class="ot">rwsExcept ::</span> <span class="dt">RWST</span> r w s (<span class="dt">Except</span> e) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> <span class="dt">Either</span> e (a, s, w)
+rwsExcept m r s <span class="fu">=</span> Except.runExcept (RWS.runRWST m r s)
+
+<span class="ot">rwsRws ::</span> <span class="dt">RWST</span> r w s (<span class="dt">RWS</span> r&#39; w&#39; s&#39;) a <span class="ot">-&gt;</span> r <span class="ot">-&gt;</span> s <span class="ot">-&gt;</span> r&#39; <span class="ot">-&gt;</span> s&#39; <span class="ot">-&gt;</span> ((a, s, w), s&#39;, w&#39;)
+rwsRws m r s r&#39; s&#39; <span class="fu">=</span> RWS.runRWS (RWS.runRWST m r s) r&#39; s&#39;</code></pre></div>
+</div>
+]]></summary>
+</entry>
+<entry>
     <title>Writing Performant Haskell (6 of 6): Closing</title>
     <link href="https://jship.github.io/posts/2017-08-19-writing-performant-haskell-part-6.html" />
     <id>https://jship.github.io/posts/2017-08-19-writing-performant-haskell-part-6.html</id>
