@@ -43,7 +43,7 @@ In June of 2015, I visited Microsoft\'s Redmond campus for a week-long hackathon
 
 At CAE, I worked in C and C++ on the radar and underwater acoustics subsystems for flight simulators and weapon systems trainers.  Areas worked include target detection, landmass processing, line of sight, UDP/TCP messaging, acoustics state management, and entity prioritization schemes.  I learned a great deal about performance here, much like my time at Applied Research Associates.  More importantly, this job often had me interfacing directly with the US Navy to hash out requirements and demonstrate recent changes.  This was critical for the development of my soft skills.  Communicating, receiving feedback, and knowing when to be assertive versus adaptable are just as important in software development as writing code.  I also learned the ins and outs of the waterfall methodology here.
 
-### Tutor, University of Central Florida (May 2013 - May 2014)
+### Tutor, University of Central Florida (May 2012 - May 2013)
 
 While working on my undergraduate degree in Computer Science, I tutored for graduate- and undergraduate-level courses, such as Graphics Programming under Dr\. Sumanta N. Pattanaik, Operating Systems under Dr\. Mark Llewellyn, and Web-based Information Technology also under Dr\. Mark Llewellyn.  Additional responsibilities included evaluating exams and assignments.
 
