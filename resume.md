@@ -8,7 +8,7 @@ title: Resume
 
 ## Summary
 
-Developer with 4+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
+Developer with 4.5+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
 
 ## Skills
 
@@ -21,7 +21,11 @@ Developer with 4+ years\' success building correct and flexible solutions in var
 
 ## Experience
 
-### Programmer/Analyst - Ad Platform, Catalina (June 2016 - Present)
+### Software Engineer - Backend, SimSpace (January 2018 - Present)
+
+I currently work on the Haskell backend at SimSpace.
+
+### Programmer/Analyst - Ad Platform, Catalina (June 2016 - Deceber 2017)
 
 In June of 2016, I transitioned from the In-Store team to Catalina\'s ad platform team.  The ad platform aims to fundamentally redefine how Catalina operates with realtime execution via geographically-distributed cloud computing and highly flexible offer rendering.  Along the way, it is simplifying offer setup and opening the door for omni-channel opportunities (i\.e\. in-store, mobile, web, home delivery, etc).
 
