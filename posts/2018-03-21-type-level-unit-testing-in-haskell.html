@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <!-- Site Properties -->
+  <title>jship - Type-level Unit Testing in Haskell</title>
+  <link rel="stylesheet" type="text/css" href="../css/semantic.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/icon.min.css">
+
+  <!-- This page's CSS. -->
+  <link rel="stylesheet" type="text/css" href="../css/default.css">
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css">
+
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/semantic.min.js"></script>
+
+  <!-- This script wires up a few pieces of the UI. -->
+  <script src="../js/default.js"></script>
+</head>
+<body>
+  <!-- Following Menu -->
+  <div class="ui large top fixed hidden menu">
+    <div class="ui container">
+      <div class="header item">
+        jship
+      </div>
+      <a class="item" href="../index.html">Home</a>
+      <a class="item" href="../archive.html">Blog</a>
+      <a class="item" href="../about.html">About</a>
+      <a class="item" href="../contact.html">Contact</a>
+      <a class="item" href="../resume.html">Resume</a>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="ui vertical inverted sidebar menu">
+    <div class="header item">
+      jship
+    </div>
+    <a class="item" href="../index.html">Home</a>
+    <a class="item" href="../archive.html">Blog</a>
+    <a class="item" href="../about.html">About</a>
+    <a class="item" href="../contact.html">Contact</a>
+    <a class="item" href="../resume.html">Resume</a>
+  </div>
+
+  <!-- Page Contents -->
+  <div class="pusher page-background-gradient">
+    <div class="ui vertical center aligned segment top-menu-segment">
+      <div class="ui container">
+        <div class="ui large secondary inverted pointing menu top-pointing-menu">
+          <a class="toc item">
+            <i class="sidebar icon"></i>
+          </a>
+          <div class="header item">
+            jship
+          </div>
+          <a class="item" href="../index.html">Home</a>
+          <a class="item" href="../archive.html">Blog</a>
+          <a class="item" href="../about.html">About</a>
+          <a class="item" href="../contact.html">Contact</a>
+          <a class="item" href="../resume.html">Resume</a>
+        </div>
+      </div>
+    </div>
+    <div class="ui raised padded text container segment" id="blog_content">
+  <h2 class="ui header">Type-level Unit Testing in Haskell</h2>
+  <div class="ui right rail">
+    <div class="ui sticky">
+      <div class="ui labeled icon vertical menu">
+        <a class="item" href="https://twitter.com/jship21347">
+          <i class="twitter icon"></i>
+          Twitter
+        </a>
+        <a class="item" href="../rss.xml">
+          <i class="rss icon"></i>
+          RSS
+        </a>
+        <a class="item" href="../atom.xml">
+          <i class="rss square icon"></i>
+          Atom
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="ui feed">
+    <div class="event">
+      <div class="label">
+        <img src="../images/headshot.png">
+      </div>
+      <div class="content">
+        <div class="summary">
+          <a class="user" href="../about.html">
+            Jason Shipman
+          </a>
+          <div class="date">
+            March 21, 2018
+          </div>
+        </div>
+        <div class="meta">
+          <i class="tags icon"></i>
+          
+            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Types.html">Types</a>, <a href="../tags/Unit%20Testing.html">Unit Testing</a>, <a href="../tags/Type%20Families.html">Type Families</a>, <a href="../tags/Proxies.html">Proxies</a>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui icon info message">
+<i class="info icon"></i>
+<div class="content">
+<p>
+This post will assume some familiarity with type-level programming in Haskell. I recommend this <a href="http://www.parsonsmatt.org/2017/04/26/basic_type_level_programming_in_haskell.html">excellent blog post</a> as an introduction to type-level Haskell. Understanding the entirety of that post is not required to continue reading this one, but I do recommend being slightly comfortable with closed type families, data kinds, and type-level natural numbers.
+</p>
+</div>
+</div>
+<h3 id="tao"><code>tao</code></h3>
+<p>The <a href="https://hackage.haskell.org/package/tao"><code>tao</code></a> package was released this week and we can use it do a sort of type-level “unit testing”. The package gives us type-level assertion operators/functions. Here, we are using <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/GHC-TypeNats.html#t:Nat">Nats</a> and asserting that <code>3</code> is, in fact, <code>1 + 2</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTest ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTest <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="dt">AssertEq</span> <span class="st">&quot;3 = 1 + 2&quot;</span> <span class="dv">3</span> (<span class="dv">1</span> <span class="fu">+</span> <span class="dv">2</span>))</code></pre></div>
+<p><code>AssertEq</code> is a closed type family that takes three things:</p>
+<ul>
+<li>a message that is used on assertion failure</li>
+<li>the expected type</li>
+<li>the actual type</li>
+</ul>
+<p>If the expected type and actual type are equal, the test passes and our code compiles! Otherwise, the code will not compile. We will see what the use of <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/Data-Proxy.html#t:Proxy"><code>Proxy</code></a> is all about, as well as why the proxy wraps the promoted unit type later in this post.</p>
+<p>This example could be written equivalently using <a href="https://www.stackage.org/lts-11.0/package/HUnit-1.6.0.0">HUnit</a>-inspired operators:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTest ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTest <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="st">&quot;3 = 1 + 2&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="dv">3</span> <span class="fu">@=?</span> <span class="dv">1</span> <span class="fu">+</span> <span class="dv">2</span>)</code></pre></div>
+<p>In this post though, we will temporarily pretend the <a href="https://hackage.haskell.org/package/tao"><code>tao</code></a> package does not exist. Instead, we will implement the core portion of <code>tao</code> ourselves! Afterwards, we will get a feel for how to work with the package like we have in the examples above.</p>
+<h3 id="type-equality">Type equality</h3>
+<p>A core usage of <code>tao</code> is asserting that types are equal using <code>AssertEq</code> or the <code>(@=?)</code> operator version. The <a href="https://www.stackage.org/lts-11.0/package/base-4.10.1.0">base</a> package conveniently provides the <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/Data-Type-Equality.html#t:-61--61-"><code>(==)</code></a> type function in the <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/Data-Type-Equality.html"><code>Data.Type.Equality</code></a> module.</p>
+<p>Let’s play around with type-level equality! The <code>(==)</code> type function is declared like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> family (<span class="ot">a ::</span> k) <span class="fu">==</span> (<span class="ot">b ::</span> k)<span class="ot"> ::</span> <span class="dt">Bool</span></code></pre></div>
+<p>This means we can give the type function two types and the result will be of kind <code>Bool</code>, so let’s get to it. We can load the following script directly into <code>GHCi</code> via <code>stack &lt;script_name&gt;.hs</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-11.0 --install-ghc exec ghci</span>
+
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Type.Equality</span> (type (==))
+
+<span class="kw">type</span> <span class="dt">LooksEqual</span> <span class="fu">=</span> <span class="dt">Int</span> <span class="fu">==</span> <span class="dt">Int</span>
+<span class="kw">type</span> <span class="dt">LooksNotEqual</span> <span class="fu">=</span> <span class="dt">Int</span> <span class="fu">==</span> <span class="dt">Bool</span></code></pre></div>
+<p>We will ask <code>GHCi</code> what the kinds of these two type synonyms are:</p>
+<pre><code>ghci&gt; :kind LooksEqual
+LooksEqual :: Bool
+ghci&gt; :kind LooksNotEqual 
+LooksNotEqual :: Bool</code></pre>
+<p>This jives with the <code>(==)</code> type family declaration we saw above. Both type synonyms are of kind <code>Bool</code>. Now we can ask GHCi to evaluate the types (using <code>kind!</code> instead of <code>kind</code>):</p>
+<pre><code>ghci&gt; :kind! LooksEqual
+LooksEqual :: Bool
+= 'True
+ghci&gt; :kind! LooksNotEqual
+LooksNotEqual :: Bool
+= 'False</code></pre>
+<p>We are not stuck giving types of kind <code>*</code> (like <code>Bool</code>, <code>Char</code>, <code>(Int -&gt; String)</code>, etc.) to <code>(==)</code> though. We can throw <code>Nat</code>s, <code>Symbol</code>s, and more at it!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-11.0 --install-ghc exec ghci</span>
+
+<span class="ot">{-# LANGUAGE DataKinds #-}</span>
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Type.Equality</span> (type (==))
+<span class="kw">import </span><span class="dt">GHC.TypeNats</span> (type (*))
+
+<span class="kw">type</span> <span class="dt">LooksEqual</span> <span class="fu">=</span> <span class="dv">81</span> <span class="fu">==</span> <span class="dv">9</span> <span class="fu">*</span> <span class="dv">9</span>
+<span class="kw">type</span> <span class="dt">LooksNotEqual</span> <span class="fu">=</span> <span class="st">&quot;haskell&quot;</span> <span class="fu">==</span> <span class="st">&quot;Haskell&quot;</span></code></pre></div>
+<p>Let’s do our type evaluation again:</p>
+<pre><code>ghci&gt; :kind! LooksEqual
+LooksEqual :: Bool
+= 'True
+ghci&gt; :kind! LooksNotEqual
+LooksNotEqual :: Bool
+= 'False</code></pre>
+<h3 id="implementing-asserteq">Implementing <code>AssertEq</code></h3>
+<p>Now that we are familiar with the handy <code>(==)</code> type function, we can offload the labor for asserting type equality to it as we implement <code>AssertEq</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-11.0 --install-ghc exec ghci</span>
+
+<span class="ot">{-# LANGUAGE DataKinds #-}</span>
+<span class="ot">{-# LANGUAGE PolyKinds #-}</span>
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+<span class="ot">{-# LANGUAGE UndecidableInstances #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Type.Equality</span> (type (==))
+<span class="kw">import </span><span class="dt">GHC.TypeLits</span> (<span class="dt">Symbol</span>)
+
+<span class="kw">type</span> family <span class="dt">AssertEq</span> (<span class="ot">msg ::</span> <span class="dt">Symbol</span>) (<span class="ot">expected ::</span> k) (<span class="ot">actual ::</span> k)<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertEq</span> m e a <span class="fu">=</span> <span class="dt">AssertEq'</span> m e a (e <span class="fu">==</span> a)</code></pre></div>
+<p>Here we have created a type function called <code>AssertEq</code> that takes in a <code>Symbol</code> (type-level string literal), an expected type, and an actual type. The result type is of kind <code>()</code>. The implementation of our type function passes its input parameters as well as the <code>(e == a)</code> equality result type over to a yet-to-be-defined type function, <code>AssertEq'</code>. The intent will be that users call <code>AssertEq</code> and <code>AssertEq'</code> is an implementation detail.</p>
+<p>Now we can define <code>AssertEq'</code>:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-11.0 --install-ghc exec ghci</span>
+
+<span class="ot">{-# LANGUAGE DataKinds #-}</span>
+<span class="ot">{-# LANGUAGE PolyKinds #-}</span>
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+<span class="ot">{-# LANGUAGE UndecidableInstances #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Type.Equality</span> (type (==))
+<span class="kw">import </span><span class="dt">GHC.TypeLits</span> (<span class="dt">Symbol</span>)
+
+<span class="kw">type</span> family <span class="dt">AssertEq</span> (<span class="ot">msg ::</span> <span class="dt">Symbol</span>) (<span class="ot">expected ::</span> k) (<span class="ot">actual ::</span> k)<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertEq</span> m e a <span class="fu">=</span> <span class="dt">AssertEq'</span> m e a (e <span class="fu">==</span> a)
+
+<span class="kw">type</span> family <span class="dt">AssertEq'</span> (<span class="ot">msg ::</span> <span class="dt">Symbol</span>) (<span class="ot">expected ::</span> k) (<span class="ot">actual ::</span> k) (<span class="ot">result ::</span> <span class="dt">Bool</span>)<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertEq'</span> _ _ _ <span class="ch">'True  = '</span>()
+  <span class="dt">AssertEq'</span> m e a <span class="ch">'False = -- hmmm.....</span></code></pre></div>
+<p>From <code>AssertEq</code>, we are passing the result type of kind <code>Bool</code> from the type equality check into the the <code>result</code> slot of <code>AssertEq'</code>. In <code>AssertEq'</code>, we have “pattern matched” on the two possible types of kind <code>Bool</code> - <code>'True</code> and <code>'False</code>. On <code>'True</code>, this means the expected and actual types are equal and we return promoted unit - the assertion has passed!</p>
+<p>The <code>'False</code> case is a bit trickier. When the types are not equal, we want the assertion to fail at compile time. Fortunately, GHC provides us with something that will perfectly suit our needs: user-defined type errors via <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/GHC-TypeLits.html#t:TypeError"><code>TypeError</code></a>! <code>TypeError</code> is implemented as a type function and its declaration looks like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> family <span class="dt">TypeError</span> (<span class="ot">a ::</span> <span class="dt">ErrorMessage</span>)<span class="ot"> ::</span> b <span class="kw">where</span></code></pre></div>
+<p>Think of this function sort of like type-level <code>undefined</code>. Hitting <code>undefined</code> at runtime makes our program throw a nasty exception. Hitting a <code>TypeError</code> at compile time causes GHC to stop doing its thing and report the type error.</p>
+<p>The input type we can pass to <code>TypeError</code> is of kind <a href="https://www.stackage.org/haddock/lts-11.0/base-4.10.1.0/GHC-TypeLits.html#t:ErrorMessage"><code>ErrorMessage</code></a>. We can use the input type to build up a custom error message when the expected and actual types are not equal in <code>AssertEq'</code>!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
+<span class="co">-- stack --resolver lts-11.0 --install-ghc exec ghci</span>
+
+<span class="ot">{-# LANGUAGE DataKinds #-}</span>
+<span class="ot">{-# LANGUAGE PolyKinds #-}</span>
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+<span class="ot">{-# LANGUAGE UndecidableInstances #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Type.Equality</span> (type (==))
+<span class="kw">import </span><span class="dt">GHC.TypeLits</span> (<span class="dt">ErrorMessage</span>((:&lt;&gt;:), <span class="dt">ShowType</span>, <span class="dt">Text</span>), <span class="dt">Symbol</span>, type <span class="dt">TypeError</span>)
+
+<span class="kw">type</span> family <span class="dt">AssertEq</span> (<span class="ot">msg ::</span> <span class="dt">Symbol</span>) (<span class="ot">expected ::</span> k) (<span class="ot">actual ::</span> k)<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertEq</span> m e a <span class="fu">=</span> <span class="dt">AssertEq'</span> m e a (e <span class="fu">==</span> a)
+
+<span class="kw">type</span> family <span class="dt">AssertEq'</span> (<span class="ot">msg ::</span> <span class="dt">Symbol</span>) (<span class="ot">expected ::</span> k) (<span class="ot">actual ::</span> k) (<span class="ot">result ::</span> <span class="dt">Bool</span>)<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertEq'</span> _ _ _ <span class="ch">'True  = '</span>()
+  <span class="dt">AssertEq'</span> m e a <span class="ch">'False = TypeError ( '</span><span class="dt">Text</span> m
+                                 <span class="ch">':&lt;&gt;: '</span><span class="dt">Text</span> <span class="st">&quot;: expected (&quot;</span>
+                                 <span class="ch">':&lt;&gt;: '</span><span class="dt">ShowType</span> e
+                                 <span class="ch">':&lt;&gt;: '</span><span class="dt">Text</span> <span class="st">&quot;), actual (&quot;</span>
+                                 <span class="ch">':&lt;&gt;: '</span><span class="dt">ShowType</span> a
+                                 <span class="ch">':&lt;&gt;: '</span><span class="dt">Text</span> <span class="st">&quot;)&quot;</span>
+                                     )</code></pre></div>
+<p>All of the new bits we are using here - <code>'Text</code>, <code>'ShowType</code>, and <code>':&lt;&gt;:</code> - are the promoted constructors from <code>ErrorMessage</code>. We create a <code>TypeError</code> that reports the user-supplied assertion failure message as well as the expected and actual types (as pretty printed by <code>'ShowType</code>). The <code>':&lt;&gt;:</code> operator smooshes together pieces of <code>ErrorMessage</code> on the same line.</p>
+<h3 id="using-asserteq">Using AssertEq</h3>
+<p>Let’s put our new type function to work!</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">MustBeEqual</span> <span class="fu">=</span> <span class="dt">AssertEq</span> <span class="st">&quot;True is True&quot;</span> <span class="ch">'True '</span><span class="dt">True</span></code></pre></div>
+<p>Reloading this in GHCi gives us no errors. Let’s do the kind check:</p>
+<pre><code>ghci&gt; :kind! MustBeEqual
+MustBeEqual :: ()</code></pre>
+<p>The types are in fact equal, so <code>AssertEq</code> has returned <code>'()</code>! Now we will introduce a mismatching type:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">MustBeEqual</span> <span class="fu">=</span> <span class="dt">AssertEq</span> <span class="st">&quot;True is False?&quot;</span> <span class="ch">'True '</span><span class="dt">False</span></code></pre></div>
+<p>Reloading this in GHCi does not give us any errors. This may be surprising but just introducing the type synonym will not evaluate the type! Let’s do the kind check again:</p>
+<pre><code>ghci&gt; :kind! MustBeEqual 
+MustBeEqual :: ()
+= (TypeError ...)</code></pre>
+<p>Hmm… two undesirable things have happened:</p>
+<ol style="list-style-type: decimal">
+<li><code>GHCi</code> does not show our custom type error message</li>
+<li>The assertion did not fail at compile time (reloading in <code>GHCi</code>)</li>
+</ol>
+<p>We can address both of these problems by using a <code>Proxy</code> instead:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Proxy</span> (<span class="dt">Proxy</span>(<span class="dt">Proxy</span>))
+
+<span class="co">-- ...</span>
+
+<span class="ot">unitTest ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTest <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="dt">AssertEq</span> <span class="st">&quot;True is False?&quot;</span> <span class="ch">'True '</span><span class="dt">False</span>)</code></pre></div>
+<p><code>unitTest</code>’s type is a proxy containing promoted unit. In the body of the function, we have annotated the <code>Proxy</code> value we are constructing using <code>AssertEq</code>, and <code>AssertEq</code> produces the promoted unit type. By using a binding like this, we are telling GHC that the type of the proxy value we are constructing should evaluate to the <code>Proxy '()</code> type we have annotated the whole binding with. GHC will then be forced to get evaluation-happy and see if we are telling the truth!</p>
+<p>We will reload in <code>GHCi</code> again:</p>
+<pre><code>&lt;script_name&gt;.hs:28:12: error:
+    • True is False?: expected ('True), actual ('False)
+    • In the expression:
+          Proxy :: Proxy (AssertEq &quot;True is False?&quot;  'True  'False)
+      In an equation for ‘unitTest’:
+          unitTest
+            = Proxy :: Proxy (AssertEq &quot;True is False?&quot;  'True  'False)
+   |
+28 | unitTest = Proxy :: Proxy (AssertEq &quot;True is False?&quot; 'True 'False)
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Failed, no modules loaded.</code></pre>
+<p>Much better! Now we see our custom-built type error message, and it tells us what the expected/actual types are. Woohoo - we have implemented the backbone of <code>tao</code>! From this point on, we will use the <code>tao</code> package directly.</p>
+<h3 id="infix-assertion-operators">Infix assertion operators</h3>
+<p><code>AssertEq</code> is the core type function in <code>tao</code>. The package also provides infix variants of <code>AssertEq</code> via <code>(@=?)</code> when the expected type is on the left and <code>(@?=)</code> when the expected type is on the right. They offload the work straight to <code>AssertEq</code>, so we will not implement them in this post. Assertion messages can be attached via <code>@&lt;&gt;</code> or <code>&lt;&gt;@</code>.</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTestInfix ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTestInfix <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="st">&quot;True is False?&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="ch">'True @=? '</span><span class="dt">False</span>)
+
+<span class="ot">unitTestInfix' ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTestInfix' <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="ch">'False @?= '</span><span class="dt">True</span> <span class="fu">&lt;&gt;@</span> <span class="st">&quot;True is False?&quot;</span>)</code></pre></div>
+<p>We will use the infix versions from here on out.</p>
+<h3 id="improving-usability">Improving usability</h3>
+<p>It is often the case that we do not just have a single unit test. Our examples so far have been of the form:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTest ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTest <span class="fu">=</span> <span class="co">-- stuff...</span></code></pre></div>
+<p>What if we have a couple tests? We could make multiple proxies:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">
+<span class="ot">{-# LANGUAGE DataKinds #-}</span>
+<span class="ot">{-# LANGUAGE TypeFamilies #-}</span>
+<span class="ot">{-# LANGUAGE TypeOperators #-}</span>
+
+<span class="kw">import </span><span class="dt">Data.Proxy</span> (<span class="dt">Proxy</span>(<span class="dt">Proxy</span>))
+<span class="kw">import </span><span class="dt">GHC.TypeNats</span> (type (+), type (*))
+<span class="kw">import </span><span class="dt">Tao</span>
+
+<span class="ot">testAddingNats ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+testAddingNats <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="st">&quot;3 = 1 + 2&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="dv">3</span> <span class="fu">@=?</span> <span class="dv">1</span> <span class="fu">+</span> <span class="dv">2</span>)
+
+<span class="ot">testMultiplyingNats ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+testMultiplyingNats <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="st">&quot;3 = 1 * 3&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="dv">3</span> <span class="fu">@=?</span> <span class="dv">1</span> <span class="fu">*</span> <span class="dv">3</span>)</code></pre></div>
+<p>This works, but it is fairly heavy-handed. It would be nice to instead just stuff all of our assertions in a type-level list. A first attempt might look like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTests ::</span> <span class="dt">Proxy</span> <span class="ch">'[ '</span>(), <span class="ch">'() ]</span>
+unitTests <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span>
+  <span class="ch">'[&quot;3 = 1 + 2&quot; @&lt;&gt; 3 @=? 1 + 2</span>
+   ,<span class="st">&quot;3 = 1 * 3&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="dv">3</span> <span class="fu">@=?</span> <span class="dv">1</span> <span class="fu">*</span> <span class="dv">3</span>
+   ]</code></pre></div>
+<p>This is an improvement, but now we have to add a promoted unit to the type-level list in <code>unitTests</code>’s type signature every time we add an assertion.</p>
+<p>A helper called <code>AssertAll</code> is provided for this case:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unitTests ::</span> <span class="dt">Proxy</span> <span class="ch">'()</span>
+unitTests <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot"> ::</span> <span class="dt">Proxy</span> (<span class="dt">AssertAll</span>
+  <span class="ch">'[&quot;3 = 1 + 2&quot; @&lt;&gt; 3 @=? 1 + 2</span>
+   ,<span class="st">&quot;3 = 1 * 3&quot;</span> <span class="fu">@&lt;&gt;</span> <span class="dv">3</span> <span class="fu">@=?</span> <span class="dv">1</span> <span class="fu">*</span> <span class="dv">3</span>
+   ])</code></pre></div>
+<p><code>AssertAll</code> will squash down all the result units from assertions into a single unit. This way, we can keep on adding assertions and never have to fuss with <code>unitTests</code>’s type signature along the way. We can implement <code>AssertAll</code> like this:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> family <span class="dt">AssertAll</span> (<span class="ot">xs ::</span> [()])<span class="ot"> ::</span> () <span class="kw">where</span>
+  <span class="dt">AssertAll</span> <span class="ch">'[] = '</span>()
+  <span class="dt">AssertAll</span> (<span class="ch">'() '</span><span class="fu">:</span> xs) <span class="fu">=</span> <span class="dt">AssertAll</span> xs</code></pre></div>
+<p>Here we have “pattern matched” on the promoted <code>'[]</code> and <code>':</code> constructors to traverse the type-level list, ensuring that every value is of type <code>'()</code>.</p>
+<h3 id="wrap-up">Wrap up</h3>
+<p>Besides what has been shown in this post, <code>tao</code> also provides an <a href="https://hackage.haskell.org/package/tao-1.0.0/docs/Tao.html#t:AssertBool"><code>AssertBool</code></a> type function (plus operators) for asserting on boolean conditions. If anyone wants to get their feet wet with type-level Haskell, I recommend taking a crack at <code>AssertBool</code> now that we have learned how <code>AssertEq</code> works.</p>
+<p>For more examples, there is a <a href="https://hackage.haskell.org/package/tao-example-1.0.0/docs/Tao-Example.html"><code>tao-example</code></a> package which demonstrates testing a few more complicated type functions than the type-level natural numbers examples shown here.</p>
+<p>There is an interesting property when doing type-level “unit testing”: our tests run every time we build the library!</p>
+<p><img class="ui fluid image" src="../images/type-level-unit-testing-in-haskell-meme.jpg"></p>
+</div>
+
+  </div>
+
+</body>
+</html>
