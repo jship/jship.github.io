@@ -74,7 +74,7 @@ plugin = defaultPlugin
 ```
 
 And finally the constraint solver for what our plugin cares about -
-adding the `MonadIO` constraint anywhere our users' code wants it!
+solving the `MonadIO` constraint anywhere our users' code wants it!
 
 ```haskell
 solveMonadIOCt :: Ct -> Maybe (EvTerm, Ct)
