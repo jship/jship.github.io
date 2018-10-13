@@ -86,7 +86,7 @@ plugin <span class="fu">=</span> defaultPlugin
         pure <span class="fu">.</span> <span class="dt">TcPluginOk</span> (mapMaybe solveMonadIOCt wantedCts) <span class="fu">$</span> []
     }
   }</code></pre></div>
-<p>And finally the constraint solver for what our plugin cares about - adding the <code>MonadIO</code> constraint anywhere our users’ code wants it!</p>
+<p>And finally the constraint solver for what our plugin cares about - solving the <code>MonadIO</code> constraint anywhere our users’ code wants it!</p>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">solveMonadIOCt ::</span> <span class="dt">Ct</span> <span class="ot">-&gt;</span> <span class="dt">Maybe</span> (<span class="dt">EvTerm</span>, <span class="dt">Ct</span>)
 solveMonadIOCt ct <span class="fu">=</span> <span class="kw">do</span>
   <span class="dt">ClassPred</span> cls _types <span class="ot">&lt;-</span> pure <span class="fu">.</span> classifyPredType <span class="fu">.</span> ctEvPred <span class="fu">.</span> ctEvidence <span class="fu">$</span> ct
