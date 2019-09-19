@@ -34,7 +34,7 @@
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -157,7 +157,7 @@ becauseWhyNot <span class="fu">=</span> <span class="kw">do</span>
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -433,7 +433,7 @@ unitTests <span class="fu">=</span> <span class="dt">Proxy</span><span class="ot
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -727,7 +727,7 @@ rwsRws m r s r&#39; s&#39; <span class="fu">=</span> RWS.runRWS (RWS.runRWST m r
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -990,7 +990,7 @@ intToDigitUpper i
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -1446,7 +1446,7 @@ unsafeDropHexPrefix (<span class="dt">Text.Internal.Text</span> arr _ len) <span
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -1710,7 +1710,7 @@ go <span class="fu">!</span>n b <span class="fu">=</span> go (n <span class="fu"
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -1929,7 +1929,7 @@ json <span class="fu">=</span> [aesonQQ|{
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -2189,7 +2189,7 @@ We are lucky that we get to vet the performance of our library functions against
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
@@ -2683,7 +2683,7 @@ We are lucky that we get to vet the performance of our library functions against
   <div class="ui feed">
     <div class="event">
       <div class="label">
-        <img src="/images/headshot.png">
+        <img src="/images/headshot.jpg">
       </div>
       <div class="content">
         <div class="summary">
