@@ -8,7 +8,7 @@ title: Resume
 
 ## Summary
 
-Developer with 4.5+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
+Developer with 6+ years\' success building correct and flexible solutions in various industries.  Diverse experience spanning enterprise backend services, frontend web dev, dashboards, and embedded systems.  Strong analytical and interpersonal skills.  Statically typed functional programming enthusiast.  Git fanatic.  Avid consumer of emerging technologies.
 
 ## Skills
 
@@ -16,20 +16,24 @@ Developer with 4.5+ years\' success building correct and flexible solutions in v
 - **Paradigms**: Purely functional, functional, declarative, stream processing, reactive, event-driven, imperative, object-oriented
 - **Databases**: SQL, NoSQL (column, key-value, document)
 - **DevOps**: Git, SVN, Puppet, Vagrant, AWS, Azure, Travis CI, Jenkins
-- **Environments**: Ubuntu Linux, Mac OS X, Windows 10, Windows Embedded Server 2009, Windows XP Embedded
+- **Environments**: macOS, Ubuntu Linux, Windows 10, Windows Embedded Server 2009, Windows XP Embedded
 - **Methodologies**: Scrum, kanban, pair/mob/extreme programming, waterfall
 
 ## Experience
 
-### Software Engineer - Backend, SimSpace (January 2018 - Present)
+### Senior Software Engineer - Backend, SimSpace (September 2018 - Present)
 
-I currently work on the Haskell backend at SimSpace.
+I continue to work on the Haskell backend and am a team lead at SimSpace.
+
+### Software Engineer - Backend, SimSpace (January 2018 - September 2018)
+
+Working on the Haskell backend.
 
 ### Programmer/Analyst - Ad Platform, Catalina (June 2016 - Deceber 2017)
 
 In June of 2016, I transitioned from the In-Store team to Catalina\'s ad platform team.  The ad platform aims to fundamentally redefine how Catalina operates with realtime execution via geographically-distributed cloud computing and highly flexible offer rendering.  Along the way, it is simplifying offer setup and opening the door for omni-channel opportunities (i\.e\. in-store, mobile, web, home delivery, etc).
 
-This team is structured like a startup and we each work on all areas of the ad platform, from the backend Java codebase, the HTML5/Javascript/Less web interface, the Node.js rendering component that runs alongside the In-Store software, to the Puppet scripts that provision the infrastructure in AWS and Azure.  We use scrum on a two-week release cycle and deploy all releases via Jenkins.  The ad platform leans heavily on open-source projects, in particular, the Apache ecosystem.  We work with Hbase, Solr, Kafka, Hadoop, and Hive every day.
+This team was structured like a startup and we each worked on all areas of the ad platform, from the backend Java codebase, the HTML5/Javascript/Less web interface, the Node.js rendering component that runs alongside the In-Store software, to the Puppet scripts that provision the infrastructure in AWS and Azure.  We used scrum on a two-week release cycle and deploy all releases via Jenkins.  The ad platform leans heavily on open-source projects, in particular, the Apache ecosystem.  We worked with Hbase, Solr, Kafka, Hadoop, and Hive every day.
 
 ### Programmer/Analyst - In-Store System, Catalina (August 2015 - June 2016)
 
