@@ -104,7 +104,7 @@
         <div class="meta">
           <i class="tags icon"></i>
           
-            <a href="../tags/Cereal.html">Cereal</a>, <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Language%20Extension.html">Language Extension</a>, <a href="../tags/Parsing.html">Parsing</a>, <a href="../tags/Quick%20Tip.html">Quick Tip</a>
+            <a title="All pages tagged 'Cereal'." href="../tags/Cereal.html">Cereal</a>, <a title="All pages tagged 'Haskell'." href="../tags/Haskell.html">Haskell</a>, <a title="All pages tagged 'Language Extension'." href="../tags/Language%20Extension.html">Language Extension</a>, <a title="All pages tagged 'Parsing'." href="../tags/Parsing.html">Parsing</a>, <a title="All pages tagged 'Quick Tip'." href="../tags/Quick%20Tip.html">Quick Tip</a>
           
         </div>
       </div>
@@ -115,104 +115,104 @@
 <p>Kwang’s linked blogpost shows binary serialization using the extension. This post will show the improvements we get with <code>RecordWildCards</code> and binary deserialization, but first…</p>
 <h3 id="what-does-recordwildcards-do">What does <code>RecordWildCards</code> do?</h3>
 <p><code>RecordWildCards</code> provides local bindings for the fields in a record:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
-<span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package text</span>
-
-<span class="ot">{-# LANGUAGE OverloadedStrings #-}</span>
-<span class="ot">{-# LANGUAGE RecordWildCards #-}</span>
-
-<span class="kw">import </span><span class="dt">Data.Monoid</span> ((&lt;&gt;))
-<span class="kw">import </span><span class="dt">Data.Text</span> (<span class="dt">Text</span>, intercalate)
-<span class="kw">import </span><span class="dt">Data.Text.IO</span> (putStrLn)
-<span class="kw">import </span><span class="dt">Prelude</span> <span class="kw">hiding</span> (putStrLn)
-
-<span class="kw">data</span> <span class="dt">BlogPost</span> <span class="fu">=</span> <span class="dt">BlogPost</span>
-  {<span class="ot"> blogPostTitle  ::</span> <span class="dt">Text</span>
-  ,<span class="ot"> blogPostTags   ::</span> [<span class="dt">Text</span>]
-  }
-
-<span class="ot">samplePost ::</span> <span class="dt">BlogPost</span>
-samplePost <span class="fu">=</span> <span class="dt">BlogPost</span> <span class="st">&quot;Foo&quot;</span> [<span class="st">&quot;Bar&quot;</span>, <span class="st">&quot;Baz, Quux&quot;</span>]
-
-<span class="co">-- Pattern matching is convenient but fiddly when new fields are</span>
-<span class="co">-- added or existing fields are rearranged.</span>
-<span class="ot">printViaPatternMatching ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaPatternMatching (<span class="dt">BlogPost</span> title tags) <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> title
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> tags
-
-<span class="co">-- Record accessors are not fiddly when new fields are added or existing fields</span>
-<span class="co">-- are rearranged, but require more keystrokes and horizontal space.</span>
-<span class="ot">printViaRecordAccessors ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaRecordAccessors blogPost <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> blogPostTitle blogPost
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> (blogPostTags blogPost)
-
-<span class="co">-- RecordWildCards offers the best of both worlds with the above two</span>
-<span class="co">-- approaches. We use the field names directly as bindings to the</span>
-<span class="co">-- record's values.</span>
-<span class="ot">printViaRecordWildCards ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printViaRecordWildCards <span class="dt">BlogPost</span>{<span class="fu">..</span>} <span class="fu">=</span> <span class="kw">do</span>
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Title: &quot;</span> <span class="fu">&lt;&gt;</span> blogPostTitle
-  putStrLn <span class="fu">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="fu">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> blogPostTags</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="pp">#!/usr/bin/env stack</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package text</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">{-# LANGUAGE RecordWildCards #-}</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Monoid</span> ((&lt;&gt;))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Text</span> (<span class="dt">Text</span>, intercalate)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Text.IO</span> (putStrLn)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Prelude</span> <span class="kw">hiding</span> (putStrLn)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">BlogPost</span> <span class="ot">=</span> <span class="dt">BlogPost</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  {<span class="ot"> blogPostTitle  ::</span> <span class="dt">Text</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>  ,<span class="ot"> blogPostTags   ::</span> [<span class="dt">Text</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  }</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="ot">samplePost ::</span> <span class="dt">BlogPost</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>samplePost <span class="ot">=</span> <span class="dt">BlogPost</span> <span class="st">&quot;Foo&quot;</span> [<span class="st">&quot;Bar&quot;</span>, <span class="st">&quot;Baz, Quux&quot;</span>]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="co">-- Pattern matching is convenient but fiddly when new fields are</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">-- added or existing fields are rearranged.</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="ot">printViaPatternMatching ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>printViaPatternMatching (<span class="dt">BlogPost</span> title tags) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Title: &quot;</span> <span class="op">&lt;&gt;</span> title</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="op">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> tags</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="co">-- Record accessors are not fiddly when new fields are added or existing fields</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="co">-- are rearranged, but require more keystrokes and horizontal space.</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="ot">printViaRecordAccessors ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>printViaRecordAccessors blogPost <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Title: &quot;</span> <span class="op">&lt;&gt;</span> blogPostTitle blogPost</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="op">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> (blogPostTags blogPost)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a><span class="co">-- RecordWildCards offers the best of both worlds with the above two</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a><span class="co">-- approaches. We use the field names directly as bindings to the</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="co">-- record's values.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a><span class="ot">printViaRecordWildCards ::</span> <span class="dt">BlogPost</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>printViaRecordWildCards <span class="dt">BlogPost</span>{<span class="op">..</span>} <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Title: &quot;</span> <span class="op">&lt;&gt;</span> blogPostTitle</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>  <span class="fu">putStrLn</span> <span class="op">$</span> <span class="st">&quot;Tags: &quot;</span> <span class="op">&lt;&gt;</span> intercalate <span class="st">&quot;, &quot;</span> blogPostTags</span></code></pre></div>
 <p>You can execute the above script with <code>stack</code> and it will spin up <code>GHCi</code>.</p>
 <h3 id="how-does-it-help-with-binary-parsing">How does it help with binary parsing?</h3>
 <p>Let’s use <a href="https://www.stackage.org/lts-8.20/package/cereal-0.5.4.0">cereal</a> as our binary parsing library. Here are the imports we’ll need:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
-<span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package bytestring --package cereal</span>
-
-<span class="ot">{-# LANGUAGE RecordWildCards #-}</span>
-
-<span class="kw">import </span><span class="dt">Data.ByteString</span> (<span class="dt">ByteString</span>)
-<span class="kw">import </span><span class="dt">Data.Serialize.Get</span> (<span class="dt">Get</span>, getWord8, getWord16le, runGet)
-<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word8</span>, <span class="dt">Word16</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="pp">#!/usr/bin/env stack</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="co">-- stack --resolver lts-8.20 --install-ghc exec ghci --package bytestring --package cereal</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="ot">{-# LANGUAGE RecordWildCards #-}</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.ByteString</span> (<span class="dt">ByteString</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Serialize.Get</span> (<span class="dt">Get</span>, getWord8, getWord16le, runGet)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Word</span> (<span class="dt">Word8</span>, <span class="dt">Word16</span>)</span></code></pre></div>
 <p>We will keep the domain fun and pretend we have a simple video game configuration we need to parse out of a file. Why we are using a binary file format for this is above our paygrade apparently:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">GameConfig</span> <span class="fu">=</span> <span class="dt">GameConfig</span>
-  {<span class="ot"> gameConfigScreenWidth  ::</span> <span class="dt">Word16</span>
-  ,<span class="ot"> gameConfigScreenHeight ::</span> <span class="dt">Word16</span>
-  ,<span class="ot"> gameConfigVolume       ::</span> <span class="dt">Word8</span>
-  } <span class="kw">deriving</span> (<span class="dt">Show</span>)
-
-<span class="ot">decodeGameConfig ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span> <span class="ot">-&gt;</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">GameConfig</span>
-decodeGameConfig <span class="fu">=</span> runGet</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">GameConfig</span> <span class="ot">=</span> <span class="dt">GameConfig</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  {<span class="ot"> gameConfigScreenWidth  ::</span> <span class="dt">Word16</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  ,<span class="ot"> gameConfigScreenHeight ::</span> <span class="dt">Word16</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  ,<span class="ot"> gameConfigVolume       ::</span> <span class="dt">Word8</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  } <span class="kw">deriving</span> (<span class="dt">Show</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="ot">decodeGameConfig ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span> <span class="ot">-&gt;</span> <span class="dt">ByteString</span> <span class="ot">-&gt;</span> <span class="dt">Either</span> <span class="dt">String</span> <span class="dt">GameConfig</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>decodeGameConfig <span class="ot">=</span> runGet</span></code></pre></div>
 <p>Now we need to provide a <code>Get GameConfig</code> and we’ll be off to the races. There are multiple ways we can tackle this, and the <a href="https://hackage.haskell.org/package/cereal-0.5.4.0/docs/Data-Serialize-Get.html#t:Get">docs</a> indicate <code>Get</code> has instances for <code>Applicative</code> and <code>Monad</code>.</p>
 <p>I typically reach for <code>Applicative</code> by default when I need to parse something simple:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">applicativeGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-applicativeGetter <span class="fu">=</span> <span class="dt">GameConfig</span> <span class="fu">&lt;$&gt;</span> getWord16le <span class="fu">&lt;*&gt;</span> getWord16le <span class="fu">&lt;*&gt;</span> getWord8</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">applicativeGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>applicativeGetter <span class="ot">=</span> <span class="dt">GameConfig</span> <span class="op">&lt;$&gt;</span> getWord16le <span class="op">&lt;*&gt;</span> getWord16le <span class="op">&lt;*&gt;</span> getWord8</span></code></pre></div>
 <p>This has a drawback though: the pieces being parsed are not named. If we look at the parser in isolation, all we know is that a <code>GameConfig</code> wraps two <code>Word16</code>s and one <code>Word8</code> and the fields are laid out in that order in the data declaration.</p>
 <p>Another option would be to monadically parse the <code>GameConfig</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetter <span class="fu">=</span> <span class="kw">do</span>
-  screenWidth <span class="ot">&lt;-</span> getWord16le
-  screenHeight <span class="ot">&lt;-</span> getWord16le
-  volume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span> screenWidth screenHeight volume</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">monadicGetter ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>monadicGetter <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  screenWidth <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>  screenHeight <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  volume <span class="ot">&lt;-</span> getWord8</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="dt">GameConfig</span> screenWidth screenHeight volume</span></code></pre></div>
 <p>This provides instant understanding of the meaning of the fields we are parsing. We know what a <code>GameConfig</code> represents without flipping over to its declaration. The disadvantage over the <code>Applicative</code> approach is that we must ensure we are passing the field values in the correct order to the <code>GameConfig</code> constructor. What if we got sleepy and wrote the last line like this?</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  pure <span class="fu">$</span> <span class="dt">GameConfig</span> screenHeight screenWidth volume</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="dt">GameConfig</span> screenHeight screenWidth volume</span></code></pre></div>
 <p>A third approach would be to still parse monadically but use record syntax at the end:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetterWithRecordSyntax ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetterWithRecordSyntax <span class="fu">=</span> <span class="kw">do</span>
-  screenWidth <span class="ot">&lt;-</span> getWord16le
-  screenHeight <span class="ot">&lt;-</span> getWord16le
-  volume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span>
-    { gameConfigScreenWidth <span class="fu">=</span> screenWidth
-    , gameConfigScreenHeight <span class="fu">=</span> screenHeight
-    , gameConfigVolume <span class="fu">=</span> volume
-    }</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ot">monadicGetterWithRecordSyntax ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>monadicGetterWithRecordSyntax <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>  screenWidth <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>  screenHeight <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>  volume <span class="ot">&lt;-</span> getWord8</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="dt">GameConfig</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>    { gameConfigScreenWidth <span class="ot">=</span> screenWidth</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    , gameConfigScreenHeight <span class="ot">=</span> screenHeight</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>    , gameConfigVolume <span class="ot">=</span> volume</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>    }</span></code></pre></div>
 <p>This somewhat helps alleviate the problem of the sleepy dev, but now the parser is almost twice as many lines and we could still incorrectly write the last bit like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  pure <span class="fu">$</span> <span class="dt">GameConfig</span>
-    { gameConfigScreenWidth <span class="fu">=</span> screenHeight
-    , gameConfigScreenHeight <span class="fu">=</span> screenWidth
-    , gameConfigVolume <span class="fu">=</span> volume
-    }</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="dt">GameConfig</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    { gameConfigScreenWidth <span class="ot">=</span> screenHeight</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>    , gameConfigScreenHeight <span class="ot">=</span> screenWidth</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>    , gameConfigVolume <span class="ot">=</span> volume</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>    }</span></code></pre></div>
 <p>Let’s see what we can do now that we have <code>RecordWildCards</code> in our toolbelt:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">monadicGetterWithRecordWildCards ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span>
-monadicGetterWithRecordWildCards <span class="fu">=</span> <span class="kw">do</span>
-  gameConfigScreenWidth <span class="ot">&lt;-</span> getWord16le
-  gameConfigScreenHeight <span class="ot">&lt;-</span> getWord16le
-  gameConfigVolume <span class="ot">&lt;-</span> getWord8
-  pure <span class="fu">$</span> <span class="dt">GameConfig</span>{<span class="fu">..</span>}</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ot">monadicGetterWithRecordWildCards ::</span> <span class="dt">Get</span> <span class="dt">GameConfig</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>monadicGetterWithRecordWildCards <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>  gameConfigScreenWidth <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>  gameConfigScreenHeight <span class="ot">&lt;-</span> getWord16le</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>  gameConfigVolume <span class="ot">&lt;-</span> getWord8</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>  <span class="fu">pure</span> <span class="op">$</span> <span class="dt">GameConfig</span>{<span class="op">..</span>}</span></code></pre></div>
 <p>We have solved the problem of the sleepy dev! That aside, the big win here is that we can look at the parser in complete isolation - no flipping to the data declaration. All we have to worry about is that we parse the fields in the correct order, which is the main problem we were solving anyways! We don’t have to worry about the fields in the data structure being laid out in the same order as the bytes in the file.</p>
 </div>
 

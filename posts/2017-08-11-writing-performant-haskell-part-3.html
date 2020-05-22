@@ -104,7 +104,7 @@
         <div class="meta">
           <i class="tags icon"></i>
           
-            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+            <a title="All pages tagged 'Haskell'." href="../tags/Haskell.html">Haskell</a>, <a title="All pages tagged 'Performance'." href="../tags/Performance.html">Performance</a>, <a title="All pages tagged 'Hexy Tutorial'." href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
           
         </div>
       </div>
@@ -123,60 +123,60 @@ Thanks to <a href="https://www.reddit.com/user/dramforever">/u/dramforever</a> o
 </div>
 <h3 id="recap">Recap</h3>
 <p>In the <a href="../posts/2017-08-10-writing-performant-haskell-part-2.html">previous post</a>, we overhauled <code>hexy</code>’s API to return <code>Text</code> values instead of <code>String</code>. Our API looked like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-
-<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span></code></pre></div>
 <p>After this change, the <a href="../html/writing-performant-haskell-part-2-bench.html">benchmark report</a>’s summary looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-2-bench-summary.png"></p>
 <p>Our initial iteration of using <code>Text</code> instead of <code>String</code> made about half of our functions run significantly slower (i.e. the lowercase ones). I mentioned that using <code>Text</code> instead of <code>String</code> will eventually pay off for the optimization flexibility it gives us, but we are not going to explore that just yet. We will see how we can get a nice performance boost via a GHC language pragma in this post.</p>
 <h3 id="typeclass-desugaring">Typeclass Desugaring</h3>
 <p>There is a great post on <a href="https://www.schoolofhaskell.com/user/jfischoff/instances-and-dictionaries">School of Haskell</a> describing how typeclasses are desugared. Where we last left off, our <code>HexShow</code> typeclass, the <code>xshow</code> function, and the <code>Word32</code> instance looked like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-
-<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
-  xbuild <span class="fu">=</span> xbuildStorable
-  xbuildu <span class="fu">=</span> xbuilduStorable
-
-<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-xshow <span class="fu">=</span> Text.Lazy.toStrict <span class="fu">.</span> xshowl</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  xbuild <span class="ot">=</span> xbuildStorable</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  xbuildu <span class="ot">=</span> xbuilduStorable</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>xshow <span class="ot">=</span> Text.Lazy.toStrict <span class="op">.</span> xshowl</span></code></pre></div>
 <p>Our typeclass gets desugared into a record:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">HexShowRec</span> a <span class="fu">=</span> <span class="dt">HexShowRec</span>
-  {<span class="ot"> hexShowRecXBuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-  ,<span class="ot"> hexShowRecXBuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-  }</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">HexShowRec</span> a <span class="ot">=</span> <span class="dt">HexShowRec</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  {<span class="ot"> hexShowRecXBuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  ,<span class="ot"> hexShowRecXBuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>  }</span></code></pre></div>
 <p>For every instance, GHC creates a dictionary using the <code>HexShowRec</code> record:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">word32HexShowInstanceDictionary ::</span> <span class="dt">HexShowRec</span> <span class="dt">Word32</span>
-word32HexShowInstanceDictionary <span class="fu">=</span> <span class="dt">HexShowRec</span>
-  { xbuild  <span class="fu">=</span> xbuildStorable
-  , xbuildu <span class="fu">=</span> xbuilduStorable
-  }</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">word32HexShowInstanceDictionary ::</span> <span class="dt">HexShowRec</span> <span class="dt">Word32</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>word32HexShowInstanceDictionary <span class="ot">=</span> <span class="dt">HexShowRec</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  { xbuild  <span class="ot">=</span> xbuildStorable</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>  , xbuildu <span class="ot">=</span> xbuilduStorable</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>  }</span></code></pre></div>
 <p>The compiler replaces the <code>HexShow</code> constraint on <code>xshow</code> with a <code>HexShowRec</code> value as a “method dictionary”:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xshowHexShowRec ::</span> <span class="dt">HexShowRec</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">xshowHexShowRec ::</span> <span class="dt">HexShowRec</span> a <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span></code></pre></div>
 <p>Whenever we call <code>xshow</code>, behind the scenes we are calling <code>xshowHexShowRec</code>. GHC implicitly passes the correct method dictionary as the first parameter for us.</p>
 <p>If GHC knows at compile-time that type <code>a</code> is <code>Word32</code> for a given call to <code>xshow</code>, then conceptually, the underlying call to <code>xshowHexShowRec</code> will know it was passed <code>word32HexShowInstanceDictionary</code> specifically.</p>
 <p>If GHC does not know what <code>a</code> is at compile-time for a given call to <code>xshow</code>, then the underlying call to <code>xshowHexShowRec</code> will have no knowledge that it was specifically passed the <code>Word32</code> method dictionary or some other instance’s method dictionary. This makes it difficult for GHC to perform important optimizations like inlining, so calling a function provided by the dictionary is expensive.</p>
 <p>Fortunately for us, GHC will probably know what <code>a</code> is based on how our users will likely use the library. For example:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">showHexColor ::</span> (<span class="dt">Word8</span>, <span class="dt">Word8</span>, <span class="dt">Word8</span>) <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-showHexColor (r, g, b) <span class="fu">=</span> mconcat [<span class="st">&quot;#&quot;</span>, xshow r, xshow g, xshow b]
-
-<span class="co">-- showHexColor (0, 255, 0) == &quot;#00ff00&quot;, i.e. way too green</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ot">showHexColor ::</span> (<span class="dt">Word8</span>, <span class="dt">Word8</span>, <span class="dt">Word8</span>) <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>showHexColor (r, g, b) <span class="ot">=</span> <span class="fu">mconcat</span> [<span class="st">&quot;#&quot;</span>, xshow r, xshow g, xshow b]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">-- showHexColor (0, 255, 0) == &quot;#00ff00&quot;, i.e. way too green</span></span></code></pre></div>
 <p>On the other hand, our <code>HexShow</code> instances offload all the real work to <code>xbuildStorable</code> and <code>xbuilduStorable</code> in our internal module. Their types:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-xbuildStorable v <span class="fu">=</span> <span class="co">-- ...</span>
-
-<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-xbuilduStorable v <span class="fu">=</span> <span class="co">-- ...</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>xbuildStorable v <span class="ot">=</span> <span class="co">-- ...</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>xbuilduStorable v <span class="ot">=</span> <span class="co">-- ...</span></span></code></pre></div>
 <p>These functions use typeclass constraints too, meaning that the typeclasses will be desugared to corresponding record values just like we saw with our <code>xshow</code> function. GHC will probably not know the concrete type for <code>a</code> in these functions at compile time, so we will take a performance hit when we use any of the functions from <code>Integral</code>, <code>Show</code>, or <code>Storable</code>.</p>
 <div class="ui icon message">
 <i class="sticky note outline icon"></i>
@@ -188,81 +188,81 @@ I intentionally used the word “probably” a couple times above. The only way 
 <h3 id="specialize-to-the-rescue"><code>SPECIALIZE</code> To The Rescue!</h3>
 <p>GHC offers a language pragma - <a href="https://downloads.haskell.org/~ghc/8.0.2/docs/html/users_guide/glasgow_exts.html#specialize-pragma"><code>SPECIALIZE</code></a> - that in certain circumstances can help us get around the runtime hit of calling typeclass functions. This is an aptly-named extension as it allows us to create “extra [function] versions specialised to particular types”.</p>
 <p><code>Hexy</code> provides instances for the <code>Word</code>-y and <code>Int</code>-y data types, so let’s specialize <code>xbuildStorable</code> and <code>xbuilduStorable</code> for those:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Int -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Int8 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Int16 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Int32 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Int64 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Word -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Word8 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Word16 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Word32 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuildStorable :: Word64 -&gt; Builder #-}</span>
-xbuildStorable v <span class="fu">=</span> <span class="co">-- ..</span>
-
-<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int8 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int16 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int32 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Int64 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word8 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word16 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word32 -&gt; Builder #-}</span>
-<span class="ot">{-# SPECIALIZE xbuilduStorable :: Word64 -&gt; Builder #-}</span>
-xbuilduStorable v <span class="fu">=</span> <span class="co">-- ...</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Int -&gt; Builder #-}</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Int8 -&gt; Builder #-}</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Int16 -&gt; Builder #-}</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Int32 -&gt; Builder #-}</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Int64 -&gt; Builder #-}</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Word -&gt; Builder #-}</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Word8 -&gt; Builder #-}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Word16 -&gt; Builder #-}</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Word32 -&gt; Builder #-}</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuildStorable :: Word64 -&gt; Builder #-}</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>xbuildStorable v <span class="ot">=</span> <span class="co">-- ..</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a><span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Int -&gt; Builder #-}</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Int8 -&gt; Builder #-}</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Int16 -&gt; Builder #-}</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Int32 -&gt; Builder #-}</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Int64 -&gt; Builder #-}</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Word -&gt; Builder #-}</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Word8 -&gt; Builder #-}</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Word16 -&gt; Builder #-}</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Word32 -&gt; Builder #-}</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a><span class="ot">{-# SPECIALIZE xbuilduStorable :: Word64 -&gt; Builder #-}</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>xbuilduStorable v <span class="ot">=</span> <span class="co">-- ...</span></span></code></pre></div>
 <p>To use the <code>SPECIALIZE</code> pragma, we give it an additonal type signature that is less polymorphic than the type signature of the function we are specializing. In our case, less polymorphic means monomorphic - we are using all concrete types in our specializations. This means GHC can know at compile-time specifically which method dictionaries it is working with and can optimize accordingly. We avoid the runtime cost of calling things like <code>Storable.sizeOf</code>.</p>
 <p>As we are not diving into the core output in these posts, we will go ahead and add specialized versions for <code>xshow</code> and its variants in the public API. The updates to the code are available on <a href="https://github.com/jship/hexy/commit/8ea5358a7d65e08cfbcbf1442bcc7693021feaf2">GitHub</a>. We are doing this to rule out the chance of paying the runtime costs here too, even though we have a hunch GHC would likely know which dictionaries to use at compile-time for these functions. When we get to benchmarking below, I encourage you to experiment with removing the specializations on <code>xshow</code> and its variants in the public API. In my testing, any performance differences were negligible.</p>
 <p>Writing SPECIALIZE pragmas by-hand is error-prone and tiresome. We can stitch together a quick-and-dirty script to do it for us:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">#!/usr/bin/env stack</span>
-<span class="co">-- stack script --resolver lts-8.23 --package aeson --package aeson-qq --package stache --package text</span>
-
-<span class="ot">{-# LANGUAGE QuasiQuotes #-}</span>
-
-<span class="kw">import </span><span class="dt">Data.Aeson</span> (<span class="dt">Value</span>)
-<span class="kw">import </span><span class="dt">Data.Aeson.QQ</span> (aesonQQ)
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy.IO</span> <span class="kw">as</span> <span class="dt">Text.Lazy.IO</span>
-<span class="kw">import </span><span class="dt">Text.Mustache</span> (<span class="dt">Template</span>, renderMustache)
-<span class="kw">import </span><span class="dt">Text.Mustache.Compile.TH</span> (mustache)
-
-<span class="ot">main ::</span> <span class="dt">IO</span> ()
-main <span class="fu">=</span> Text.Lazy.IO.putStr <span class="fu">.</span> renderMustache template <span class="fu">$</span> json
-
-<span class="ot">template ::</span> <span class="dt">Template</span>
-template <span class="fu">=</span> [mustache|{{#types}}
-{-# SPECIALIZE xbuildStorable :: {{a}} -&gt; Builder #-}
-{{/types}}
-|]
-
-<span class="ot">json ::</span> <span class="dt">Value</span>
-json <span class="fu">=</span> [aesonQQ|{
-  types: [
-    {a: &quot;Int&quot;},
-    {a: &quot;Int8&quot;},
-    {a: &quot;Int16&quot;},
-    {a: &quot;Int32&quot;},
-    {a: &quot;Int64&quot;},
-    {a: &quot;Word&quot;},
-    {a: &quot;Word8&quot;},
-    {a: &quot;Word16&quot;},
-    {a: &quot;Word32&quot;},
-    {a: &quot;Word64&quot;}
-  ]
-}|]</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="pp">#!/usr/bin/env stack</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">-- stack script --resolver lts-8.23 --package aeson --package aeson-qq --package stache --package text</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="ot">{-# LANGUAGE QuasiQuotes #-}</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Aeson</span> (<span class="dt">Value</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Aeson.QQ</span> (aesonQQ)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Lazy.IO</span> <span class="kw">as</span> <span class="dt">Text.Lazy.IO</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Text.Mustache</span> (<span class="dt">Template</span>, renderMustache)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Text.Mustache.Compile.TH</span> (mustache)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>main <span class="ot">=</span> Text.Lazy.IO.putStr <span class="op">.</span> renderMustache template <span class="op">$</span> json</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a><span class="ot">template ::</span> <span class="dt">Template</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a>template <span class="ot">=</span> [mustache|{{#types}}</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a>{-# SPECIALIZE xbuildStorable :: {{a}} -&gt; Builder #-}</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a>{{/types}}</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a>|]</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a><span class="ot">json ::</span> <span class="dt">Value</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>json <span class="ot">=</span> [aesonQQ|{</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>  types: [</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>    {a: &quot;Int&quot;},</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a>    {a: &quot;Int8&quot;},</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a>    {a: &quot;Int16&quot;},</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a>    {a: &quot;Int32&quot;},</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a>    {a: &quot;Int64&quot;},</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a>    {a: &quot;Word&quot;},</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a>    {a: &quot;Word8&quot;},</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true"></a>    {a: &quot;Word16&quot;},</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true"></a>    {a: &quot;Word32&quot;},</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true"></a>    {a: &quot;Word64&quot;}</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true"></a>  ]</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true"></a>}|]</span></code></pre></div>
 <p>We put the contents above into a file called <code>GimmeSpecializeLines.hs</code> and run it with <code>stack</code>:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> GimmeSpecializeLines.hs
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span>
-{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>$ <span class="ex">stack</span> GimmeSpecializeLines.hs</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Int64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word8 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word16 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word32 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>{<span class="ex">-</span># SPECIALIZE xbuildStorable :: Word64 -<span class="op">&gt;</span> Builder <span class="co">#-}</span></span></code></pre></div>
 <p>When we need specialize lines for another function, we update the script’s inline <a href="https://mustache.github.io/">Mustache</a> template. It is refreshing to write an unconfigurable script every now and then!</p>
 <h3 id="test-check">Test Check</h3>
 <p>Our API has not changed so our unit tests do not need to be updated. Feel free to run them to make sure they still pass!</p>
@@ -270,7 +270,7 @@ json <span class="fu">=</span> [aesonQQ|{
 <p>In the previous post, our <a href="../html/writing-performant-haskell-part-2-bench.html">benchmark results</a> looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-2-bench-summary.png"></p>
 <p>Let’s run the benchmarks again now that we have specialized our functions:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></span></code></pre></div>
 <p>View the full report from this run <a href="../html/writing-performant-haskell-part-3-bench.html">here</a>. The summary looks like this (scales are not the same due to <code>printf</code>):</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-3-bench-summary.png"></p>
 <p>Whoa… By using the <code>SPECIALIZE</code> pragma to make monomorphic versions of our functions, every function in <code>Hexy</code>’s public API is now faster by at least 100 nanoseconds, and in some cases 150-160 nanoseconds!</p>

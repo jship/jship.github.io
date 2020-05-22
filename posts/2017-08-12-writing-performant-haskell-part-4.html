@@ -104,7 +104,7 @@
         <div class="meta">
           <i class="tags icon"></i>
           
-            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+            <a title="All pages tagged 'Haskell'." href="../tags/Haskell.html">Haskell</a>, <a title="All pages tagged 'Performance'." href="../tags/Performance.html">Performance</a>, <a title="All pages tagged 'Hexy Tutorial'." href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
           
         </div>
       </div>
@@ -112,183 +112,183 @@
   </div>
   <h3 id="recap">Recap</h3>
 <p>In the <a href="../posts/2017-08-11-writing-performant-haskell-part-3.html">previous post</a>, we applied GHC’s <code>SPECIALIZE</code> pragma for some nice performance gains. Our API looked like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-
-<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span></code></pre></div>
 <p>After we went specialize-happy, the <a href="../html/writing-performant-haskell-part-3-bench.html">benchmark report</a>’s summary looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-3-bench-summary.png"></p>
 <p>We shaved off anywhere from about 100 to 160 nanoseconds for each of the functions in <code>Hexy</code>’s public API. In this post, we will revisit our usage of <code>Builder</code> and do a brief dive into strictness.</p>
 <h3 id="builder-bewildered"><code>Builder</code> Bewildered</h3>
 <p>Our <code>xbuildStorable</code> and <code>xbuilduStorable</code> functions are doing something strange:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">xbuildStorable v <span class="fu">=</span> zeroPaddedHex <span class="fu">.</span> buildHex <span class="dt">Char</span><span class="fu">.</span>intToDigit <span class="fu">$</span> v
- <span class="kw">where</span>
-  zeroPaddedHex hex <span class="fu">=</span> go numPadCharsNeeded hex
-   <span class="kw">where</span>
-    go <span class="dv">0</span> b <span class="fu">=</span> b
-    go n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="fu">&lt;&gt;</span> b)
-    numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> hexLength
-    lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf v
-    <span class="co">-- Hmm...</span>
-    hexLength <span class="fu">=</span> Text.Lazy.length <span class="fu">.</span> Text.Lazy.Builder.toLazyText <span class="fu">$</span> hex</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>xbuildStorable v <span class="ot">=</span> zeroPaddedHex <span class="op">.</span> buildHex <span class="dt">Char</span><span class="op">.</span><span class="fu">intToDigit</span> <span class="op">$</span> v</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a> <span class="kw">where</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  zeroPaddedHex hex <span class="ot">=</span> go numPadCharsNeeded hex</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>   <span class="kw">where</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>    go <span class="dv">0</span> b <span class="ot">=</span> b</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    go n b <span class="ot">=</span> go (n <span class="op">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="op">&lt;&gt;</span> b)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>    numPadCharsNeeded <span class="ot">=</span> lengthWithoutPrefix <span class="op">-</span> hexLength</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>    lengthWithoutPrefix <span class="ot">=</span> <span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dv">2</span> <span class="op">*</span> Storable.sizeOf v</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>    <span class="co">-- Hmm...</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    hexLength <span class="ot">=</span> Text.Lazy.length <span class="op">.</span> Text.Lazy.Builder.toLazyText <span class="op">$</span> hex</span></code></pre></div>
 <p>We are calculating the length of the <code>Builder</code> by converting it to a lazy <code>Text</code> and then getting the lazy <code>Text</code> value’s length. This was purely out of convenience as we cannot know a <code>Builder</code> value’s length from the <code>Builder</code> value alone. <code>text-show</code> has a <a href="https://hackage.haskell.org/package/text-show-3.4.1.1/docs/src/TextShow-Utils.html#lengthB"><code>lengthB</code></a> helper function that does the same thing. Still, this is unnecessary and we can do better.</p>
 <p>One way to solve for this is to add a new internal data type:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">LengthTrackingBuilder</span> a <span class="fu">=</span> <span class="dt">LengthTrackingBuilder</span> a <span class="dt">Builder</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">LengthTrackingBuilder</span> a <span class="ot">=</span> <span class="dt">LengthTrackingBuilder</span> a <span class="dt">Builder</span></span></code></pre></div>
 <p>Our <code>LengthTrackingBuilder</code> is parameterized for all values of <code>a</code>. The new data type wraps an <code>a</code> and a <code>Builder</code>. Our <code>a</code>’s will be counters that we manually update anytime we add to the <code>Builder</code>. The <code>a</code>’s will wind up being the same type as the value we convert to hex.</p>
 <p>We update our <code>buildHex</code> and <code>buildWordAtBase</code> functions to use the <code>LengthTrackingBuilder</code> instead of the vanilla <code>Builder</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">buildHex ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-buildHex <span class="fu">=</span> buildWordAtBase <span class="dv">16</span>
-
-<span class="ot">buildWordAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-buildWordAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> buildIt (quotRem n0 base) (<span class="dt">LengthTrackingBuilder</span> <span class="dv">1</span> mempty)
-     <span class="kw">where</span>
-      buildIt (n, d) (<span class="dt">LengthTrackingBuilder</span> l b) <span class="fu">=</span> seq c <span class="fu">$</span> <span class="co">-- stricter than necessary</span>
-        <span class="kw">case</span> n <span class="kw">of</span>
-          <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> l b'
-          _ <span class="ot">-&gt;</span> buildIt (quotRem n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="fu">+</span> l) b')
-       <span class="kw">where</span>
-        c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-        b' <span class="fu">=</span> Text.Lazy.Builder.singleton c <span class="fu">&lt;&gt;</span> b</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">buildHex ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>buildHex <span class="ot">=</span> buildWordAtBase <span class="dv">16</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="ot">buildWordAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>buildWordAtBase base toChr n0</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> buildIt (<span class="fu">quotRem</span> n0 base) (<span class="dt">LengthTrackingBuilder</span> <span class="dv">1</span> <span class="fu">mempty</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>     <span class="kw">where</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>      buildIt (n, d) (<span class="dt">LengthTrackingBuilder</span> l b) <span class="ot">=</span> <span class="fu">seq</span> c <span class="op">$</span> <span class="co">-- stricter than necessary</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>        <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>          <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> l b'</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>          _ <span class="ot">-&gt;</span> buildIt (<span class="fu">quotRem</span> n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="op">+</span> l) b')</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>       <span class="kw">where</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>        c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>        b' <span class="ot">=</span> Text.Lazy.Builder.singleton c <span class="op">&lt;&gt;</span> b</span></code></pre></div>
 <p><code>buildWordAtBase</code>’s flow is exactly the same as before except now it does some extra bookkeeping to bump the counter in the <code>LengthTrackingBuilder</code>.</p>
 <p>We will pull out <code>zeroPaddedHex</code> into a top-level function:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">zeroPaddedHex ::</span> (<span class="dt">Integral</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> <span class="dt">LengthTrackingBuilder</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-zeroPaddedHex (<span class="dt">LengthTrackingBuilder</span> len hex) <span class="fu">=</span> go numPadCharsNeeded hex
- <span class="kw">where</span>
-  go <span class="dv">0</span> b <span class="fu">=</span> b
-  go n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="fu">&lt;&gt;</span> b)
-  numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> len
-  lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf len</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">zeroPaddedHex ::</span> (<span class="dt">Integral</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> <span class="dt">LengthTrackingBuilder</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>zeroPaddedHex (<span class="dt">LengthTrackingBuilder</span> len hex) <span class="ot">=</span> go numPadCharsNeeded hex</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a> <span class="kw">where</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>  go <span class="dv">0</span> b <span class="ot">=</span> b</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>  go n b <span class="ot">=</span> go (n <span class="op">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="op">&lt;&gt;</span> b)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>  numPadCharsNeeded <span class="ot">=</span> lengthWithoutPrefix <span class="op">-</span> len</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  lengthWithoutPrefix <span class="ot">=</span> <span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dv">2</span> <span class="op">*</span> Storable.sizeOf len</span></code></pre></div>
 <p><code>zeroPaddedHex</code> now takes a <code>LengthTrackingBuilder a</code> as input and returns a vanilla <code>Builder</code>. All we need the length for is calculating how many remaining <code>'0'</code> characters we need to pad the hex string. The length is not important to us after the string is padded.</p>
 <p>Now <code>xbuildStorable</code> and <code>xbuilduStorable</code> are pretty concise. They make <code>buildHex</code> and <code>zeroPaddedHex</code> do all the work!</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-xbuildStorable <span class="fu">=</span> zeroPaddedHex <span class="fu">.</span> buildHex <span class="dt">Char</span><span class="fu">.</span>intToDigit
-
-<span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-xbuilduStorable <span class="fu">=</span> zeroPaddedHex <span class="fu">.</span> buildHex (<span class="dt">Char</span><span class="fu">.</span>toUpper <span class="fu">.</span> <span class="dt">Char</span><span class="fu">.</span>intToDigit)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ot">xbuildStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>xbuildStorable <span class="ot">=</span> zeroPaddedHex <span class="op">.</span> buildHex <span class="dt">Char</span><span class="op">.</span><span class="fu">intToDigit</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="ot">xbuilduStorable ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>xbuilduStorable <span class="ot">=</span> zeroPaddedHex <span class="op">.</span> buildHex (<span class="dt">Char</span><span class="op">.</span><span class="fu">toUpper</span> <span class="op">.</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">intToDigit</span>)</span></code></pre></div>
 <h3 id="test-check">Test Check</h3>
 <p>Our public API has not changed so our unit tests do not need to be updated. Feel free to run them to make sure they still pass!</p>
 <h3 id="performance-check">Performance Check</h3>
 <p>In the previous post, our <a href="../html/writing-performant-haskell-part-3-bench.html">benchmark results</a> looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-3-bench-summary.png"></p>
 <p>Let’s run the benchmarks again:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></span></code></pre></div>
 <p>View the full report from this run <a href="../html/writing-performant-haskell-part-4-bench-1.html">here</a>. The summary looks like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-4-bench-1-summary.png"></p>
 <p>Nice! Those are some serious performance gains and the <a href="https://github.com/jship/hexy/commit/e3530765891768a98a4718c9c80ec2727f909145">code update</a> was pretty minor. Every function is now faster by at least 100 nanoseconds, and a few of the functions are faster by close to 200 nanoseconds! Our functions are getting ever closer to the performance of <code>showHex</code> and they are doing more work via zero padding.</p>
 <h3 id="laziness">Laziness</h3>
 <p>Haskell is a non-strict language. We touched on this a bit in the <a href="../posts/2017-08-09-writing-performant-haskell-part-1.html">first post</a> when we talked about normal form and weak head normal form. This <a href="http://chimera.labs.oreilly.com/books/1230000000929/ch02.html#sec_par-eval-whnf">section</a> of Simon Marlow’s <em>Parallel and Concurrent Programming in Haskell</em> is a great reference on how laziness works in GHC. Computations like <code>let y = 3 - 2</code> are not evaluated until they are actually needed somewhere. <code>y</code> points to a “thunk” created for the <code>(-)</code> function. As Simon Marlow defines it, a thunk is an “object in memory representing an unevaluted computation”. The thunk has pointers to each of its arguments. If no parts of our code ever demand the value of <code>y</code>, the thunk will remain unevaluated.</p>
 <p>This means we can write code like this (though just because we can does not mean we should!):</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">printThatInt ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printThatInt _ <span class="fu">=</span> putStrLn <span class="st">&quot;No int for you!&quot;</span>
-
-<span class="ot">main ::</span> <span class="dt">IO</span> ()
-main <span class="fu">=</span> <span class="kw">do</span>
-  printThatInt <span class="dv">42</span>
-  printThatInt undefined
-  printThatInt (error <span class="st">&quot;I'ma crash yer program...&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ot">printThatInt ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>printThatInt _ <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;No int for you!&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>main <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>  printThatInt <span class="dv">42</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>  printThatInt <span class="fu">undefined</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>  printThatInt (<span class="fu">error</span> <span class="st">&quot;I'ma crash yer program...&quot;</span>)</span></code></pre></div>
 <p>If we run the <code>main</code> function, the program does not crash or throw an exception. <code>main</code> outputs:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">No</span> int for you!
-<span class="ex">No</span> int for you!
-<span class="ex">No</span> int for you!</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">No</span> int for you!</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="ex">No</span> int for you!</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="ex">No</span> int for you!</span></code></pre></div>
 <p>We used <code>_</code> in <code>printThatInt</code> to ignore the argument. Turns out we are not just ignoring the argument - we are flat out not evaluating the argument!</p>
 <p>What if we instead wrote <code>printThatInt</code> like this?</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">printThatInt ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()
-printThatInt <span class="dv">3</span> <span class="fu">=</span> putStrLn <span class="st">&quot;What a nice number! Sorry, but I keep it!&quot;</span>
-printThatInt _ <span class="fu">=</span> putStrLn <span class="st">&quot;No int for you!&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="ot">printThatInt ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> ()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>printThatInt <span class="dv">3</span> <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;What a nice number! Sorry, but I keep it!&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>printThatInt _ <span class="ot">=</span> <span class="fu">putStrLn</span> <span class="st">&quot;No int for you!&quot;</span></span></code></pre></div>
 <p>Running <code>main</code> would output:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">No</span> int for you!
-<span class="ex">***</span> Exception: Prelude.undefined</code></pre></div>
-<p>By adding a pattern match for the value <code>3</code>, we have made <code>printThatInt</code> strict in its argument. The <code>Int</code> value coming into the function must be fully evaluated to see if it is <code>3</code> or not. When we pass in <code>undefined</code> or <code>error &quot;I'ma crash yer program...&quot;</code>, they are evaluated and spell certain death for our program.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="ex">No</span> int for you!</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="ex">***</span> Exception: Prelude.undefined</span></code></pre></div>
+<p>By adding a pattern match for the value <code>3</code>, we have made <code>printThatInt</code> strict in its argument. The <code>Int</code> value coming into the function must be fully evaluated to see if it is <code>3</code> or not. When we pass in <code>undefined</code> or <code>error "I'ma crash yer program..."</code>, they are evaluated and spell certain death for our program.</p>
 <h3 id="strictness-annotations">Strictness Annotations</h3>
 <p>Laziness can hurt performance - particularly when accumulators are involved. Here is the definition of <code>buildWordAtBase</code> again:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">buildWordAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-buildWordAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> buildIt (quotRem n0 base) (<span class="dt">LengthTrackingBuilder</span> <span class="dv">1</span> mempty)
-     <span class="kw">where</span>
-      buildIt (n, d) (<span class="dt">LengthTrackingBuilder</span> l b) <span class="fu">=</span> seq c <span class="fu">$</span> <span class="co">-- stricter than necessary</span>
-        <span class="kw">case</span> n <span class="kw">of</span>
-          <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> l b'
-          _ <span class="ot">-&gt;</span> buildIt (quotRem n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="fu">+</span> l) b') <span class="co">-- here there be thunks!</span>
-       <span class="kw">where</span>
-        c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-        b' <span class="fu">=</span> Text.Lazy.Builder.singleton c <span class="fu">&lt;&gt;</span> b</code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ot">buildWordAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> a</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>buildWordAtBase base toChr n0</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.buildWordAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> buildIt (<span class="fu">quotRem</span> n0 base) (<span class="dt">LengthTrackingBuilder</span> <span class="dv">1</span> <span class="fu">mempty</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a>     <span class="kw">where</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a>      buildIt (n, d) (<span class="dt">LengthTrackingBuilder</span> l b) <span class="ot">=</span> <span class="fu">seq</span> c <span class="op">$</span> <span class="co">-- stricter than necessary</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a>        <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a>          <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="dt">LengthTrackingBuilder</span> l b'</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a>          _ <span class="ot">-&gt;</span> buildIt (<span class="fu">quotRem</span> n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="op">+</span> l) b') <span class="co">-- here there be thunks!</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a>       <span class="kw">where</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a>        c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a>        b' <span class="ot">=</span> Text.Lazy.Builder.singleton c <span class="op">&lt;&gt;</span> b</span></code></pre></div>
 <p>The line we care about:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">_ <span class="ot">-&gt;</span> buildIt (quotRem n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="fu">+</span> l) b') <span class="co">-- here there be thunks!</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>_ <span class="ot">-&gt;</span> buildIt (<span class="fu">quotRem</span> n base) (<span class="dt">LengthTrackingBuilder</span> (<span class="dv">1</span> <span class="op">+</span> l) b') <span class="co">-- here there be thunks!</span></span></code></pre></div>
 <p>This is the recursive call to <code>buildIt</code>. The second parameter we pass to <code>buildIt</code> is a new <code>LengthTrackingBuilder</code> with the updated length and <code>Builder</code> value.</p>
 <p>It turns out we can do slightly better. The length update - the <code>(1 + l)</code> bit - creates a thunk for the <code>(+)</code> computation on every subsequent invocation of <code>buildIt</code>. What we are actually passing to <code>buildIt</code> is more like <code>LengthTrackingBuilder &lt;addition_thunk&gt; b</code>. Our code does not evaluate all the additions until <code>zeroPaddedHex</code> demands the length value so it can get to work. Don’t worry about a similar thunk representation for the <code>Builder</code> value - we are only concerned with accumulators here.</p>
 <p>The new <code>LengthTrackingBuilder</code> data type we introduced could instead be defined like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">LengthTrackingBuilder</span> a <span class="fu">=</span> <span class="dt">LengthTrackingBuilder</span> <span class="fu">!</span>a <span class="dt">Builder</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="kw">data</span> <span class="dt">LengthTrackingBuilder</span> a <span class="ot">=</span> <span class="dt">LengthTrackingBuilder</span> <span class="op">!</span>a <span class="dt">Builder</span></span></code></pre></div>
 <p>This is a single character change to the definition we introduced previously. We added an exclamation mark in front of the counter type in the data constructor. This exclamation mark is called a <a href="https://wiki.haskell.org/Performance/Data_types#Strict_fields">strictness annotation</a>. We can use strictness annotations on fields to indicate those fields must be fully evaluated when a value of our data type is constructed.</p>
 <p>This should give us a minor performance improvement, but we will not be able to tell a difference with our current benchmarks. Our benchmark suite looks like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
-main <span class="fu">=</span> defaultMain
-  [ bgroup <span class="st">&quot;Word32&quot;</span>
-    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
-    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf   (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span>
-    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="fu">$</span> whnf xbuild   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="fu">$</span> whnf xbuildu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf   xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf   xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf   xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf   xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf   xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf   xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf   xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf   xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    ]
-  ]</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>main <span class="ot">=</span> defaultMain</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>  [ bgroup <span class="st">&quot;Word32&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>    [ bench <span class="st">&quot;printf&quot;</span>   <span class="op">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>    , bench <span class="st">&quot;showHex&quot;</span>  <span class="op">$</span> nf   (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="op">$</span> whnf xbuild   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="op">$</span> whnf xbuildu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="op">$</span> nf   xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="op">$</span> nf   xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="op">$</span> nf   xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="op">$</span> nf   xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true"></a>    , bench <span class="st">&quot;xshow&quot;</span>    <span class="op">$</span> nf   xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="op">$</span> nf   xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="op">$</span> nf   xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="op">$</span> nf   xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true"></a>    ]</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true"></a>  ]</span></code></pre></div>
 <p>If we think about this, the length accumulator in <code>buildWordAtBase</code> is only going to involve a couple thunks since the resulting hex string will have length <code>2</code> not counting the zero padding. Evaluating a couple thunks in this case is very cheap. We would not notice much of a difference (if at all) with and without the strictness annotation. Feel free to try it and see for yourself!</p>
 <p>We will add a <code>Word64</code> group to our benchmark suite:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
-main <span class="fu">=</span> defaultMain
-  [ bgroup <span class="st">&quot;Word32&quot;</span>
-    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span>
-    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf   (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span>
-    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="fu">$</span> whnf xbuild   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="fu">$</span> whnf xbuildu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf   xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf   xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf   xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf   xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf   xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf   xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf   xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf   xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)
-    ]
-  , bgroup <span class="st">&quot;Word64&quot;</span>
-    [ bench <span class="st">&quot;printf&quot;</span>   <span class="fu">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word64</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1234567812345678</span>
-    , bench <span class="st">&quot;showHex&quot;</span>  <span class="fu">$</span> nf   (showHex (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)) <span class="st">&quot;&quot;</span>
-    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="fu">$</span> whnf xbuild   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="fu">$</span> whnf xbuildu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="fu">$</span> nf   xshowl   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="fu">$</span> nf   xshowlp  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="fu">$</span> nf   xshowlu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="fu">$</span> nf   xshowlpu (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshow&quot;</span>    <span class="fu">$</span> nf   xshow    (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="fu">$</span> nf   xshowp   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="fu">$</span> nf   xshowu   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="fu">$</span> nf   xshowpu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)
-    ]
-  ]</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="ot">main ::</span> <span class="dt">IO</span> ()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>main <span class="ot">=</span> defaultMain</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>  [ bgroup <span class="st">&quot;Word32&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>    [ bench <span class="st">&quot;printf&quot;</span>   <span class="op">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word32</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1f</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>    , bench <span class="st">&quot;showHex&quot;</span>  <span class="op">$</span> nf   (showHex (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)) <span class="st">&quot;&quot;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="op">$</span> whnf xbuild   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="op">$</span> whnf xbuildu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="op">$</span> nf   xshowl   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="op">$</span> nf   xshowlp  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="op">$</span> nf   xshowlu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="op">$</span> nf   xshowlpu (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a>    , bench <span class="st">&quot;xshow&quot;</span>    <span class="op">$</span> nf   xshow    (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="op">$</span> nf   xshowp   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="op">$</span> nf   xshowu   (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="op">$</span> nf   xshowpu  (<span class="bn">0x1f</span><span class="ot"> ::</span> <span class="dt">Word32</span>)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a>    ]</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a>  , bgroup <span class="st">&quot;Word64&quot;</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a>    [ bench <span class="st">&quot;printf&quot;</span>   <span class="op">$</span> nf   (printf <span class="st">&quot;%08x&quot;</span><span class="ot"> ::</span> <span class="dt">Word64</span> <span class="ot">-&gt;</span> <span class="dt">String</span>) <span class="bn">0x1234567812345678</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a>    , bench <span class="st">&quot;showHex&quot;</span>  <span class="op">$</span> nf   (showHex (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)) <span class="st">&quot;&quot;</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuild&quot;</span>   <span class="op">$</span> whnf xbuild   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a>    , bench <span class="st">&quot;xbuildu&quot;</span>  <span class="op">$</span> whnf xbuildu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowl&quot;</span>   <span class="op">$</span> nf   xshowl   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlp&quot;</span>  <span class="op">$</span> nf   xshowlp  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlu&quot;</span>  <span class="op">$</span> nf   xshowlu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowlpu&quot;</span> <span class="op">$</span> nf   xshowlpu (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true"></a>    , bench <span class="st">&quot;xshow&quot;</span>    <span class="op">$</span> nf   xshow    (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowp&quot;</span>   <span class="op">$</span> nf   xshowp   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowu&quot;</span>   <span class="op">$</span> nf   xshowu   (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true"></a>    , bench <span class="st">&quot;xshowpu&quot;</span>  <span class="op">$</span> nf   xshowpu  (<span class="bn">0x1234567812345678</span><span class="ot"> ::</span> <span class="dt">Word64</span>)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true"></a>    ]</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true"></a>  ]</span></code></pre></div>
 <p>Passing in a value like <code>0x1234567812345678</code> means all the work will be in <code>buildWordAtBase</code> instead of <code>zeroPadHex</code>, which results in more accumulator thunks.</p>
 <p>We will run our benchmarks first without the strictness annotation.</p>
 <p>View the full report from the run without the strictness annotation <a href="../html/writing-performant-haskell-part-4-bench-2.html">here</a>. The summary looks like this:</p>
@@ -299,21 +299,21 @@ main <span class="fu">=</span> defaultMain
 <p>Johan Tibell <a href="https://github.com/tibbe/haskell-style-guide/blob/0d4fea64a87195192faa376696ea094d1aed4baa/haskell-style.md#data-types">encourages</a> marking all constructor fields as strict unless we have a specific reason to make them lazy. I feel this is excellent advice!</p>
 <h3 id="bangpatterns"><code>BangPatterns</code></h3>
 <p>GHC provides a language extension called <a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html?highlight=bangpatterns#ghc-flag--XBangPatterns"><code>BangPatterns</code></a> and it can be enabled like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span></code></pre></div>
 <p>This extension lets you add strictness annotations on function arguments similarly to how we added one to the counter field in the <code>LengthTrackingBuilder</code> data constructor. Knowing this, we will turn our attention to the <code>go</code> function within <code>zeroPadHex</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">zeroPaddedHex (<span class="dt">LengthTrackingBuilder</span> len hex) <span class="fu">=</span> go numPadCharsNeeded hex
- <span class="kw">where</span>
-  go <span class="dv">0</span> b <span class="fu">=</span> b
-  go n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="fu">&lt;&gt;</span> b)
-  numPadCharsNeeded <span class="fu">=</span> lengthWithoutPrefix <span class="fu">-</span> len
-  lengthWithoutPrefix <span class="fu">=</span> fromIntegral <span class="fu">$</span> <span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf len</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>zeroPaddedHex (<span class="dt">LengthTrackingBuilder</span> len hex) <span class="ot">=</span> go numPadCharsNeeded hex</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a> <span class="kw">where</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a>  go <span class="dv">0</span> b <span class="ot">=</span> b</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a>  go n b <span class="ot">=</span> go (n <span class="op">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="op">&lt;&gt;</span> b)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>  numPadCharsNeeded <span class="ot">=</span> lengthWithoutPrefix <span class="op">-</span> len</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a>  lengthWithoutPrefix <span class="ot">=</span> <span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dv">2</span> <span class="op">*</span> Storable.sizeOf len</span></code></pre></div>
 <p>Haskellers bitten with “strictness paranoia” may think a function like <code>go</code> should look like this to be strict in its first argument:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span>
-
-<span class="co">-- ...</span>
-
-go <span class="dv">0</span> b <span class="fu">=</span> b
-go <span class="fu">!</span>n b <span class="fu">=</span> go (n <span class="fu">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="fu">&lt;&gt;</span> b)</code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a><span class="co">-- ...</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a>go <span class="dv">0</span> b <span class="ot">=</span> b</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a>go <span class="op">!</span>n b <span class="ot">=</span> go (n <span class="op">-</span> <span class="dv">1</span>) (Text.Lazy.Builder.singleton <span class="ch">'0'</span> <span class="op">&lt;&gt;</span> b)</span></code></pre></div>
 <p>We added a bang pattern (i.e. strictness annotation) to <code>n</code> to say “<code>n</code> should be fully evaluated”. The way our function is written, this bang pattern is redundant. <code>go</code> has a similar structure to the second version of the <code>printThatInt</code> function we introduced earlier. The pattern match check for a value of <code>0</code> means the function is already strict in its first argument. The bang pattern in this case will not give us any better performance!</p>
 <p>I am specifically mentioning the example above because I am no stranger to “strictness paranoia”. I have dished out plenty of unnecessary bang patterns!</p>
 <p>For a quick example of where the <code>BangPatterns</code> extension can be useful, have a look at this <a href="https://github.com/tibbe/haskell-style-guide/blob/0d4fea64a87195192faa376696ea094d1aed4baa/haskell-style.md#functions">section</a> of Johan Tibell’s Haskell style guide. Oliver Charles has a great blog post about <code>BangPatterns</code> <a href="https://ocharles.org.uk/blog/posts/2014-12-05-bang-patterns.html">here</a> too.</p>

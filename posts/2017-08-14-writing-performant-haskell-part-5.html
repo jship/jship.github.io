@@ -104,7 +104,7 @@
         <div class="meta">
           <i class="tags icon"></i>
           
-            <a href="../tags/Haskell.html">Haskell</a>, <a href="../tags/Performance.html">Performance</a>, <a href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
+            <a title="All pages tagged 'Haskell'." href="../tags/Haskell.html">Haskell</a>, <a title="All pages tagged 'Performance'." href="../tags/Performance.html">Performance</a>, <a title="All pages tagged 'Hexy Tutorial'." href="../tags/Hexy%20Tutorial.html">Hexy Tutorial</a>
           
         </div>
       </div>
@@ -123,183 +123,183 @@ Thanks to <a href="https://www.reddit.com/user/bos">/u/bos</a> and <a href="http
 </div>
 <h3 id="recap">Recap</h3>
 <p>In the <a href="../posts/2017-08-12-writing-performant-haskell-part-4.html">previous post</a>, we improved our usage of <code>Builder</code> by introducing a new data type that kept track of a <code>Builder</code> value and its length. We also learned a bit about strictness. Our API looked like this:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-<span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span>
-
-<span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">  xbuild ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">  xbuildu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Builder</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ot">xshow ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="ot">xshowp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="ot">xshowu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="ot">xshowpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="ot">xshowl ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="ot">xshowlp ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="ot">xshowlu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="ot">xshowlpu ::</span> <span class="dt">HexShow</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span></code></pre></div>
 <p>After we improved our usage of <code>Builder</code>, the <a href="../html/writing-performant-haskell-part-4-bench-4.html">benchmark report</a>’s summary looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-4-bench-4-summary.png"></p>
 <p>We chopped off anywhere from roughly 100 to 200 nanoseconds for each of the functions in <code>Hexy</code>’s public API.</p>
 <p>In this post, we finally return to the proposition from the <a href="../posts/2017-08-10-writing-performant-haskell-part-2.html">second post</a> that using <code>text</code> gives us more optimization flexibility. We will dive into the internals of the <code>text</code> package and hopefully come out with some seriously fast functions.</p>
 <h3 id="text-and-arrays"><code>text</code> and Arrays</h3>
 <p>The <code>text</code> package is using packed arrays under the hood. As a reminder, a strict <code>Text</code> is a packed array, while a lazy <code>Text</code> is a list of packed arrays. If arrays drive <code>text</code>’s performance, it sure would be nice if we could make like a C programmer and <code>malloc</code> precisely the amount of storage we need for our hex strings:</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span>
-<span class="pp">#include </span><span class="im">&lt;string.h&gt;</span>
-
-<span class="dt">const</span> <span class="dt">char</span>* xbuild(<span class="dt">uint32_t</span> v)
-{
-  <span class="dt">char</span>* s = malloc(<span class="dv">2</span> * <span class="kw">sizeof</span>(v) + <span class="dv">1</span>);
-  <span class="co">// implementation details...</span>
-  <span class="cf">return</span> s;
-}</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdint.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="pp">#include </span><span class="im">&lt;string.h&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="dt">const</span> <span class="dt">char</span>* xbuild(<span class="dt">uint32_t</span> v)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>{</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  <span class="dt">char</span>* s = malloc(<span class="dv">2</span> * <span class="kw">sizeof</span>(v) + <span class="dv">1</span>);</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>  <span class="co">// implementation details...</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="cf">return</span> s;</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This would allow us to work on fixed-size buffers and the contents of each buffer would be contiguous in memory. An approach like this directly opposes the API we have built so far. Our API leverages <code>Builder</code> and dynamically builds up the hex strings. The user then chooses whether they want a <code>Builder</code> value, a strict <code>Text</code> value, or a lazy <code>Text</code> value. For all instances of our <code>HexShow</code> typeclass, we know exactly how much storage we need for the result strings: Twice the size in bytes of the input type, and maybe a couple characters for the <code>0x</code> prefix. We are not taking full advantage of this knowledge.</p>
 <p>Let’s dig down into the internals of <code>text</code> - I promise we will maintain most of our sanity!</p>
 <h3 id="evolving-the-api">Evolving the API</h3>
 <p>If we want to get away from <code>Builder</code> and move to manually allocating storage for strict <code>Text</code> values, we need to alter our API. We will scrap returning <code>Builder</code> altogether:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-<span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-
-  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span></span></code></pre></div>
 <p>We have also bundled all our functions under the <code>HexShow</code> typeclass. To implement instances, we only need to implement <code>xshowp</code> and <code>xshowpu</code> then we will get the rest of the functions for free. Remember that <code>xshowp</code> converts its input to a lowercase hex string, zero-padded based on the size of the input type, and prefixed with <code>0x</code>. <code>xshowpu</code> is identical to <code>xshowp</code> except its returned hex string is uppercase.</p>
 <p>In a way, we have turned our API upside-down. Previously, we were building the zero-padded hex string and then, if needed, tacking on the <code>0x</code> prefix. Now we are requiring that instances implement the functions to build the full zero-padded, <code>0x</code>-prefixed hex string and then instances will get the remaining variants for free.</p>
 <p>This is in line with our goal of allocating just the amount of space we need for the hex string. Going ahead and allocating for the 2 additonal <code>0x</code> prefix characters regardless of whether or not our users want to use the prefix variants will save us from a possible reallocation for the prefix later.</p>
 <p>Sometimes we have to make breaking API changes in the name of performance!</p>
 <h3 id="internal-implementation">Internal Implementation</h3>
 <p>Let’s get to hacking on <code>Hexy.Internal</code>. The extremely interesting top portion of the module:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE BangPatterns #-}</span>
-
-<span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span>
-
-<span class="kw">import </span><span class="dt">Control.Monad.ST</span> (<span class="dt">ST</span>)
-<span class="kw">import qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span>
-<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)
-<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Array</span> <span class="kw">as</span> <span class="dt">Text.Array</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal</span> <span class="kw">as</span> <span class="dt">Text.Internal</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal.Private</span> <span class="kw">as</span> <span class="dt">Text.Internal.Private</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Internal.Unsafe.Char</span> <span class="kw">as</span> <span class="dt">Text.Internal.Unsafe.Char</span>
-<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
-<span class="kw">import </span><span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))
-<span class="kw">import qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ot">{-# LANGUAGE BangPatterns #-}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">module</span> <span class="dt">Hexy.Internal</span> <span class="kw">where</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Control.Monad.ST</span> (<span class="dt">ST</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Char</span> <span class="kw">as</span> <span class="dt">Char</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int8</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Array</span> <span class="kw">as</span> <span class="dt">Text.Array</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Internal</span> <span class="kw">as</span> <span class="dt">Text.Internal</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Internal.Private</span> <span class="kw">as</span> <span class="dt">Text.Internal.Private</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Internal.Unsafe.Char</span> <span class="kw">as</span> <span class="dt">Text.Internal.Unsafe.Char</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Foreign.Storable</span> (<span class="dt">Storable</span>(..))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Foreign.Storable</span> <span class="kw">as</span> <span class="dt">Storable</span></span></code></pre></div>
 <p>Below we have a couple new functions that will be core to implementing our <code>HexShow</code> typeclass instances:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">showHexTextLower ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-showHexTextLower <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitLower
-
-<span class="ot">showHexTextUpper ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-showHexTextUpper <span class="fu">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitUpper</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ot">showHexTextLower ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>showHexTextLower <span class="ot">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitLower</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="ot">showHexTextUpper ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>showHexTextUpper <span class="ot">=</span> textShowIntAtBase <span class="dv">16</span> intToDigitUpper</span></code></pre></div>
 <p>Note that unlike <code>xbuild</code> and <code>xbuildu</code>, these are returning strict <code>Text</code> values.</p>
 <p>Let’s go ahead and define those lowercase and uppercase functions:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
-intToDigitLower i
-  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'0'</span> <span class="fu">+</span> i)
-  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'a'</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="fu">++</span> show i)
-
-<span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>
-intToDigitUpper i
-  <span class="fu">|</span> i <span class="fu">&gt;=</span>  <span class="dv">0</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span>  <span class="dv">9</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'0'</span> <span class="fu">+</span> i)
-  <span class="fu">|</span> i <span class="fu">&gt;=</span> <span class="dv">10</span> <span class="fu">&amp;&amp;</span> i <span class="fu">&lt;=</span> <span class="dv">15</span> <span class="fu">=</span> Text.Internal.Unsafe.Char.unsafeChr (fromIntegral <span class="fu">$</span> <span class="dt">Char</span><span class="fu">.</span>ord <span class="ch">'A'</span> <span class="fu">+</span> i <span class="fu">-</span> <span class="dv">10</span>)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="fu">++</span> show i)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ot">intToDigitLower ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>intToDigitLower i</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  <span class="op">|</span> i <span class="op">&gt;=</span>  <span class="dv">0</span> <span class="op">&amp;&amp;</span> i <span class="op">&lt;=</span>  <span class="dv">9</span> <span class="ot">=</span> Text.Internal.Unsafe.Char.unsafeChr (<span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">ord</span> <span class="ch">'0'</span> <span class="op">+</span> i)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>  <span class="op">|</span> i <span class="op">&gt;=</span> <span class="dv">10</span> <span class="op">&amp;&amp;</span> i <span class="op">&lt;=</span> <span class="dv">15</span> <span class="ot">=</span> Text.Internal.Unsafe.Char.unsafeChr (<span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">ord</span> <span class="ch">'a'</span> <span class="op">+</span> i <span class="op">-</span> <span class="dv">10</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitLower: not a digit &quot;</span> <span class="op">++</span> <span class="fu">show</span> i)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="ot">intToDigitUpper ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>intToDigitUpper i</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>  <span class="op">|</span> i <span class="op">&gt;=</span>  <span class="dv">0</span> <span class="op">&amp;&amp;</span> i <span class="op">&lt;=</span>  <span class="dv">9</span> <span class="ot">=</span> Text.Internal.Unsafe.Char.unsafeChr (<span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">ord</span> <span class="ch">'0'</span> <span class="op">+</span> i)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>  <span class="op">|</span> i <span class="op">&gt;=</span> <span class="dv">10</span> <span class="op">&amp;&amp;</span> i <span class="op">&lt;=</span> <span class="dv">15</span> <span class="ot">=</span> Text.Internal.Unsafe.Char.unsafeChr (<span class="fu">fromIntegral</span> <span class="op">$</span> <span class="dt">Char</span><span class="op">.</span><span class="fu">ord</span> <span class="ch">'A'</span> <span class="op">+</span> i <span class="op">-</span> <span class="dv">10</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.intToDigitUpper: not a digit &quot;</span> <span class="op">++</span> <span class="fu">show</span> i)</span></code></pre></div>
 <p><code>intToDigitLower</code> is a slightly modified copy of the <code>intToDigit</code> function from <code>base</code>’s <code>Data.Char</code> module. These functions are comparing the input value against the inclusive 0-9 range and the inclusive 10-15 range. Depending upon which range the input value is in, the function returns the ASCII-adjusted hex <code>Char</code> representation of the <code>Int</code> value.</p>
 <p>The <code>unsafeChr</code> function from <code>text</code> converts its input <code>Word16</code> to a <code>Char</code> value - there is no bounds checking. Think of <code>unsafeChr</code> like a cast from C:</p>
-<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="dt">int</span> i = <span class="dv">42</span>;
-<span class="dt">char</span> c = (<span class="dt">char</span>) i;</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="dt">int</span> i = <span class="dv">42</span>;</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="dt">char</span> c = (<span class="dt">char</span>) i;</span></code></pre></div>
 <p>Now we will implement our most important function:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="kw">let</span> zeroPadLoop i
-            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
-            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
-                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span>
-                zeroPadLoop i'
-      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
-      k <span class="ot">&lt;-</span> zeroPadLoop j
-      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span>
-      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span>
-      done buffer size</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>      <span class="kw">let</span> zeroPadLoop i</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a>            <span class="op">|</span> i <span class="op">&lt;</span> <span class="dv">2</span> <span class="ot">=</span> <span class="fu">pure</span> i</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a>            <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a>                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a>                zeroPadLoop i'</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>      j <span class="ot">&lt;-</span> hexLoop (size <span class="op">-</span> <span class="dv">1</span>) (<span class="fu">quotRem</span> n0 base)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a>      k <span class="ot">&lt;-</span> zeroPadLoop j</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a>      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a>      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>      done buffer size</span></code></pre></div>
 <p><code>textShowIntAtBase</code> looks a good bit different from the previous incarnation’s <code>buildWordAtBase</code> and is a lot to take in. We will break this down.</p>
 <p>Our 2 initial guards are identical to the <code>buildWordAtBase</code> version:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span></code></pre></div>
 <p>The <code>otherwise</code> guard is where things get interesting:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="co">-- ...</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>      <span class="co">-- ...</span></span></code></pre></div>
 <p>The <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Private.html#runText"><code>runText</code></a> function is coming from the internals of the <code>text</code> package. Haskell libaries (including <code>Hexy</code>!) often provide a clear divide between what is the public API and what is internal to the library. “Internal to the library” means the functions are used in the library but are not necessarily expected to be used by clients of the library. Any internal modules are subject to change and may not respect invariants so if we decide to use them, we must do so at our own risk!</p>
 <p>Package modules are conventionally marked as internal modules via placing them under a subdirectory called <code>Internal</code> or being housed entirely in a <code>Internal.hs</code> module. Authors generally still export these internal modules for client use so users can, for example, eke out more performance or use the package in ways the authors never anticipated. If you are authoring a package, note that choosing to not export internal modules is generally frowned upon in the community as it can limit what users can do with your package.</p>
 <p>Fortunately for us, the internal modules in <code>text</code> are exported and clearly marked with an <code>Internal</code> somewhere in the module name, i.e.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Data.Text.Internal</span>
-<span class="dt">Data.Text.Internal.Fusion</span>
-<span class="dt">Data.Text.Lazy.Internal</span>
-<span class="co">-- and so on...</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="dt">Data.Text.Internal</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="dt">Data.Text.Internal.Fusion</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="dt">Data.Text.Lazy.Internal</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">-- and so on...</span></span></code></pre></div>
 <p>Have a look at the <a href="https://hackage.haskell.org/package/text">docs</a> to see the various internal modules.</p>
 <p>What does <code>runText</code> do though? Let’s start with its type:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <p>That type is notably scary and gives rise to a few questions. What is an <code>MArray</code>? What is <code>ST</code>? Why is there a <code>forall s</code>?</p>
 <p>At a high level, <code>runText</code> is taking in 1 gnarly parameter and returning a strict <code>Text</code> value. We should break this down further:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                             <span class="dt">The</span> output value, a strict <span class="ot">`Text`</span> <span class="fu">-------+</span>
-                                                                      <span class="fu">|</span>
-                                                                      v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>                             <span class="dt">The</span> output value, a strict <span class="ot">`Text`</span> <span class="op">-------+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>                                                                      <span class="op">|</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>                                                                      v</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">           <span class="fu">+-------</span> <span class="dt">The</span> single gnarly input value, this is a
-           <span class="fu">|</span>        function we define
-           v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>           <span class="op">+-------</span> <span class="dt">The</span> single gnarly input value, this is a</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>           <span class="op">|</span>        function we define</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>           v</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> function we define must produce a strict <span class="dt">Text</span> <span class="fu">------+</span>
-<span class="kw">in</span> the <span class="dt">ST</span> monad                                         <span class="fu">|</span>
-                                                        v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="dt">The</span> function we define must produce a strict <span class="dt">Text</span> <span class="op">------+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="kw">in</span> the <span class="dt">ST</span> monad                                         <span class="op">|</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>                                                        v</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                      <span class="fu">+-------</span> <span class="dt">Utility</span> function that is passed to the function
-                      <span class="fu">|</span>        we define<span class="fu">.</span> <span class="dt">We</span> call this at the end <span class="kw">of</span> the
-                      <span class="fu">|</span>        function we define to get our <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>,
-                      <span class="fu">|</span>        hence why we named it <span class="ch">'done'</span> above<span class="fu">.</span>
-                      v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>                      <span class="op">+-------</span> <span class="dt">Utility</span> function that is passed to the function</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>                      <span class="op">|</span>        we define<span class="op">.</span> <span class="dt">We</span> call this at the end <span class="kw">of</span> the</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>                      <span class="op">|</span>        function we define to get our <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>                      <span class="op">|</span>        hence why we named it 'done' above<span class="op">.</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>                      v</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                       <span class="fu">+-------</span> <span class="dt">The</span> mutable array we must build <span class="kw">in</span> the
-                       <span class="fu">|</span>        function we define
-                       v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>                       <span class="op">+-------</span> <span class="dt">The</span> mutable array we must build <span class="kw">in</span> the</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>                       <span class="op">|</span>        function we define</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>                       v</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> length <span class="kw">of</span> the mutable array <span class="fu">---+</span>
-                                   <span class="fu">|</span>
-                                   v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="dt">The</span> <span class="fu">length</span> <span class="kw">of</span> the mutable array <span class="op">---+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>                                   <span class="op">|</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a>                                   v</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">The</span> utility function returns the <span class="fu">---------+</span>
-result <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>                         <span class="fu">|</span>
-                                          v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="dt">The</span> utility function returns the <span class="op">---------+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>result <span class="dt">Text</span> <span class="kw">in</span> <span class="dt">ST</span>                         <span class="op">|</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>                                          v</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">                   <span class="fu">+-------</span> <span class="dt">Phantom</span> <span class="kw">type</span> for the <span class="dt">ST</span> monad that prevents
-                   <span class="fu">|</span>        the internal state from being accessible
-                   <span class="fu">|</span>        outside <span class="kw">of</span> the computation
-                   v
-<span class="ot">runText ::</span> (forall s<span class="fu">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a>                   <span class="op">+-------</span> <span class="dt">Phantom</span> <span class="kw">type</span> for the <span class="dt">ST</span> monad that prevents</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a>                   <span class="op">|</span>        the internal state from being accessible</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a>                   <span class="op">|</span>        outside <span class="kw">of</span> the computation</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a>                   v</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a><span class="ot">runText ::</span> (<span class="kw">forall</span> s<span class="op">.</span> (<span class="dt">MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Text</span>) <span class="ot">-&gt;</span> <span class="dt">Text</span></span></code></pre></div>
 <hr />
 <p>We will not go into details in this blog post series on how the <code>ST</code> monad works, so try not to get hung up on the <code>s</code> type parameter. For our purposes, it suffices to think of <code>ST</code> as a <code>State</code> monad that allows for in-place mutation. Unlike when we are in <code>IO</code>, the mutation we do in <code>ST</code> is not externally visible to other parts of our program, so extracting results from <code>ST</code> is pure.</p>
 <p>The mutation we are doing is on <code>MArray s</code> values. These are mutable arrays <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/Data-Text-Array.html">provided</a> by the <code>text</code> package.</p>
@@ -310,198 +310,198 @@ Look out world! We are about to put on our imperative Haskell hats.
 </p>
 </div>
 <p>Let’s view a bit more of our <code>textShowIntAtBase</code>. The first thing we do is determine the array size we will need. The only difference in our size calculation now versus the one from previous posts is that we now add <code>2</code> to account for the <code>0x</code> prefix:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>Now we allocate an array with the computed size and bind it to <code>buffer</code>. The type of <code>new</code> is <code>Int -&gt; ST s (MArray s)</code>. We give it an <code>Int</code> value representing the size of the array we want and it spits out an uninitialized array of that size.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>We then define a <code>hexLoop</code> function with type <code>Int -&gt; (a, a) -&gt; ST s Int</code>. <code>hexLoop</code> is the spiritual successor to <a href="https://github.com/jship/hexy/blob/e3530765891768a98a4718c9c80ec2727f909145/library/Hexy/Internal.hs#L92"><code>buildIt</code></a> from the previous post. It takes in a write index and the current <code>quotRem</code> result, and in-place writes to <code>buffer</code> as it <code>quotRem</code>’s down <code>n0</code>. It uses a function we have not defined yet - <code>unsafeWriteRev</code> - to write each character. <code>unsafeWriteRev</code> returns the write index given to it minus 1, hence the <code>...Rev</code> suffix. We are writing to the array from back to front. When <code>hexLoop</code> is done, it returns the next index to begin writing to for zero-padding.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>Next, we define a <code>zeroPadLoop</code> function with type <code>Int -&gt; ST s Int</code>. <code>zeroPadLoop</code> recursively fills the rest of the array with <code>'0'</code> characters, going from where <code>hexLoop</code> will leave off. <code>zeroPadLoop</code> stops before writing to index 0 and 1, as that is where the <code>0x</code> prefix will be written. When <code>zeroPadLoop</code> is done, it returns the next index to begin writing to for the <code>0x</code> prefix.</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="kw">let</span> zeroPadLoop i
-            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
-            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
-                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span>
-                zeroPadLoop i'
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true"></a>      <span class="kw">let</span> zeroPadLoop i</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true"></a>            <span class="op">|</span> i <span class="op">&lt;</span> <span class="dv">2</span> <span class="ot">=</span> <span class="fu">pure</span> i</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true"></a>            <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true"></a>                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true"></a>                zeroPadLoop i'</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>Let’s call our <code>hexLoop</code> and <code>zeroPadLoop</code> functions, making sure to respect the write indices they return:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="kw">let</span> zeroPadLoop i
-            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
-            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
-                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span>
-                zeroPadLoop i'
-      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
-      k <span class="ot">&lt;-</span> zeroPadLoop j
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true"></a>      <span class="kw">let</span> zeroPadLoop i</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true"></a>            <span class="op">|</span> i <span class="op">&lt;</span> <span class="dv">2</span> <span class="ot">=</span> <span class="fu">pure</span> i</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true"></a>            <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true"></a>                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true"></a>                zeroPadLoop i'</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true"></a>      j <span class="ot">&lt;-</span> hexLoop (size <span class="op">-</span> <span class="dv">1</span>) (<span class="fu">quotRem</span> n0 base)</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true"></a>      k <span class="ot">&lt;-</span> zeroPadLoop j</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>Now we will write the <code>0x</code> prefix, respecting write indices from <code>unsafeWriteRev</code>:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="kw">let</span> zeroPadLoop i
-            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
-            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
-                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span>
-                zeroPadLoop i'
-      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
-      k <span class="ot">&lt;-</span> zeroPadLoop j
-      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span>
-      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span>
-      <span class="co">-- implementation details...</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true"></a>      <span class="kw">let</span> zeroPadLoop i</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true"></a>            <span class="op">|</span> i <span class="op">&lt;</span> <span class="dv">2</span> <span class="ot">=</span> <span class="fu">pure</span> i</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true"></a>            <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true"></a>                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true"></a>                zeroPadLoop i'</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true"></a>      j <span class="ot">&lt;-</span> hexLoop (size <span class="op">-</span> <span class="dv">1</span>) (<span class="fu">quotRem</span> n0 base)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true"></a>      k <span class="ot">&lt;-</span> zeroPadLoop j</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true"></a>      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true"></a>      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true"></a>      <span class="co">-- implementation details...</span></span></code></pre></div>
 <p>The final bit we need to complete our function is to call the <code>done</code> utility passed into our function. This <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text-Internal-Private.html#runText">utility function</a> will “freeze” up the mutable array we give it, i.e. converting it into an immutable array. It then creates a <code>Text</code> for us in <code>ST</code> using the immutable array and the size:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-<span class="co">-- a bunch of SPECIALIZE pragmas...</span>
-textShowIntAtBase base toChr n0
-  <span class="fu">|</span> base <span class="fu">&lt;=</span> <span class="dv">1</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="fu">++</span> show base)
-  <span class="fu">|</span> n0   <span class="fu">&lt;</span>  <span class="dv">0</span> <span class="fu">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="fu">++</span> show n0)
-  <span class="fu">|</span> otherwise <span class="fu">=</span> Text.Internal.Private.runText <span class="fu">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span>
-      <span class="kw">let</span> <span class="fu">!</span>size <span class="fu">=</span> <span class="dv">2</span> <span class="fu">+</span> (<span class="dv">2</span> <span class="fu">*</span> Storable.sizeOf n0)
-      buffer <span class="ot">&lt;-</span> Text.Array.new size
-      <span class="kw">let</span> hexLoop i (n, d) <span class="fu">=</span> <span class="kw">do</span>
-            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c
-            <span class="kw">case</span> n <span class="kw">of</span>
-              <span class="dv">0</span> <span class="ot">-&gt;</span> pure i'
-              _ <span class="ot">-&gt;</span> hexLoop i' (quotRem n base)
-           <span class="kw">where</span>
-            c <span class="fu">=</span> toChr <span class="fu">$</span> fromIntegral d
-      <span class="kw">let</span> zeroPadLoop i
-            <span class="fu">|</span> i <span class="fu">&lt;</span> <span class="dv">2</span> <span class="fu">=</span> pure i
-            <span class="fu">|</span> otherwise <span class="fu">=</span> <span class="kw">do</span>
-                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span>
-                zeroPadLoop i'
-      j <span class="ot">&lt;-</span> hexLoop (size <span class="fu">-</span> <span class="dv">1</span>) (quotRem n0 base)
-      k <span class="ot">&lt;-</span> zeroPadLoop j
-      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span>
-      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span>
-      done buffer size  <span class="co">-- done :: MArray s -&gt; Int -&gt; ST s Text</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="ot">textShowIntAtBase ::</span> (<span class="dt">Integral</span> a, <span class="dt">Show</span> a, <span class="dt">Storable</span> a) <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> (<span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span>) <span class="ot">-&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true"></a><span class="co">-- a bunch of SPECIALIZE pragmas...</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true"></a>textShowIntAtBase base toChr n0</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true"></a>  <span class="op">|</span> base <span class="op">&lt;=</span> <span class="dv">1</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to unsupported base &quot;</span> <span class="op">++</span> <span class="fu">show</span> base)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true"></a>  <span class="op">|</span> n0   <span class="op">&lt;</span>  <span class="dv">0</span> <span class="ot">=</span> errorWithoutStackTrace (<span class="st">&quot;Hexy.Internal.textShowIntAtBase: applied to negative number &quot;</span> <span class="op">++</span> <span class="fu">show</span> n0)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true"></a>  <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> Text.Internal.Private.runText <span class="op">$</span> \done <span class="ot">-&gt;</span> <span class="kw">do</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true"></a>      <span class="kw">let</span> <span class="op">!</span>size <span class="ot">=</span> <span class="dv">2</span> <span class="op">+</span> (<span class="dv">2</span> <span class="op">*</span> Storable.sizeOf n0)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true"></a>      buffer <span class="ot">&lt;-</span> Text.Array.new size</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true"></a>      <span class="kw">let</span> hexLoop i (n, d) <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true"></a>            i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i c</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true"></a>            <span class="kw">case</span> n <span class="kw">of</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true"></a>              <span class="dv">0</span> <span class="ot">-&gt;</span> <span class="fu">pure</span> i'</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true"></a>              _ <span class="ot">-&gt;</span> hexLoop i' (<span class="fu">quotRem</span> n base)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true"></a>           <span class="kw">where</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true"></a>            c <span class="ot">=</span> toChr <span class="op">$</span> <span class="fu">fromIntegral</span> d</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true"></a>      <span class="kw">let</span> zeroPadLoop i</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true"></a>            <span class="op">|</span> i <span class="op">&lt;</span> <span class="dv">2</span> <span class="ot">=</span> <span class="fu">pure</span> i</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true"></a>            <span class="op">|</span> <span class="fu">otherwise</span> <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true"></a>                i' <span class="ot">&lt;-</span> unsafeWriteRev buffer i <span class="ch">'0'</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true"></a>                zeroPadLoop i'</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true"></a>      j <span class="ot">&lt;-</span> hexLoop (size <span class="op">-</span> <span class="dv">1</span>) (<span class="fu">quotRem</span> n0 base)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true"></a>      k <span class="ot">&lt;-</span> zeroPadLoop j</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true"></a>      l <span class="ot">&lt;-</span> unsafeWriteRev buffer k <span class="ch">'x'</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true"></a>      _ <span class="ot">&lt;-</span> unsafeWriteRev buffer l <span class="ch">'0'</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true"></a>      done buffer size  <span class="co">-- done :: MArray s -&gt; Int -&gt; ST s Text</span></span></code></pre></div>
 <p>Below is the definition for <code>unsafeWriteRev</code>. It uses <code>unsafeWrite</code> from <code>text</code> and then returns the preceding write index:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeWriteRev ::</span> <span class="dt">Text.Array.MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Int</span>
-unsafeWriteRev buffer i c <span class="fu">=</span> <span class="kw">do</span>
-  Text.Array.unsafeWrite buffer i (fromIntegral (Text.Internal.Unsafe.Char.ord c))
-  pure (i <span class="fu">-</span> <span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a><span class="ot">unsafeWriteRev ::</span> <span class="dt">Text.Array.MArray</span> s <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">ST</span> s <span class="dt">Int</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true"></a>unsafeWriteRev buffer i c <span class="ot">=</span> <span class="kw">do</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true"></a>  Text.Array.unsafeWrite buffer i (<span class="fu">fromIntegral</span> (Text.Internal.Unsafe.Char.ord c))</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true"></a>  <span class="fu">pure</span> (i <span class="op">-</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>The last piece of functionality we need to complete our <code>Hexy.Internal</code> module is a means to drop the hex prefix, for use by functions like <code>xshow</code> and <code>xshowu</code>. Here we will use the internal constructor for strict <code>Text</code> values, which takes an immutable array, an offset into the array, and the length of the array:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">unsafeDropHexPrefix ::</span> <span class="dt">Text.Text</span> <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-unsafeDropHexPrefix (<span class="dt">Text.Internal.Text</span> arr _ len) <span class="fu">=</span> <span class="dt">Text.Internal.Text</span> arr <span class="dv">2</span> (len <span class="fu">-</span> <span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="ot">unsafeDropHexPrefix ::</span> <span class="dt">Text.Text</span> <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a>unsafeDropHexPrefix (<span class="dt">Text.Internal.Text</span> arr _ len) <span class="ot">=</span> <span class="dt">Text.Internal.Text</span> arr <span class="dv">2</span> (len <span class="op">-</span> <span class="dv">2</span>)</span></code></pre></div>
 <p>Note that we could have used <code>Data.Text</code>’s <a href="https://hackage.haskell.org/package/text-1.2.2.1/docs/src/Data-Text.html#drop"><code>drop</code></a> function from <code>text</code>’s public API, but the above definition should be a bit faster. Try benchmarking the two different functions to see if there is any difference.</p>
 <h3 id="public-api">Public API</h3>
 <p>We will need to update our public API in the <code>Hexy</code> module to use our new internal functions:</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">module</span> <span class="dt">Hexy</span>
-  ( <span class="dt">HexShow</span>(<span class="fu">..</span>)
-  ) <span class="kw">where</span>
-
-<span class="kw">import </span><span class="dt">Hexy.Internal</span> (showHexTextLower, showHexTextUpper, unsafeDropHexPrefix)
-
-<span class="kw">import </span><span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>, <span class="dt">Int8</span>)
-<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span>
-<span class="kw">import qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">Text.Lazy</span>
-<span class="kw">import </span><span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)
-
-<span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span>
-<span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-  xshow <span class="fu">=</span> unsafeDropHexPrefix <span class="fu">.</span> xshowp
-
-<span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-
-<span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-  xshowu <span class="fu">=</span> unsafeDropHexPrefix <span class="fu">.</span> xshowpu
-
-<span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span>
-
-<span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-  xshowl <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshow
-
-<span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-  xshowlp <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowp
-
-<span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-  xshowlu <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowu
-
-<span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span>
-  xshowlpu <span class="fu">=</span> Text.Lazy.fromStrict <span class="fu">.</span> xshowpu
-
-  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span>
-
-<span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span>
-  xshowp  <span class="fu">=</span> showHexTextLower
-  xshowpu <span class="fu">=</span> showHexTextUpper
-
-<span class="co">-- remaining instances</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="kw">module</span> <span class="dt">Hexy</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a>  ( <span class="dt">HexShow</span>(<span class="op">..</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a>  ) <span class="kw">where</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Hexy.Internal</span> (showHexTextLower, showHexTextUpper, unsafeDropHexPrefix)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Int</span> (<span class="dt">Int</span>, <span class="dt">Int16</span>, <span class="dt">Int32</span>, <span class="dt">Int64</span>, <span class="dt">Int8</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">Text</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true"></a><span class="kw">import</span> <span class="kw">qualified</span> <span class="dt">Data.Text.Lazy</span> <span class="kw">as</span> <span class="dt">Text.Lazy</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true"></a><span class="kw">import</span> <span class="dt">Data.Word</span> (<span class="dt">Word</span>, <span class="dt">Word8</span>, <span class="dt">Word16</span>, <span class="dt">Word32</span>, <span class="dt">Word64</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true"></a><span class="kw">class</span> <span class="dt">HexShow</span> a <span class="kw">where</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true"></a><span class="ot">  xshow ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true"></a>  xshow <span class="ot">=</span> unsafeDropHexPrefix <span class="op">.</span> xshowp</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true"></a><span class="ot">  xshowp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true"></a><span class="ot">  xshowu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true"></a>  xshowu <span class="ot">=</span> unsafeDropHexPrefix <span class="op">.</span> xshowpu</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true"></a></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true"></a><span class="ot">  xshowpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Text</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true"></a></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true"></a><span class="ot">  xshowl ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true"></a>  xshowl <span class="ot">=</span> Text.Lazy.fromStrict <span class="op">.</span> xshow</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true"></a></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true"></a><span class="ot">  xshowlp ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true"></a>  xshowlp <span class="ot">=</span> Text.Lazy.fromStrict <span class="op">.</span> xshowp</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true"></a></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true"></a><span class="ot">  xshowlu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true"></a>  xshowlu <span class="ot">=</span> Text.Lazy.fromStrict <span class="op">.</span> xshowu</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true"></a></span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true"></a><span class="ot">  xshowlpu ::</span> a <span class="ot">-&gt;</span> <span class="dt">Text.Lazy.Text</span></span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true"></a>  xshowlpu <span class="ot">=</span> Text.Lazy.fromStrict <span class="op">.</span> xshowpu</span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true"></a></span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true"></a>  <span class="ot">{-# MINIMAL xshowp, xshowpu #-}</span></span>
+<span id="cb30-36"><a href="#cb30-36" aria-hidden="true"></a></span>
+<span id="cb30-37"><a href="#cb30-37" aria-hidden="true"></a><span class="kw">instance</span> <span class="dt">HexShow</span> <span class="dt">Word32</span> <span class="kw">where</span></span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true"></a>  xshowp  <span class="ot">=</span> showHexTextLower</span>
+<span id="cb30-39"><a href="#cb30-39" aria-hidden="true"></a>  xshowpu <span class="ot">=</span> showHexTextUpper</span>
+<span id="cb30-40"><a href="#cb30-40" aria-hidden="true"></a></span>
+<span id="cb30-41"><a href="#cb30-41" aria-hidden="true"></a><span class="co">-- remaining instances</span></span></code></pre></div>
 <h3 id="test-check">Test Check</h3>
 <p>Our public API has changed so our unit tests need some work. Have a look at the full test suite on <a href="https://github.com/jship/hexy/blob/23321173371a5bfa77459f366ede8e9b2c05a5a3/test-suite/Test/HexyTest.hs">GitHub</a> if you like.</p>
 <h3 id="performance-check">Performance Check</h3>
 <p>In the previous post, our <a href="../html/writing-performant-haskell-part-4-bench-4.html">benchmark results</a> looked like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-4-bench-4-summary.png"></p>
 <p>Let’s run the benchmarks again:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a>$ <span class="ex">stack</span> bench --benchmark-arguments <span class="st">&quot;--output bench.html&quot;</span></span></code></pre></div>
 <p>View the full report from this run <a href="../html/writing-performant-haskell-part-5-bench.html">here</a>. The summary looks like this:</p>
 <p><img class="ui fluid image" src="../images/writing-performant-haskell-part-5-bench-summary.png"></p>
 <p>This is our greatest performance improvement yet - all of our functions clock in at approximately 50 nanoseconds! They are roughly 5 times faster than their previous iterations. Our users can call either the strict or the lazy variants with no penalty. Furthermore, our functions are about 2.65 times faster than <code>base</code>’s <code>showHex</code> and are doing more work via zero-padding and prefixing with <code>0x</code></p>
