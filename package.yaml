@@ -3,13 +3,13 @@ version: 0.1.0.0
 category: Web
 author: Jason Shipman
 maintainer: jasonpshipman@gmail.com
-copyright: 2017 (C) Jason Shipman
+copyright: 2017-2020 (C) Jason Shipman
 license: BSD3
 homepage: https://github.com/jship/stub#readme
 extra-source-files:
 - README.md
 dependencies:
-- base >=4.7 && <5
+- base
 - filepath
 - hakyll
 executables:
